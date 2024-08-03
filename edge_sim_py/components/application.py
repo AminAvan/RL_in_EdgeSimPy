@@ -46,7 +46,7 @@ class Application(ComponentManager, Agent):
         self.unique_id = None
 
     def _to_dict(self) -> dict:
-        """Method that overrides the way the object is formatted to JSON."
+        """Method that overrides the way the object is formatted to JSON.
 
         Returns:
             dict: JSON-friendly representation of the object as a dictionary.
