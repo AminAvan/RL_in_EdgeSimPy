@@ -191,9 +191,10 @@ class User(ComponentManager, Agent):
             for path in self.communication_paths[str(app.id)]:
                 delay += topology.calculate_path_delay(path=[NetworkSwitch.find_by_id(i) for i in path])
 
+            # time it takes for the app (service) to be executed in the edge server and return to user
             if metric.lower() == "response time":
-                # We assume that Response Time = Latency * 2
-                delay = delay * 2
+                execution_time = app.execution_time_on_edge_server  # Replace with the actual method/attribute
+                delay = (delay * 2) + execution_time
 
         # Updating application delay inside user's 'applications' attribute
         self.delays[str(app.id)] = delay
