@@ -200,11 +200,12 @@ class User(ComponentManager, Agent):
             # response time: total time for application service to execute on edge server & return result to the user
             # response time = (communication delay) + (time it takes for the app to be executed on edge server)
             if metric.lower() == "response time":
-                self.application_execution_time[str(app.id)] = app.execution_time
+                self.application_execution_time[str(app.id)] = app.services[0].server.execution_time_of_service[str(self.id)]
                 self.response_time[str(app.id)] = (delay * 2) + self.application_execution_time[str(app.id)]
-                print(f"response time of application {app.id} for user {self.id} is {self.response_time[str(app.id)]}")
-                print(f"delay of application {app.id} for user {self.id} is {delay}")
-                print()
+
+        print(f"response time={self.response_time[str(app.id)]}")
+        print(f"delay={delay}")
+        print()
 
         # Updating application delay inside user's 'applications' attribute
         self.delays[str(app.id)] = delay
