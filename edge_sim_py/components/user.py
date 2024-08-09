@@ -61,6 +61,10 @@ class User(ComponentManager, Agent):
         self.delays = {}
         self.delay_slas = {}
 
+        # Calculates the application's execution time and the corresponding response time perceived by the user
+        self.application_execution_time = {}
+        self.response_time = {}
+
         # Model-specific attributes (defined inside the model's "initialize()" method)
         self.model = None
         self.unique_id = None
@@ -75,6 +79,7 @@ class User(ComponentManager, Agent):
         for app_id, access_pattern in self.access_patterns.items():
             access_patterns[app_id] = {"class": access_pattern.__class__.__name__, "id": access_pattern.id}
 
+        # maybe needed to add execution_time
         dictionary = {
             "attributes": {
                 "id": self.id,
@@ -107,6 +112,7 @@ class User(ComponentManager, Agent):
         for app in self.applications:
             access_history[str(app.id)] = self.access_patterns[str(app.id)].history
 
+        # maybe needed to add execution_time
         metrics = {
             "Instance ID": self.id,
             "Coordinates": self.coordinates,
@@ -191,10 +197,14 @@ class User(ComponentManager, Agent):
             for path in self.communication_paths[str(app.id)]:
                 delay += topology.calculate_path_delay(path=[NetworkSwitch.find_by_id(i) for i in path])
 
-            # time it takes for the app (service) to be executed in the edge server and return to user
+            # response time: total time for application service to execute on edge server & return result to the user
+            # response time = (communication delay) + (time it takes for the app to be executed on edge server)
             if metric.lower() == "response time":
-                execution_time = app.execution_time_on_edge_server  # Replace with the actual method/attribute
-                delay = (delay * 2) + execution_time
+                self.application_execution_time[str(app.id)] = app.execution_time
+                self.response_time[str(app.id)] = (delay * 2) + self.application_execution_time[str(app.id)]
+                print(f"response time of application {app.id} for user {self.id} is {self.response_time[str(app.id)]}")
+                print(f"delay of application {app.id} for user {self.id} is {delay}")
+                print()
 
         # Updating application delay inside user's 'applications' attribute
         self.delays[str(app.id)] = delay
@@ -253,8 +263,9 @@ class User(ComponentManager, Agent):
                 path = [[NetworkSwitch.find_by_id(i) for i in p] for p in self.communication_paths[str(app.id)]]
                 topology._allocate_communication_path(communication_path=path, app=app)
 
-        # Computing application's delay
-        self._compute_delay(app=app, metric="latency")
+        # Computing application's delay where 'metric' can be either "latency" or "response time"
+        # self._compute_delay(app=app, metric="latency") #was
+        self._compute_delay(app=app, metric="response time") #is
 
         return self.communication_paths[str(app.id)]
 

@@ -1,6 +1,7 @@
 """ Contains application-related functionality."""
 # EdgeSimPy components
 from edge_sim_py.component_manager import ComponentManager
+import random
 
 # Mesa modules
 from mesa import Agent
@@ -37,6 +38,9 @@ class Application(ComponentManager, Agent):
 
         # List of services that compose the application
         self.services = []
+
+        # Application execution time, now just prototype with randomNumber
+        self.execution_time = random.choice([i for i in range(1, 20) if i % 5 != 0])
 
         # List of users that access the application
         self.users = []
