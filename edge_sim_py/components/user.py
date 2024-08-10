@@ -203,10 +203,18 @@ class User(ComponentManager, Agent):
                 self.application_execution_time[str(app.id)] = app.services[0].server.execution_time_of_service[str(self.id)]
                 self.response_time[str(app.id)] = (delay * 2) + self.application_execution_time[str(app.id)]
 
-        print(f"response time={self.response_time[str(app.id)]}")
-        print(f"delay={delay}")
-        print()
+                print(f"response time of application {app.id} for user{self.id} = {self.response_time[str(app.id)]}")
+                print(f"deadline of user{self.id} = {self.delay_slas[str(app.id)]}")
 
+                # Calculates if the deadline is met or not
+                if (self.response_time[str(app.id)] <= self.delay_slas[str(app.id)]):
+                    print(f"meet.")
+                else:
+                    print(f"miss")
+
+
+        # print(f"delay={delay}")
+        print()
         # Updating application delay inside user's 'applications' attribute
         self.delays[str(app.id)] = delay
 

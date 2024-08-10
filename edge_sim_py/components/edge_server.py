@@ -90,6 +90,8 @@ class EdgeServer(ComponentManager, Agent):
         # Container registries and services hosted by the edge server
         self.container_registries = []
         self.services = []
+
+        # Execution time parameter for services regarding the host edge-server
         self.execution_time_of_service = {}
 
         # Container images and container layers hosted by the edge server
