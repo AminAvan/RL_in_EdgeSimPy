@@ -65,6 +65,9 @@ class User(ComponentManager, Agent):
         self.application_execution_time = {}
         self.response_time = {}
 
+        # List of metadata of meeting/missing the deadline of services for users
+        self.deadline_metadata = {}
+
         # Model-specific attributes (defined inside the model's "initialize()" method)
         self.model = None
         self.unique_id = None
@@ -118,6 +121,9 @@ class User(ComponentManager, Agent):
             "Coordinates": self.coordinates,
             "Base Station": f"{self.base_station} ({self.base_station.coordinates})" if self.base_station else None,
             "Delays": copy.deepcopy(self.delays),
+            "Required Deadline": self.delay_slas,
+            "Response Time": copy.deepcopy(self.response_time),
+            "Deadline Status": copy.deepcopy(self.deadline_metadata),
             "Communication Paths": copy.deepcopy(self.communication_paths),
             "Making Requests": copy.deepcopy(self.making_requests),
             "Access History": copy.deepcopy(access_history),
@@ -201,15 +207,17 @@ class User(ComponentManager, Agent):
             # response time = (communication delay) + (time it takes for the app to be executed on edge server)
             if metric.lower() == "response time":
                 self.application_execution_time[str(app.id)] = app.services[0].server.execution_time_of_service[str(self.id)]
-                self.response_time[str(app.id)] = (delay * 2) + self.application_execution_time[str(app.id)]
+                self.response_time[str(app.id)] = round(((delay * 2) + self.application_execution_time[str(app.id)]), 3)
 
                 print(f"response time of application {app.id} for user{self.id} = {self.response_time[str(app.id)]}")
                 print(f"deadline of user{self.id} = {self.delay_slas[str(app.id)]}")
 
                 # Calculates if the deadline is met or not
                 if (self.response_time[str(app.id)] <= self.delay_slas[str(app.id)]):
-                    print(f"meet.")
+                    self.deadline_metadata[str(app.id)] = "meet"
+                    print(f"meet")
                 else:
+                    self.deadline_metadata[str(app.id)] = "miss"
                     print(f"miss")
 
 
@@ -217,6 +225,7 @@ class User(ComponentManager, Agent):
         print()
         # Updating application delay inside user's 'applications' attribute
         self.delays[str(app.id)] = delay
+        print(self.deadline_metadata)
 
         return delay
 
@@ -273,8 +282,8 @@ class User(ComponentManager, Agent):
                 topology._allocate_communication_path(communication_path=path, app=app)
 
         # Computing application's delay where 'metric' can be either "latency" or "response time"
-        # self._compute_delay(app=app, metric="latency") #was
-        self._compute_delay(app=app, metric="response time") #is
+        # self._compute_delay(app=app, metric="latency") # for calculating the 'delay'
+        self._compute_delay(app=app, metric="response time") # for calculating the 'response time'
 
         return self.communication_paths[str(app.id)]
 
