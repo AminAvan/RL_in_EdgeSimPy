@@ -64,6 +64,7 @@ class User(ComponentManager, Agent):
         # Calculates the application's execution time and the corresponding response time perceived by the user
         self.application_execution_time = {}
         self.response_time = {}
+        self.round_trip_time = {}
 
         # List of metadata of meeting/missing the deadline of services for users
         self.deadline_metadata = {}
@@ -122,6 +123,8 @@ class User(ComponentManager, Agent):
             "Base Station": f"{self.base_station} ({self.base_station.coordinates})" if self.base_station else None,
             "Delays": copy.deepcopy(self.delays),
             "Required Deadline": self.delay_slas,
+            "Round Trip Time": self.round_trip_time,
+            "In Server Processing Time": self.application_execution_time,
             "Response Time": copy.deepcopy(self.response_time),
             "Deadline Status": copy.deepcopy(self.deadline_metadata),
             "Communication Paths": copy.deepcopy(self.communication_paths),
@@ -206,26 +209,25 @@ class User(ComponentManager, Agent):
             # response time: total time for application service to execute on edge server & return result to the user
             # response time = (communication delay) + (time it takes for the app to be executed on edge server)
             if metric.lower() == "response time":
-                self.application_execution_time[str(app.id)] = app.services[0].server.execution_time_of_service[str(self.id)]
-                self.response_time[str(app.id)] = round(((delay * 2) + self.application_execution_time[str(app.id)]), 3)
+                self.round_trip_time[str(app.id)] = (delay * 2)
+                self.application_execution_time[str(app.id)] = round(app.services[0].server.execution_time_of_service[str(self.id)], 3)
+                self.response_time[str(app.id)] = round((self.round_trip_time[str(app.id)] + self.application_execution_time[str(app.id)]), 3)
 
-                print(f"response time of application {app.id} for user{self.id} = {self.response_time[str(app.id)]}")
-                print(f"deadline of user{self.id} = {self.delay_slas[str(app.id)]}")
+                # print(f"response time of application {app.id} for user{self.id} = {self.response_time[str(app.id)]}")
+                # print(f"deadline of user{self.id} = {self.delay_slas[str(app.id)]}")
 
                 # Calculates if the deadline is met or not
                 if (self.response_time[str(app.id)] <= self.delay_slas[str(app.id)]):
                     self.deadline_metadata[str(app.id)] = "meet"
-                    print(f"meet")
+                    # print(f"meet")
                 else:
                     self.deadline_metadata[str(app.id)] = "miss"
-                    print(f"miss")
+                    # print(f"miss")
 
 
         # print(f"delay={delay}")
-        print()
         # Updating application delay inside user's 'applications' attribute
         self.delays[str(app.id)] = delay
-        print(self.deadline_metadata)
 
         return delay
 
