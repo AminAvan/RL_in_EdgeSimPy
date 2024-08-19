@@ -182,7 +182,7 @@ class User(ComponentManager, Agent):
                     self.communication_paths[str(application.id)] = []
                     self._compute_delay(app=application)
 
-    def _compute_delay(self, app: object, metric: str = "latency") -> int:
+    def _compute_delay(self, app: object, metric: str = "latency", app_service_index: int = 0) -> int:
         """Computes the delay of an application accessed by the user.
 
         Args:
@@ -209,29 +209,47 @@ class User(ComponentManager, Agent):
             # response time: total time for application service to execute on edge server & return result to the user
             # response time = (communication delay) + (time it takes for the app to be executed on edge server)
             if metric.lower() == "response time":
+                # calculate round trip time that is communication delay
                 self.round_trip_time[str(app.id)] = (delay * 2)
-                self.application_execution_time[str(app.id)] = round(app.services[0].server.execution_time_of_service[str(self.id)], 3)
-                self.response_time[str(app.id)] = round((self.round_trip_time[str(app.id)] + self.application_execution_time[str(app.id)]), 3)
 
-                # print(f"response time of application {app.id} for user{self.id} = {self.response_time[str(app.id)]}")
-                # print(f"deadline of user{self.id} = {self.delay_slas[str(app.id)]}")
+                # Checking the application to determine the maximum response time among multiple services
+                if (not self.response_time):
+                    # Initialize the response time to a very small number
+                    max_response_time = float('-inf')
+                else:
+                    # make max of response time of application with its current response time
+                    max_response_time = self.response_time[str(app.id)]
+
+                # calculate the response time of application when there are several services in the applications
+                for i in range(len(app.services)):
+                    if (app.services[i].id == app_service_index):
+
+                        # Calculating the execution time of each service on the EdgeServers
+                        self.application_execution_time[str(app.id)] = round(app.services[i].server.execution_time_of_service[str(app_service_index)], 5)
+
+                        # Since an application may consist of multiple services, we use the maximum service time as the application's response time
+                        # Calculate the current response time
+                        current_response_time = round((self.round_trip_time[str(app.id)] + self.application_execution_time[str(app.id)]), 5)
+
+                        ## Update the maximum response time if the current one is greater
+                        if current_response_time > max_response_time:
+                            max_response_time = current_response_time
+
+                # calculate the application's response time
+                self.response_time[str(app.id)] = round(max_response_time, 5)
 
                 # Calculates if the deadline is met or not
                 if (self.response_time[str(app.id)] <= self.delay_slas[str(app.id)]):
                     self.deadline_metadata[str(app.id)] = "meet"
-                    # print(f"meet")
                 else:
                     self.deadline_metadata[str(app.id)] = "miss"
-                    # print(f"miss")
 
-
-        # print(f"delay={delay}")
         # Updating application delay inside user's 'applications' attribute
         self.delays[str(app.id)] = delay
 
         return delay
 
-    def set_communication_path(self, app: object, communication_path: list = []) -> list:
+    def set_communication_path(self, app: object, communication_path: list = [], service_index: int = None) -> list:
         """Updates the set of links used during the communication of user and its application.
 
         Args:
@@ -285,7 +303,7 @@ class User(ComponentManager, Agent):
 
         # Computing application's delay where 'metric' can be either "latency" or "response time"
         # self._compute_delay(app=app, metric="latency") # for calculating the 'delay'
-        self._compute_delay(app=app, metric="response time") # for calculating the 'response time'
+        self._compute_delay(app=app, metric="response time", app_service_index=service_index) # for calculating the 'response time'
 
         return self.communication_paths[str(app.id)]
 

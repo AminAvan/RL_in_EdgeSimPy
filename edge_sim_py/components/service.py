@@ -247,7 +247,8 @@ class Service(ComponentManager, Agent):
                 app = self.application
                 users = app.users
                 for user in users:
-                    user.set_communication_path(app)
+                    # For applications that has more than one services, it is needed to send the service's id
+                    user.set_communication_path(app,service_index=self.id)
 
     def provision(self, target_server: object):
         """Starts the service's provisioning process. This process comprises both placement and migration. In the former, the
