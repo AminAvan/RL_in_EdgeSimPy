@@ -1,6 +1,7 @@
 """ Contains application-related functionality."""
 # EdgeSimPy components
 from edge_sim_py.component_manager import ComponentManager
+import random
 
 # Mesa modules
 from mesa import Agent
@@ -46,7 +47,7 @@ class Application(ComponentManager, Agent):
         self.unique_id = None
 
     def _to_dict(self) -> dict:
-        """Method that overrides the way the object is formatted to JSON."
+        """Method that overrides the way the object is formatted to JSON.
 
         Returns:
             dict: JSON-friendly representation of the object as a dictionary.

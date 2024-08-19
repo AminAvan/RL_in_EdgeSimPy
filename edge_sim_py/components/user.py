@@ -61,6 +61,14 @@ class User(ComponentManager, Agent):
         self.delays = {}
         self.delay_slas = {}
 
+        # Calculates the application's execution time and the corresponding response time perceived by the user
+        self.application_execution_time = {}
+        self.response_time = {}
+        self.round_trip_time = {}
+
+        # List of metadata of meeting/missing the deadline of services for users
+        self.deadline_metadata = {}
+
         # Model-specific attributes (defined inside the model's "initialize()" method)
         self.model = None
         self.unique_id = None
@@ -75,6 +83,7 @@ class User(ComponentManager, Agent):
         for app_id, access_pattern in self.access_patterns.items():
             access_patterns[app_id] = {"class": access_pattern.__class__.__name__, "id": access_pattern.id}
 
+        # maybe needed to add execution_time
         dictionary = {
             "attributes": {
                 "id": self.id,
@@ -107,11 +116,17 @@ class User(ComponentManager, Agent):
         for app in self.applications:
             access_history[str(app.id)] = self.access_patterns[str(app.id)].history
 
+        # maybe needed to add execution_time
         metrics = {
             "Instance ID": self.id,
             "Coordinates": self.coordinates,
             "Base Station": f"{self.base_station} ({self.base_station.coordinates})" if self.base_station else None,
             "Delays": copy.deepcopy(self.delays),
+            "Required Deadline": self.delay_slas,
+            "Round Trip Time": self.round_trip_time,
+            "In Server Processing Time": self.application_execution_time,
+            "Response Time": copy.deepcopy(self.response_time),
+            "Deadline Status": copy.deepcopy(self.deadline_metadata),
             "Communication Paths": copy.deepcopy(self.communication_paths),
             "Making Requests": copy.deepcopy(self.making_requests),
             "Access History": copy.deepcopy(access_history),
@@ -167,7 +182,7 @@ class User(ComponentManager, Agent):
                     self.communication_paths[str(application.id)] = []
                     self._compute_delay(app=application)
 
-    def _compute_delay(self, app: object, metric: str = "latency") -> int:
+    def _compute_delay(self, app: object, metric: str = "latency", app_service_index: int = 0) -> int:
         """Computes the delay of an application accessed by the user.
 
         Args:
@@ -191,16 +206,50 @@ class User(ComponentManager, Agent):
             for path in self.communication_paths[str(app.id)]:
                 delay += topology.calculate_path_delay(path=[NetworkSwitch.find_by_id(i) for i in path])
 
+            # response time: total time for application service to execute on edge server & return result to the user
+            # response time = (communication delay) + (time it takes for the app to be executed on edge server)
             if metric.lower() == "response time":
-                # We assume that Response Time = Latency * 2
-                delay = delay * 2
+                # calculate round trip time that is communication delay
+                self.round_trip_time[str(app.id)] = (delay * 2)
+
+                # Checking the application to determine the maximum response time among multiple services
+                if (not self.response_time):
+                    # Initialize the response time to a very small number
+                    max_response_time = float('-inf')
+                else:
+                    # make max of response time of application with its current response time
+                    max_response_time = self.response_time[str(app.id)]
+
+                # calculate the response time of application when there are several services in the applications
+                for i in range(len(app.services)):
+                    if (app.services[i].id == app_service_index):
+
+                        # Calculating the execution time of each service on the EdgeServers
+                        self.application_execution_time[str(app.id)] = round(app.services[i].server.execution_time_of_service[str(app_service_index)], 5)
+
+                        # Since an application may consist of multiple services, we use the maximum service time as the application's response time
+                        # Calculate the current response time
+                        current_response_time = round((self.round_trip_time[str(app.id)] + self.application_execution_time[str(app.id)]), 5)
+
+                        ## Update the maximum response time if the current one is greater
+                        if current_response_time > max_response_time:
+                            max_response_time = current_response_time
+
+                # calculate the application's response time
+                self.response_time[str(app.id)] = round(max_response_time, 5)
+
+                # Calculates if the deadline is met or not
+                if (self.response_time[str(app.id)] <= self.delay_slas[str(app.id)]):
+                    self.deadline_metadata[str(app.id)] = "meet"
+                else:
+                    self.deadline_metadata[str(app.id)] = "miss"
 
         # Updating application delay inside user's 'applications' attribute
         self.delays[str(app.id)] = delay
 
         return delay
 
-    def set_communication_path(self, app: object, communication_path: list = []) -> list:
+    def set_communication_path(self, app: object, communication_path: list = [], service_index: int = None) -> list:
         """Updates the set of links used during the communication of user and its application.
 
         Args:
@@ -252,8 +301,9 @@ class User(ComponentManager, Agent):
                 path = [[NetworkSwitch.find_by_id(i) for i in p] for p in self.communication_paths[str(app.id)]]
                 topology._allocate_communication_path(communication_path=path, app=app)
 
-        # Computing application's delay
-        self._compute_delay(app=app, metric="latency")
+        # Computing application's delay where 'metric' can be either "latency" or "response time"
+        # self._compute_delay(app=app, metric="latency") # for calculating the 'delay'
+        self._compute_delay(app=app, metric="response time", app_service_index=service_index) # for calculating the 'response time'
 
         return self.communication_paths[str(app.id)]
 

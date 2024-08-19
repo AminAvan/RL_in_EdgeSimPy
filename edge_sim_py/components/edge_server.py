@@ -91,6 +91,9 @@ class EdgeServer(ComponentManager, Agent):
         self.container_registries = []
         self.services = []
 
+        # Execution time parameter for services regarding the host edge-server
+        self.execution_time_of_service = {}
+
         # Container images and container layers hosted by the edge server
         self.container_images = []
         self.container_layers = []
@@ -238,7 +241,13 @@ class EdgeServer(ComponentManager, Agent):
         free_disk = self.disk - self.disk_demand
 
         # Checking if the host would have resources to host the registry and its (additional) layers
-        can_host = free_cpu >= service.cpu_demand and free_memory >= service.memory_demand and free_disk >= additional_disk_demand
+        if (free_cpu >= service.cpu_demand and free_memory >= service.memory_demand and free_disk >= additional_disk_demand):
+            # calculating true execution time of service on the host server
+            self.execution_time_of_service[str(service.id)] = ((service.memory_demand * service.cpu_demand) / (self.cpu * self.memory))
+            can_host = True
+        else:
+            can_host = False
+
         return can_host
 
     def _add_container_image(self, template_container_image: object) -> object:
