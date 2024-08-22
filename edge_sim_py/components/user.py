@@ -217,7 +217,11 @@ class User(ComponentManager, Agent):
                     # Initialize the response time to a very small number
                     max_response_time = float('-inf')
                 else:
-                    # make max of response time of application with its current response time
+                    # Set the response time of the application to the maximum between its current response time and
+                    # the response times of its services. For applications with more than one service
+                    # the condition (not self.response_time) is met for the first service, but for the second, third,
+                    # and subsequent services, this condition (else) continues to hold. As a result, the 'response time'
+                    # for a user will be the maximum 'response time' among its services.
                     max_response_time = self.response_time[str(app.id)]
 
                 # calculate the response time of application when there are several services in the applications
