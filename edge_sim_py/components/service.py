@@ -26,6 +26,7 @@ class Service(ComponentManager, Agent):
         label: str = "",
         cpu_demand: int = 0,
         memory_demand: int = 0,
+        processor_cycles_demand: int = 0,
         state: int = 0,
     ) -> object:
         """Creates a Service object.
@@ -36,6 +37,7 @@ class Service(ComponentManager, Agent):
             label (str, optional): Service label. Defaults to "".
             cpu_demand (int, optional): Service CPU demand. Defaults to 0.
             memory_demand (int, optional): Service Memory demand. Defaults to 0.
+            processor_cycles_demand (int, optional) : Service Processor cycles demand per bit. Defaults to 0.
             state (int, optional): Service state (0 for stateless services). Defaults to 0.
 
         Returns:
@@ -59,6 +61,7 @@ class Service(ComponentManager, Agent):
         # Service demand
         self.cpu_demand = cpu_demand
         self.memory_demand = memory_demand
+        self.processor_cycles_demand = (50_000 * 1024) # (per 1KB * 1024 KB) = cycles for 1MB
 
         # Service state
         self.state = state
@@ -97,6 +100,7 @@ class Service(ComponentManager, Agent):
                 "_available": self._available,
                 "cpu_demand": self.cpu_demand,
                 "memory_demand": self.memory_demand,
+                "processor_cycles_demand": self.processor_cycles_demand,
                 "image_digest": self.image_digest,
             },
             "relationships": {
@@ -167,6 +171,7 @@ class Service(ComponentManager, Agent):
                 if self.server:
                     self.server.cpu_demand -= self.cpu_demand
                     self.server.memory_demand -= self.memory_demand
+                    self.server.processor_cycles_demand -= self.processor_cycles_demand
 
                 # Once all service layers have been pulled, creates a ContainerImage object representing
                 # the service image on the target host if that host didn't already have such image
@@ -298,6 +303,7 @@ class Service(ComponentManager, Agent):
         target_server.ongoing_migrations += 1
         target_server.cpu_demand += self.cpu_demand
         target_server.memory_demand += self.memory_demand
+        target_server.processor_cycles_demand += self.processor_cycles_demand
 
         # Updating the service's migration status
         self._Service__migrations.append(

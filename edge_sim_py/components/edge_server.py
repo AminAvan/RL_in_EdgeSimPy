@@ -70,11 +70,13 @@ class EdgeServer(ComponentManager, Agent):
         self.cpu = cpu
         self.memory = memory
         self.disk = disk
+        self.processor_cycles = 2008 * 10**6  # MHz== 10^6 == million cycles per second
 
         # Edge server demand
         self.cpu_demand = 0
         self.memory_demand = 0
         self.disk_demand = 0
+        self.processor_cycles_demand = 0
 
         # Edge server's availability status
         self.available = True
@@ -126,6 +128,7 @@ class EdgeServer(ComponentManager, Agent):
                 "cpu_demand": self.cpu_demand,
                 "memory_demand": self.memory_demand,
                 "disk_demand": self.disk_demand,
+                "processor_cycles_demand": self.processor_cycles_demand,
                 "coordinates": self.coordinates,
                 "max_concurrent_layer_downloads": self.max_concurrent_layer_downloads,
                 "active": self.active,
@@ -163,6 +166,7 @@ class EdgeServer(ComponentManager, Agent):
             "CPU Demand": self.cpu_demand,
             "RAM Demand": self.memory_demand,
             "Disk Demand": self.disk_demand,
+            "Processor Cycles Demand": self.processor_cycles_demand,
             "Ongoing Migrations": self.ongoing_migrations,
             "Services": [service.id for service in self.services],
             "Registries": [registry.id for registry in self.container_registries],
@@ -239,11 +243,20 @@ class EdgeServer(ComponentManager, Agent):
         free_cpu = self.cpu - self.cpu_demand
         free_memory = self.memory - self.memory_demand
         free_disk = self.disk - self.disk_demand
+        free_processor_cycles_demand = self.processor_cycles - self.processor_cycles_demand
 
         # Checking if the host would have resources to host the registry and its (additional) layers
         if (free_cpu >= service.cpu_demand and free_memory >= service.memory_demand and free_disk >= additional_disk_demand):
             # calculating true execution time of service on the host server
-            self.execution_time_of_service[str(service.id)] = ((service.memory_demand * service.cpu_demand) / (self.cpu * self.memory))
+            self.execution_time_of_service[str(service.id)] = ((service.memory_demand * service.cpu_demand) / (free_cpu * free_memory))
+            test_exe_time = round(((service.processor_cycles_demand * service.memory_demand) / (free_processor_cycles_demand * free_cpu)), 2)
+            print(f"Execution time of service[{str(service.id)}] on server {self.id} is "
+                  f"{test_exe_time} sec")
+            print(f"service {str(service.id)} cycles demand: {service.processor_cycles_demand}")
+            print(f"service {str(service.id)} memory demand: {service.memory_demand}")
+            print(f"server {self.id} free processor cycles: {free_processor_cycles_demand}")
+            print(f"server {self.id} free cpu cores: {free_cpu}")
+            print()
             can_host = True
         else:
             can_host = False
