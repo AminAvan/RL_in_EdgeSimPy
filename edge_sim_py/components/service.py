@@ -26,7 +26,8 @@ class Service(ComponentManager, Agent):
         label: str = "",
         cpu_demand: int = 0,
         memory_demand: int = 0,
-        processor_cycles_demand: int = 0,
+        cpu_cycles_demand: int = 0,
+        processing_power_demand: int = 0,
         state: int = 0,
     ) -> object:
         """Creates a Service object.
@@ -37,7 +38,8 @@ class Service(ComponentManager, Agent):
             label (str, optional): Service label. Defaults to "".
             cpu_demand (int, optional): Service CPU demand. Defaults to 0.
             memory_demand (int, optional): Service Memory demand. Defaults to 0.
-            processor_cycles_demand (int, optional) : Service Processor cycles demand per bit. Defaults to 0.
+            cpu_cycles_demand (int, optional) : Service Processor cycles demand per bit. Defaults to 0.
+            processing_power_demand (int, optional): Service Processing demand = (cpu_cycles_demand * memory_demand). Defaults to 0.
             state (int, optional): Service state (0 for stateless services). Defaults to 0.
 
         Returns:
@@ -61,7 +63,9 @@ class Service(ComponentManager, Agent):
         # Service demand
         self.cpu_demand = cpu_demand
         self.memory_demand = memory_demand
-        self.processor_cycles_demand = (50_000 * 1024) # (per 1KB * 1024 KB) = cycles for 1MB
+        self.cpu_cycles_demand = (30_000 * 1024) # (per 1KB * 1024 KB) = cycles for 1MB
+        self.processing_power_demand = 0 # (self.cpu_cycles_demand * self.memory_demand)
+
 
         # Service state
         self.state = state
@@ -100,7 +104,8 @@ class Service(ComponentManager, Agent):
                 "_available": self._available,
                 "cpu_demand": self.cpu_demand,
                 "memory_demand": self.memory_demand,
-                "processor_cycles_demand": self.processor_cycles_demand,
+                "cpu_cycles_demand": self.cpu_cycles_demand,
+                "processing_power_demand": self.processing_power_demand,
                 "image_digest": self.image_digest,
             },
             "relationships": {
@@ -139,11 +144,15 @@ class Service(ComponentManager, Agent):
             "Being Provisioned": self.being_provisioned,
             "Last Migration": last_migration,
         }
+        self.processing_power_demand = (self.cpu_cycles_demand * self.memory_demand)
         return metrics
 
     def step(self):
         """Method that executes the events involving the object at each time step."""
         if len(self._Service__migrations) > 0 and self._Service__migrations[-1]["end"] == None:
+            # print(f"app {self.application.users[0].delay_slas} is {next(iter(self.application.users[0].delay_slas.values()))}"
+            #       f" has access to service {self.id}")
+
             migration = self._Service__migrations[-1]
 
             # Gathering information about the service's image
@@ -171,7 +180,7 @@ class Service(ComponentManager, Agent):
                 if self.server:
                     self.server.cpu_demand -= self.cpu_demand
                     self.server.memory_demand -= self.memory_demand
-                    self.server.processor_cycles_demand -= self.processor_cycles_demand
+                    self.server.processing_power_demand -= self.processing_power_demand
 
                 # Once all service layers have been pulled, creates a ContainerImage object representing
                 # the service image on the target host if that host didn't already have such image
@@ -303,7 +312,7 @@ class Service(ComponentManager, Agent):
         target_server.ongoing_migrations += 1
         target_server.cpu_demand += self.cpu_demand
         target_server.memory_demand += self.memory_demand
-        target_server.processor_cycles_demand += self.processor_cycles_demand
+        target_server.processing_power_demand += self.processing_power_demand
 
         # Updating the service's migration status
         self._Service__migrations.append(
