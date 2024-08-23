@@ -25,12 +25,17 @@ class LinearServerPowerModel:
             )
             constant = (device.power_model_parameters["max_power_consumption"] - static_power) / 100
 
-            demand = device.cpu_demand
-            capacity = device.cpu
-            utilization = demand / capacity
+            # demand = device.cpu_demand
+            # capacity = device.cpu
+            # utilization = demand / capacity
+            cpu_utilization = device.total_cpu_utilization
+            memory_utilization = round((device.memory_demand / device.memory), 2)
+            comprehensive_utilization = cpu_utilization + memory_utilization
 
-            power_consumption = static_power + constant * utilization * 100
+            # power_consumption = static_power + (constant * (cpu_utilization * 100))
+            power_consumption = static_power + (constant * (comprehensive_utilization * 100))
         else:
             power_consumption = 0
 
+        print()
         return power_consumption

@@ -76,11 +76,11 @@ class EdgeServer(ComponentManager, Agent):
 
 
         # Edge server demand
+        self.total_cpu_utilization = 0.0
         self.cpu_demand = 0
         self.memory_demand = 0
         self.disk_demand = 0
         self.processing_power_demand = 0
-        self.total_cpu_utilization = 0.0
 
         # Edge server's availability status
         self.available = True
@@ -247,36 +247,28 @@ class EdgeServer(ComponentManager, Agent):
         additional_disk_demand = self._get_disk_demand_delta(service=service)
 
         # Calculating the edge server's free resources
-        free_cpu = self.cpu - self.cpu_demand
         free_memory = self.memory - self.memory_demand
         free_disk = self.disk - self.disk_demand
         free_processing_power = self.processing_power #- self.processing_power_demand
-        print(f"server_free_processing_power:{free_processing_power}")
 
         user_service_deadline = next(iter(service.application.users[0].delay_slas.values()))
         user_service_exe_time = round((service.processing_power_demand / free_processing_power), 2)
-        self.total_cpu_utilization = round(
-            (self.total_cpu_utilization + (user_service_exe_time / user_service_deadline)), 2)
-        print(f"CPU utilization of server{self.id} is {self.total_cpu_utilization} %")
-        if (self.total_cpu_utilization <= 1 and free_memory >= service.memory_demand and free_disk >= additional_disk_demand):
-            print(f"==== server{self.id} is not overloaded ====")
-        elif(self.total_cpu_utilization > 1 and free_memory >= service.memory_demand and free_disk >= additional_disk_demand):
-            print(f"==== server{self.id} is OVERLOADED ====")
+        user_service_utilization = round((user_service_exe_time / user_service_deadline), 2)
+        free_cpu_utilization = self.total_cpu_utilization + user_service_utilization
+
 
         # Checking if the host would have resources to host the registry and its (additional) layers
-        if (free_cpu >= service.cpu_demand and free_memory >= service.memory_demand and free_disk >= additional_disk_demand):
+        if (free_cpu_utilization <= 1 and free_memory >= service.memory_demand and free_disk >= additional_disk_demand):  ### if (free_cpu >= service.cpu_demand and free_memory >= service.memory_demand and free_disk >= additional_disk_demand):
             # calculating true execution time of service on the host server
-            self.execution_time_of_service[str(service.id)] = ((service.memory_demand * service.cpu_demand) / (free_cpu * free_memory))
-            print(f"Execution time of service[{str(service.id)}] on server {self.id} is {user_service_exe_time} sec")
-            print(f"service_{str(service.id)}_processing_power_demand: {service.processing_power_demand}")
-            print(f"service {str(service.id)} cpu cycles demand: {service.cpu_cycles_demand}")
-            print(f"service {str(service.id)} memory demand: {service.memory_demand}")
-            print(f"server {self.id} free processing power: {free_processing_power}")
-            print(f"server {self.id} free cpu cores: {free_cpu}")
-            print(f"server {self.id} free memory: {free_memory}")
-            print()
+            self.execution_time_of_service[str(service.id)] = user_service_exe_time
+            self.total_cpu_utilization = round((self.total_cpu_utilization + user_service_utilization), 2)
+            # print(f"CPU utilization of server{self.id} is {self.total_cpu_utilization} %")
+            # print(f"old exc time of service[{str(service.id)}] on server {self.id} is {self.execution_time_of_service[str(service.id)]} sec")
+            # print()
             can_host = True
         else:
+            # print(f"NOT HOSTED BY SERVER{self.id}")
+            # print()
             can_host = False
 
         return can_host
