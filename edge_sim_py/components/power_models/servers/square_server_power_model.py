@@ -25,11 +25,15 @@ class SquareServerPowerModel:
             )
             constant = (device.power_model_parameters["max_power_consumption"] - static_power) / 100
 
-            demand = device.cpu_demand
-            capacity = device.cpu
-            utilization = demand / capacity
+            # demand = device.cpu_demand
+            # capacity = device.cpu
+            # utilization = demand / capacity
+            cpu_utilization = device.total_cpu_utilization
+            memory_utilization = round((device.memory_demand / device.memory), 2)
+            # considering both cpu & memory usages to calculate utilization for power consumption
+            comprehensive_utilization = cpu_utilization + memory_utilization
 
-            power_consumption = static_power + constant * (utilization * 100) ** 2
+            power_consumption = static_power + constant * (comprehensive_utilization * 100) ** 2
         else:
             power_consumption = 0
 
