@@ -37,5 +37,4 @@ class LinearServerPowerModel:
         else:
             power_consumption = 0
 
-        print()
         return power_consumption
