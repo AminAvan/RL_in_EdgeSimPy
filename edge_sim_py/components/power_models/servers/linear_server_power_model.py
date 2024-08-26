@@ -30,6 +30,7 @@ class LinearServerPowerModel:
             # utilization = demand / capacity
             cpu_utilization = device.total_cpu_utilization
             memory_utilization = round((device.memory_demand / device.memory), 2)
+            # considering both cpu & memory usages to calculate utilization for power consumption
             comprehensive_utilization = cpu_utilization + memory_utilization
 
             # power_consumption = static_power + (constant * (cpu_utilization * 100))
