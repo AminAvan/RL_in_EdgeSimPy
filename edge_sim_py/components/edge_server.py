@@ -73,7 +73,7 @@ class EdgeServer(ComponentManager, Agent):
         self.cpu = cpu
         self.memory = memory
         self.disk = disk
-        self.cpu_cycle = 2008 * 10**6  # MHz== 10^6 == million cycles per second
+        self.cpu_cycle = cpu_cycle
         self.processing_power = 0 # self.cpu_cycle * self.cpu
 
 
