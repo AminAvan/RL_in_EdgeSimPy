@@ -63,7 +63,7 @@ class Service(ComponentManager, Agent):
         # Service demand
         self.cpu_demand = cpu_demand
         self.memory_demand = memory_demand
-        self.cpu_cycles_demand = (30_000 * 1024) # (per 1KB * 1024 KB) = cycles for 1MB
+        self.cpu_cycles_demand = cpu_cycles_demand
         self.processing_power_demand = 0 # (self.cpu_cycles_demand * self.memory_demand)
 
 
