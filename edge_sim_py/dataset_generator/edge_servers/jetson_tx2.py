@@ -21,6 +21,7 @@ def jetson_tx2() -> object:
     edge_server.cpu = 4
     edge_server.memory = 8192
     edge_server.disk = 32768
+    edge_server.cpu_cycle = 1734 * (10 ** 6)  ## GHz = 10^9 / MHz = 10^6
 
     # Power-related attributes
     edge_server.power_model_parameters = {

@@ -28,6 +28,7 @@ class EdgeServer(ComponentManager, Agent):
         coordinates: tuple = None,
         model_name: str = "",
         cpu: int = 0,
+        cpu_cycle: int = 0,
         memory: int = 0,
         disk: int = 0,
         power_model: typing.Callable = None,
@@ -39,6 +40,7 @@ class EdgeServer(ComponentManager, Agent):
             coordinates (tuple, optional): 2-tuple that represents the edge server coordinates.
             model_name (str, optional): Edge server model name. Defaults to "".
             cpu (int, optional): Edge server's CPU capacity. Defaults to 0.
+            cpu_cycle (int, optional): Edge server's CPU cycle (clock frequency). Defaults to 0.
             memory (int, optional): Edge server's memory capacity. Defaults to 0.
             disk (int, optional): Edge server's disk capacity. Defaults to 0.
             power_model (typing.Callable, optional): Edge server power model. Defaults to None.

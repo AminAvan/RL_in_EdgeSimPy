@@ -23,6 +23,7 @@ def e5507() -> object:
     edge_server.cpu = 8
     edge_server.memory = 8192
     edge_server.disk = 131072
+    edge_server.cpu_cycle = 2.26 * (10 ** 9)  ## # GHz = 10^9 = cycles per second
 
     # Power-related attributes
     edge_server.power_model_parameters = {

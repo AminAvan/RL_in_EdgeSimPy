@@ -23,6 +23,7 @@ def e5430() -> object:
     edge_server.cpu = 8
     edge_server.memory = 16384
     edge_server.disk = 131072
+    edge_server.cpu_cycle = 2.66 * (10 ** 9)   ## # GHz = 10^9 = cycles per second
 
     # Power-related attributes
     edge_server.power_model_parameters = {
