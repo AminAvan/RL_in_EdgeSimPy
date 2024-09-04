@@ -21,7 +21,7 @@ def jetson_nano() -> object:
     edge_server.cpu = 4
     edge_server.memory = 4096
     edge_server.disk = 16384
-    edge_server.cpu_cycle = 1479 * (10 ** 6)  ## GHz = 10^9 / MHz = 10^6
+    edge_server.cpu_cycle = 1.43 * (10 ** 9)  ## GHz = 10^9 / MHz = 10^6
 
     # Power-related attributes
     edge_server.power_model_parameters = {
