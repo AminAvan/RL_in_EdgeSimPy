@@ -147,6 +147,3 @@ logs/
 .idea/
 Q_values.npy
 pruned_G.graphml
-edge_sim_py/d4pg_files/__init__.py
-edge_sim_py/d4pg_files/D4PG_compatible_environment.py
-edge_sim_py/d4pg_files/D4PG_datastruct.py

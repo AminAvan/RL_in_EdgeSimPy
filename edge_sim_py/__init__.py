@@ -13,3 +13,6 @@ from .components import *
 
 # EdgeSimPy component builders
 from .dataset_generator import *
+
+# new algorithm
+from .d4pg_files import *
