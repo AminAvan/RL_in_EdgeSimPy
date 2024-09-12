@@ -1,7 +1,7 @@
 import dataclasses
 from typing import List, Optional
 
-from Environment.dataStruct import task
+from .D4PG_datastruct import task
 
 
 @dataclasses.dataclass

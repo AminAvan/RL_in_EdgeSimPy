@@ -58,6 +58,102 @@ class timeSlots(object):
 
 ############################################
 
+class location(object):
+    """ the location of the node. """
+    def __init__(self, x: float, y: float) -> None:
+        """ initialize the location.
+        Args:
+            x: the x coordinate.
+            y: the y coordinate.
+        """
+        self._x = x
+        self._y = y
+
+    def __str__(self) -> str:
+        return f"x: {self._x}, y: {self._y}"
+    def get_x(self) -> float:
+        return self._x
+    def get_y(self) -> float:
+        return self._y
+    def get_distance(self, location: "location") -> float:
+        """ get the distance between two locations.
+        Args:
+            location: the location.
+        Returns:
+            the distance.
+        """
+        return np.math.sqrt(
+            (self._x - location.get_x())**2 +
+            (self._y - location.get_y())**2
+        )
+
+##################################################
+
+class trajectory(object):
+    """ the trajectory of the node. """
+    def __init__(self, timeSlots: timeSlots, locations: List[location]) -> None:
+        """ initialize the trajectory.
+        Args:
+            max_time_slots: the maximum number of time slots.
+            locations: the location list.
+        """
+        self._locations = locations
+
+        # if len(self._locations) != timeSlots.get_number():
+        #     raise ValueError("The number of locations must be equal to the max_timestampes.")
+
+    def __str__(self) -> str:
+        return str([str(location) for location in self._locations])
+
+    def get_location(self, nowTimeSlot: int) -> location:
+        """ get the location of the timestamp.
+        Args:
+            timestamp: the timestamp.
+        Returns:
+            the location.
+        """
+        try:
+            return self._locations[nowTimeSlot]
+        except IndexError:
+            return None
+
+    def get_locations(self) -> List[location]:
+        """ get the locations.
+        Returns:
+            the locations.
+        """
+        return self._locations
+
+    def __str__(self) -> str:
+        """ print the trajectory.
+        Returns:
+            the string of the trajectory.
+        """
+        print_result= ""
+        for index, location in enumerate(self._locations):
+            if index % 10 == 0:
+                print_result += "\n"
+            print_result += "(" + str(index) + ", "
+            print_result += str(location.get_x()) + ", "
+            print_result += str(location.get_y()) + ")"
+        return print_result
+
+############################################
+class task(object):
+    def __init__(self, task_index: int, data_size: float, computation_cycles: float, delay_threshold: float) -> None:
+        self._task_index = task_index
+        self._data_size = data_size
+        self._computation_cycles = computation_cycles
+        self._delay_threshold = delay_threshold
+    def get_task_index(self) -> int:
+        return int(self._task_index)
+    def get_data_size(self) -> float:
+        return float(self._data_size)
+    def get_computation_cycles(self) -> float:
+        return float(self._computation_cycles)
+    def get_delay_threshold(self) -> float:
+        return float(self._delay_threshold)
+
 ### taskList can be equal to services in EdgeSimPy
 class taskList(object):
     def __init__(
@@ -99,6 +195,44 @@ class taskList(object):
         return self._task_list[int(task_index)]
 
 ######################################################################################
+
+class edge(object):
+    """ the edge. """
+
+    def __init__(
+            self,
+            edge_index: int,
+            power: float,
+            bandwidth: float,
+            computing_speed: float,
+            communication_range: float,
+            edge_x: float,
+            edge_y: float
+    ) -> None:
+        self._edge_index = edge_index
+        self._power = power
+        self._bandwidth = bandwidth
+        self._computing_speed = computing_speed
+        self._communication_range = communication_range
+        self._edge_location = location(edge_x, edge_y)
+
+    def get_edge_index(self) -> int:
+        return int(self._edge_index)
+
+    def get_power(self) -> float:
+        return float(self._power)
+
+    def get_bandwidth(self) -> float:
+        return float(self._bandwidth)
+
+    def get_computing_speed(self) -> float:
+        return float(self._computing_speed)
+
+    def get_communication_range(self) -> float:
+        return float(self._communication_range)
+
+    def get_edge_location(self) -> location:
+        return self._edge_location
 
 class edgeList(object):
     def __init__(
@@ -153,6 +287,64 @@ class edgeList(object):
         return self._edge_list[int(edge_index)]
 
 ###################################################################################
+
+
+####
+class vehicle(object):
+    """" the vehicle. """
+
+    def __init__(
+            self,
+            vehicle_index: int,
+            vehicle_trajectory: trajectory,
+            slot_number: int,
+            task_number: int,
+            task_request_rate: float,
+            seed: int,
+    ) -> None:
+        self._vehicle_index = vehicle_index
+        self._vehicle_trajectory = vehicle_trajectory
+        self._slot_number = slot_number
+        self._task_number = task_number
+        self._task_request_rate = task_request_rate
+        self._seed = seed
+
+        self._requested_tasks = self.tasks_requested()
+
+    def get_vehicle_index(self) -> int:
+        return int(self._vehicle_index)
+
+    def get_requested_tasks(self) -> List[int]:
+        return self._requested_tasks
+
+    def get_requested_task_by_slot_index(self, slot_index: int) -> int:
+        return self._requested_tasks[slot_index]
+
+    def get_vehicle_location(self, nowTimeSlot: int) -> location:
+        return self._vehicle_trajectory.get_location(nowTimeSlot)
+
+    def get_distance_between_edge(self, nowTimeSlot: int, edge_location: location) -> float:
+        return self._vehicle_trajectory.get_location(nowTimeSlot).get_distance(edge_location)
+
+    def get_vehicle_trajectory(self) -> trajectory:
+        return self._vehicle_trajectory
+
+    def tasks_requested(self) -> List[int]:
+        requested_task_number = int(self._slot_number * self._task_request_rate)
+        requested_tasks = np.zeros(self._slot_number)
+        for index in range(self._slot_number):
+            requested_tasks[index] = -1
+        if requested_task_number == self._slot_number:
+            task_requested_time_slot_index = list(range(self._slot_number))
+        else:
+            np.random.seed(self._seed)
+            task_requested_time_slot_index = list(
+                np.random.choice(self._slot_number, requested_task_number, replace=False))
+        np.random.seed(self._seed)
+        task_requested_task_index = list(np.random.choice(self._task_number, requested_task_number, replace=True))
+        for i in range(len(task_requested_time_slot_index)):
+            requested_tasks[task_requested_time_slot_index[i]] = task_requested_task_index[i]
+        return requested_tasks
 
 ### vehicle can be equal to users in EdgeSimPy
 class vehicleList(object):

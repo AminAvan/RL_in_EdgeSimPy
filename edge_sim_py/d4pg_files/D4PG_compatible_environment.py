@@ -5,7 +5,7 @@ from dm_env import specs
 from acme.types import NestedSpec
 import numpy as np
 from typing import List, Tuple, NamedTuple, Optional
-from D4PG_datastruct import timeSlots, taskList, edgeList, vehicleList
+from .D4PG_datastruct import timeSlots, taskList, edgeList, vehicleList
 import D4PG_environmentConfig as env_config
 from D4PG_utilities import (compute_channel_gain, generate_complex_normal_distribution, compute_transmission_rate,
                             compute_SINR, cover_mW_to_W)
