@@ -3,9 +3,8 @@ from typing import List, Optional
 
 from .D4PG_datastruct import task
 
-
 @dataclasses.dataclass
-class vehicularNetworkEnvConfig:
+class EdgeSimPyEnvConfig:
     """Configuration for the vehicular network environment."""
 
     """Time slot related."""
