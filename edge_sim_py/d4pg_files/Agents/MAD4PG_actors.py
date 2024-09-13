@@ -42,8 +42,10 @@ class FeedForwardActor(core.Actor):
 
     def __init__(
             self,
+            agent_number: int,
+            agent_action_size: int,
 
-            policy_network: snt.Module,
+            policy_networks: List[snt.Module],
             adder: Optional[adders.Adder] = None,
             variable_client: Optional[tf2_variable_utils.VariableClient] = None,
     ):
@@ -60,19 +62,26 @@ class FeedForwardActor(core.Actor):
         # Store these for later use.
         self._adder = adder
         self._variable_client = variable_client
-        self._policy_network = policy_network
+        self._policy_networks = policy_networks
 
-    # @tf.function
+        self._agent_number = agent_number
+        self._agent_action_size = agent_action_size
+
+    @tf.function
     def _policy(self, observations: types.NestedTensor) -> types.NestedTensor:
-        # Add a dummy batch dimension and as a side effect convert numpy to TF.
-        batched_observation = tf2_utils.add_batch_dim(observations)
+        agent_actions = []
+        for i in range(self._agent_number):
+            agent_observation = observations[i, :]
+            # Add a dummy batch dimension and as a side effect convert numpy to TF.
+            agent_batched_observation = tf2_utils.add_batch_dim(agent_observation)
+            # Compute the policy, conditioned on the observation.
+            agent_policy = self._policy_networks[i](agent_batched_observation)
+            # Sample from the policy if it is stochastic.
+            agent_action = agent_policy.sample() if isinstance(agent_policy, tfd.Distribution) else agent_policy
+            agent_actions.append(agent_action)
 
-        # Compute the policy, conditioned on the observation.
-        policy = self._policy_network(batched_observation)
-
-        # Sample from the policy if it is stochastic.
-        action = policy.sample() if isinstance(policy, tfd.Distribution) else policy
-
+        agent_actions = tf.convert_to_tensor(agent_actions, dtype=tf.float64)
+        action = tf.reshape(agent_actions, [self._agent_number, self._agent_action_size])
         return action
 
     def select_action(self, observation: types.NestedArray) -> types.NestedArray:
@@ -80,7 +89,7 @@ class FeedForwardActor(core.Actor):
         action = self._policy(observations=tf.convert_to_tensor(observation, dtype=tf.float64))
 
         # Return a numpy array with squeezed out batch dimension.
-        return tf2_utils.to_numpy_squeeze(action)
+        return action
 
     def observe_first(self, timestep: dm_env.TimeStep):
         if self._adder:
@@ -93,4 +102,3 @@ class FeedForwardActor(core.Actor):
     def update(self, wait: bool = False):
         if self._variable_client:
             self._variable_client.update(wait)
-

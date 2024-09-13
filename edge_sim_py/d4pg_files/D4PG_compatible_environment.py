@@ -10,7 +10,7 @@ from .D4PG_environmentConfig import EdgeSimPyEnvConfig as env_config
 from .D4PG_utilities import (compute_channel_gain, generate_complex_normal_distribution, compute_transmission_rate,
                             compute_SINR, cover_mW_to_W)
 """
-Vehicular Network Environments.
+'self._config' feed by 'env_config', and most of the paramters feed by 'self._config'
 """
 
 np.set_printoptions(threshold=np.inf)
@@ -27,9 +27,9 @@ class EdgeSimPyEnv(dm_env.Environment):
             self,
             envConfig: Optional[env_config] = None,
             time_slots: Optional[timeSlots] = None,
-            task_list: Optional[taskList] = None,
-            vehicle_list: Optional[vehicleList] = None,
-            edge_list: Optional[edgeList] = None,
+            task_list: Optional[taskList] = None,           # == edgesimpy's service
+            vehicle_list: Optional[vehicleList] = None,     # == edgesimpy's users
+            edge_list: Optional[edgeList] = None,           # == edgesimpy's edgeservers
             distance_matrix: Optional[np.ndarray] = None,
             channel_condition_matrix: Optional[np.ndarray] = None,
             vehicle_index_within_edges: Optional[List[List[List[int]]]] = None,
