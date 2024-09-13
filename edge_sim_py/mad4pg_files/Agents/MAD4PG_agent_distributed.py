@@ -64,6 +64,7 @@ class DistributedD4PG:
             max_actor_steps: Optional[int] = None,
             log_every: float = 10.0,
     ):
+        self.environment_wrapper = environment_wrapper ## added by amin
         self._agent_number = agent_number
         self._agent_action_size = agent_action_size
 
