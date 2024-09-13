@@ -29,7 +29,7 @@ import dm_env
 from dm_env import specs
 import numpy as np
 import tree
-from Log.logger import myapp
+# from Log.logger import myapp
 
 
 class EnvironmentLoop(core.Worker):
