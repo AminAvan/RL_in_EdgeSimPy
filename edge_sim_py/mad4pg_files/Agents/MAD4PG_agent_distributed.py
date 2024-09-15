@@ -19,16 +19,15 @@ from typing import Callable, Dict, Optional, List
 
 import acme
 from acme import specs
-from Agents.MAD4PG.agent import D4PGNetworks, D4PGConfig, D4PGBuilder, get_replicator
+from .MAD4PG_agent import D4PGNetworks, D4PGConfig, D4PGBuilder, get_replicator
 from acme.tf import savers as tf2_savers
 from acme.utils import counting
 from acme.utils import loggers
 from acme.utils import lp_utils
 import launchpad as lp
 import reverb
-import sonnet as snt
 import tensorflow as tf
-from Utilities.FileOperator import load_obj
+# from Utilities.FileOperator import load_obj
 from environment_loop import EnvironmentLoop
 
 # Valid values of the "accelerator" argument.
@@ -57,19 +56,19 @@ class DistributedD4PG:
             sigma: float = 0.3,
             clipping: bool = True,
             discount: float = 0.99,
-            policy_optimizer: Optional[snt.Optimizer] = None,
-            critic_optimizer: Optional[snt.Optimizer] = None,
+            policy_optimizer: Optional[tf.keras.optimizers.Optimizer] = None,
+            critic_optimizer: Optional[tf.keras.optimizers.Optimizer] = None,
             target_update_period: int = 100,
             variable_update_period: int = 1000,
             max_actor_steps: Optional[int] = None,
             log_every: float = 10.0,
     ):
-        self.environment_wrapper = environment_wrapper ## added by amin
+        self.environment_wrapper = environment_wrapper  # added by amin
         self._agent_number = agent_number
         self._agent_action_size = agent_action_size
 
-        if accelerator is not None and accelerator not in _ACCELERATORS:
-            raise ValueError(f'Accelerator must be one of {_ACCELERATORS}, '
+        if accelerator is not None and accelerator not in ['CPU', 'GPU', 'TPU']:
+            raise ValueError(f'Accelerator must be one of CPU, GPU, TPU, '
                              f'not "{accelerator}".')
 
         environment = load_obj(environment_file)
@@ -88,8 +87,6 @@ class DistributedD4PG:
         self._variable_update_period = variable_update_period
 
         self._builder = D4PGBuilder(
-            # TODO(mwhoffman): pass the config dataclass in directly.
-            # TODO(mwhoffman): use the limiter rather than the workaround below.
             D4PGConfig(
                 accelerator=accelerator,
                 discount=discount,
@@ -128,9 +125,14 @@ class DistributedD4PG:
 
         # If we are running on multiple accelerator devices, this replicates
         # weights and updates across devices.
-        replicator = get_replicator(self._accelerator)
+        if self._accelerator == 'TPU':
+            strategy = tf.distribute.TPUStrategy()
+        elif self._accelerator == 'GPU':
+            strategy = tf.distribute.MirroredStrategy()
+        else:
+            strategy = tf.distribute.get_strategy()  # Default strategy
 
-        with replicator.scope():
+        with strategy.scope():
             # Create the networks to optimize (online) and target networks.
             online_networks = self._networks
             target_networks = [copy.deepcopy(online_network) for online_network in online_networks]

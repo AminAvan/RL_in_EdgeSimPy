@@ -1,8 +1,8 @@
 from collections import deque
 import random
 import numpy as np
-from Agents.MAD4PG.agent_distributed_mad4pg import DistributedD4PG
-from Agents.MAD4PG.networks_mad4pg import make_default_networks
+from .Agents.MAD4PG_agent_distributed import DistributedD4PG
+from .Agents.MAD4PG_networks import make_default_networks
 
 
 class MAD4PGServiceProvisioning:
@@ -21,7 +21,19 @@ class MAD4PGServiceProvisioning:
             agent_action_size=self.agent_action_size,
             environment_wrapper=self.environment_wrapper,
             networks=self.networks,
-            # ... other parameters as in run_mad4pg.py
+            num_actors=1,
+            batch_size=256,
+            prefetch_size=4,
+            min_replay_size=1000,
+            max_replay_size=1000000,
+            samples_per_insert=8.0,
+            n_step=1,
+            sigma=0.3,
+            discount=0.996,
+            target_update_period=100,
+            variable_update_period=1000,
+            max_actor_steps=None,
+            log_every=5.0,
         )
 
         self.program = self.agent.build()

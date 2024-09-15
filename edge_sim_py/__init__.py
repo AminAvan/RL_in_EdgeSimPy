@@ -15,4 +15,4 @@ from .components import *
 from .dataset_generator import *
 
 # new algorithm
-from .d4pg_files import *
+from .mad4pg_files import *

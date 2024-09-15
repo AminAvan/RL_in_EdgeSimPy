@@ -26,8 +26,8 @@ from acme import specs
 from acme import types
 from acme.adders import reverb as reverb_adders
 from acme.agents import agent
-from Agents.MAD4PG.actors import FeedForwardActor
-from Agents.MAD4PG.learning import D4PGLearner
+from .MAD4PG_actors import FeedForwardActor
+from .MAD4PG_learning import D4PGLearner
 from acme.tf import networks as network_utils
 from acme.tf import utils
 from acme.tf import variable_utils
