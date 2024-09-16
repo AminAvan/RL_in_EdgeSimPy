@@ -28,7 +28,7 @@ import launchpad as lp
 import reverb
 import tensorflow as tf
 # from Utilities.FileOperator import load_obj
-from mad4pg_files.MAD4 import *
+from edge_sim_py.mad4pg_files.MAD4PG_environment_loop import EnvironmentLoop
 
 # Valid values of the "accelerator" argument.
 _ACCELERATORS = ('CPU', 'GPU', 'TPU')

@@ -5,9 +5,9 @@ from dm_env import specs
 from acme.types import NestedSpec
 import numpy as np
 from typing import List, Tuple, NamedTuple, Optional
-from .D4PG_datastruct import timeSlots, taskList, edgeList, vehicleList
-from .D4PG_environmentConfig import EdgeSimPyEnvConfig as env_config
-from .D4PG_utilities import (compute_channel_gain, generate_complex_normal_distribution, compute_transmission_rate,
+from .MAD4PG_datastruct import timeSlots, taskList, edgeList, vehicleList
+from .MAD4PG_environmentConfig import EdgeSimPyEnvConfig as env_config
+from .MAD4PG_utilities import (compute_channel_gain, generate_complex_normal_distribution, compute_transmission_rate,
                             compute_SINR, cover_mW_to_W)
 """
 'self._config' feed by 'env_config', and most of the paramters feed by 'self._config'

@@ -58,7 +58,7 @@ def make_default_networks(
             networks.LayerNormMLP(critic_layer_sizes, activate_final=True),
             networks.DiscreteValuedHead(vmin, vmax, num_atoms),
         ])
-        from Agents.MAD4PG.agent import D4PGNetworks
+        from .MAD4PG_agent import D4PGNetworks
         agent_network_list.append(
             D4PGNetworks(
                 policy_network=policy_network,
