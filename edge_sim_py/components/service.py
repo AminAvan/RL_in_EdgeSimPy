@@ -141,6 +141,7 @@ class Service(ComponentManager, Agent):
             "Instance ID": self.id,
             "Available": self._available,
             "Server": self.server.id if self.server else None,
+            "Application": self.application.id if self.application else None,
             "Being Provisioned": self.being_provisioned,
             "Last Migration": last_migration,
         }

@@ -1,7 +1,7 @@
 import dataclasses
 from typing import List, Optional
 
-from .D4PG_datastruct import task
+from .MAD4PG_datastruct import task
 
 @dataclasses.dataclass
 class EdgeSimPyEnvConfig:

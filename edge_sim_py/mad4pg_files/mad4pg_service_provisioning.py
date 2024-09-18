@@ -3,24 +3,23 @@ import random
 import numpy as np
 from .Agents.MAD4PG_agent_distributed import DistributedD4PG
 from .Agents.MAD4PG_networks import make_default_networks
-from .MAD4PG_compatible_environment import EdgeSimPyEnv
-
+from acme import specs
 
 class MAD4PGServiceProvisioning:
-    def __init__(self, agent_number, agent_action_size, environment_wrapper, EdgeSimPyEnv):
+    def __init__(self, agent_number, agent_action_size, environment_wrapper):
         self.agent_number = agent_number
         self.agent_action_size = agent_action_size
         self.environment_wrapper = environment_wrapper
 
         self.networks = make_default_networks(
             agent_number=self.agent_number,
-            action_spec=EdgeSimPyEnv.edge_action_spec(),
+            action_spec=self._get_action_spec(),
         )
 
         self.agent = DistributedD4PG(
             agent_number=self.agent_number,
             agent_action_size=self.agent_action_size,
-            environment_wrapper=self.environment_wrapper,
+            # environment_wrapper=None,
             networks=self.networks,
             num_actors=1,
             batch_size=256,
@@ -58,3 +57,32 @@ class MAD4PGServiceProvisioning:
         self.step_counter += 1
         if self.step_counter % self.learning_frequency == 0:
             self.learn()
+
+    def learn(self):
+        if len(self.replay_buffer) < self.batch_size:
+            return
+
+        batch = random.sample(self.replay_buffer, self.batch_size)
+        states, actions, rewards, next_states, dones = zip(*batch)
+
+        states = np.array(states)
+        actions = np.array(actions)
+        rewards = np.array(rewards)
+        next_states = np.array(next_states)
+        dones = np.array(dones)
+
+        self.agent.learner.step(states, actions, rewards, next_states, dones)
+
+    # def _get_action_spec(self):
+    #     # Implement this based on your action space
+    #     return np.zeros(self.agent_action_size)
+    def _get_action_spec(self) -> specs.BoundedArray:
+        """Define and return the action space."""
+        action_shape = (self.agent_action_size, )
+        return specs.BoundedArray(
+            shape=action_shape,
+            dtype=float,
+            minimum=np.zeros(action_shape),
+            maximum=np.ones(action_shape),
+            name='actions'
+        )

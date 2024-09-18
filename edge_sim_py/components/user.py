@@ -210,13 +210,14 @@ class User(ComponentManager, Agent):
             # response time = (communication delay) + (time it takes for the app to be executed on edge server)
             if metric.lower() == "response time":
                 # calculate round trip time that is communication delay
-                self.round_trip_time[str(app.id)] = (delay * 2)
+                # self.round_trip_time[str(app.id)] = (delay * 2)
 
                 # Checking the application to determine the maximum response time among multiple services
-                if (not self.response_time):
+                # if (not self.response_time):
+                if (0 == (self.response_time.get(str(app.id), 0))):
                     # Initialize the response time to a very small number
                     max_response_time = float('-inf')
-                else:
+                elif(0 < (self.response_time.get(str(app.id), 0))):
                     # Set the response time of the application to the maximum between its current response time and
                     # the response times of its services. For applications with more than one service
                     # the condition (not self.response_time) is met for the first service, but for the second, third,
@@ -227,6 +228,8 @@ class User(ComponentManager, Agent):
                 # calculate the response time of application when there are several services in the applications
                 for i in range(len(app.services)):
                     if (app.services[i].id == app_service_index):
+                        # calculate round trip time that is communication delay
+                        self.round_trip_time[str(app.id)] = (delay * 2)
 
                         # Calculating the execution time of each service on the EdgeServers
                         self.application_execution_time[str(app.id)] = round(app.services[i].server.execution_time_of_service[str(app_service_index)], 5)
@@ -306,8 +309,8 @@ class User(ComponentManager, Agent):
                 topology._allocate_communication_path(communication_path=path, app=app)
 
         # Computing application's delay where 'metric' can be either "latency" or "response time"
-        # self._compute_delay(app=app, metric="latency") # for calculating the 'delay'
-        self._compute_delay(app=app, metric="response time", app_service_index=service_index) # for calculating the 'response time'
+        # self._compute_delay(app=app, metric="latency") # for calculating the 'delay' for MAD4PG
+        self._compute_delay(app=app, metric="response time", app_service_index=service_index) # for calculating the 'response time'  ## it was fine for all rather MAD3PG running
 
         return self.communication_paths[str(app.id)]
 
