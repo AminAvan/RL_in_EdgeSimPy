@@ -232,18 +232,18 @@ class User(ComponentManager, Agent):
                         self.round_trip_time[str(app.id)] = (delay * 2)
 
                         # Calculating the execution time of each service on the EdgeServers
-                        self.application_execution_time[str(app.id)] = round(app.services[i].server.execution_time_of_service[str(app_service_index)], 5)
+                        self.application_execution_time[str(app.id)] = round(app.services[i].server.execution_time_of_service[str(app_service_index)], 2)
 
                         # Since an application may consist of multiple services, we use the maximum service time as the application's response time
                         # Calculate the current response time
-                        current_response_time = round((self.round_trip_time[str(app.id)] + self.application_execution_time[str(app.id)]), 5)
+                        current_response_time = round((self.round_trip_time[str(app.id)] + self.application_execution_time[str(app.id)]), 2)
 
                         ## Update the maximum response time if the current one is greater
                         if current_response_time > max_response_time:
                             max_response_time = current_response_time
 
                 # calculate the application's response time
-                self.response_time[str(app.id)] = round(max_response_time, 5)
+                self.response_time[str(app.id)] = round(max_response_time, 2)
 
                 # Calculates if the deadline is met or not
                 if (self.response_time[str(app.id)] <= self.delay_slas[str(app.id)]):

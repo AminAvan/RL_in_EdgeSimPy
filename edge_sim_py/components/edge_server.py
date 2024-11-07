@@ -18,7 +18,7 @@ import typing
 
 class EdgeServer(ComponentManager, Agent):
     is_negative_freq_capacity = 0
-    is_provisioned = 0
+    is_potential_host = 0
     """Class that represents an edge server."""
 
     # Class attributes that allow this class to use helper methods from the ComponentManager

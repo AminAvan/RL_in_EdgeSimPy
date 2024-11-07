@@ -183,6 +183,7 @@ class Service(ComponentManager, Agent):
                     self.server.memory_demand -= self.memory_demand
                     self.server.processing_power_demand -= self.processing_power_demand
 
+
                 # Once all service layers have been pulled, creates a ContainerImage object representing
                 # the service image on the target host if that host didn't already have such image
                 if not any([image.digest == self.image_digest for image in migration["target"].container_images]):
@@ -273,6 +274,7 @@ class Service(ComponentManager, Agent):
         Args:
             target_server (object): Target server.
         """
+
         # Gathering layers present in the target server (layers, download_queue, waiting_queue)
         layers_downloaded = [layer for layer in target_server.container_layers]
         layers_on_download_queue = [flow.metadata["object"] for flow in target_server.download_queue]
@@ -314,6 +316,7 @@ class Service(ComponentManager, Agent):
         target_server.cpu_demand += self.cpu_demand
         target_server.memory_demand += self.memory_demand
         target_server.processing_power_demand += self.processing_power_demand
+
 
         # Updating the service's migration status
         self._Service__migrations.append(
