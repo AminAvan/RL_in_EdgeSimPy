@@ -1,13 +1,7 @@
 <p align="center">
-    <img src="/docs/assets/edgesimpy-icon.jpg" alt="EdgeSimPy Logo" width="200" height="200" />
     <h3 align="center">EdgeSimPy</h3>
     <p align="center">🚀 The Next-Generation Edge Computing Simulation Toolkit 🚀</p>
-    <p align="center"><a href="https://edgesimpy.github.io/" target="_blank">Website</a> &#183;
-    <a href="https://edgesimpy.github.io/documentation/" target="_blank">Documentation</a> &#183;
-    <a href="https://www.github.com/edgesimpy/edgesimpy-tutorials" target="_blank">Tutorials</a> &#183;
-    <a href="https://raw.githubusercontent.com/EdgeSimPy/edgesimpy/master/docs/assets/EdgeSimPy-Paper-FGCS.pdf" target="_blank">Paper</a></p>
 </p>
-
 
 ---
 
@@ -15,9 +9,7 @@ EdgeSimPy is a Python-based Edge Computing simulator with easy-to-grasp abstract
 
 <img src="/docs/assets/edgesimpy-features.jpg" alt="EdgeSimPy Use Cases" width="60%" />
 
-
 EdgeSimPy was designed to streamline the prototyping of resource management policies through realistic simulations. To do this, EdgeSimPy provides a set of unique functional abstractions (e.g., container registries, images, and layers) that replicate the application provisioning method of widely used platforms such as [Docker](https://www.docker.com/), allowing seamless integration with repositories like [DockerHub](https://hub.docker.com/).
-
 
 # Overview
 
@@ -72,83 +64,15 @@ You can find more details on EdgeSimPy's functional abstractions below:
 
 # Quick Start
 
-Installing EdgeSimPy is a breeze! Make sure you have Python 3.7.1 or newer. Then, run the following command:
+[//]: # (Installing EdgeSimPy is a breeze! Make sure you have Python 3.7.1 or newer. Then, run the following command:)
 
-```bash
-pip install -q git+https://github.com/EdgeSimPy/EdgeSimPy.git@v1.1.0
-```
+[//]: # (```bash)
 
-Want a different EdgeSimPy version? Simply replace the content after the "@" with your desired version (you can check out all EdgeSimPy released versions [here](https://github.com/EdgeSimPy/EdgeSimPy/releases)).
+[//]: # (pip install -q git+https://github.com/EdgeSimPy/EdgeSimPy.git@v1.1.0)
 
+[//]: # (```)
 
-
-EdgeSimPy has a tutorials library ([link here](https://github.com/EdgeSimPy/edgesimpy-tutorials)) to help you use the simulator with ease. There, you will find examples for creating resource management policies, extending simulated components, monitoring the simulation, and running large-scale experiments.
-
-
-
-One of the unique features of EdgeSimPy is a high-level API that leverages the user-friendly syntax of the Python language to simplify the process of implementing resource management policies. Here is an example of service placement policy using EdgeSimPy:
-
-
-
-```python
-def get_sorted_list_of_edge_servers(service_to_host):
-    # The list below will accommodate a dictionary with the edge server objects and their "score" value
-    edge_servers = []
-    
-    # Let's loop through the list of all edge servers, assigning each a sample "score" value. In this
-    # case, our score is a randomly generated value, ranging between the sum of the edge server ID and
-    # the service ID, all the way up to 1000
-    for edge_server in EdgeServer.all():
-        edge_server_metadata = {
-            "object": edge_server,
-            "score": random.randint(edge_server.id + service.id, 1000),
-        }
-        edge_servers.append(edge_server_metadata)
-    
-    # Let's sort the list of edge servers according to their score values. Here, we use
-    # Python's sorted() function with the reverse attribute as we want to position edge
-    # servers with higher score values first in the list
-    sorted_list_of_edge_servers_metadata = sorted(edge_servers, key=lambda server_metadata: server_metadata["score"], reverse=True)
-    
-    # After sorting edge servers, let's get rid of the score values as we will not use them anymore
-    sorted_list_of_edge_servers = [server_metadata["object"] for server_metadata in sorted_list_of_edge_servers_metadata]
-
-    return sorted_list_of_edge_servers
-
-
-def my_algorithm(parameters):
-    # We can always call the 'all()' method to get a list with all created instances of a given class
-    for service in Service.all():
-        # We don't want to migrate services are are already being migrated
-        if service.server == None and not service.being_provisioned:
-
-            # We are going to call an external function to get us a sorted list of edge servers
-            edge_servers = get_sorted_list_of_edge_servers(service_to_host=service)
-            
-            # Let's iterate over the list of edge servers to find a suitable host for our service
-            for edge_server in edge_servers:
-                
-                # We must check if the edge server has enough resources to host the service
-                if edge_server.has_capacity_to_host(service=service):
-                    
-                    # Start provisioning the service in the edge server
-                    service.provision(target_server=edge_server)
-                    
-                    # After defining a host server for the service we can move on to the next service
-                    break
-```
-
-
-
-In our sample service placement policy, for each service that we need to provision in the edge infrastructure, an example function is used to rank the list of host candidates. In our example, for the sake of simplicity, the "score" value for each edge server is calculated using a rather arbitrary function. Of course, this placeholder logic can be effortlessly replaced according to our specific research goals.
-
-
-
-> Please note that the code above has been written to ease the understanding of researchers who may not be as familiar with Python syntax. Therefore, we have intentionally not used some language optimizations and best practices.
-
-
-
-After implementing our service placement policy, we can instantiate an object from EdgeSimPy's "Simulator" class, providing some simulation details such as the stopping criterion (in our case, when all services have been provisioned) and an input dataset file:
+After implementing our service placement policy, you can instantiate an object from EdgeSimPy's "Simulator" class, providing some simulation details such as the stopping criterion (in our case, when all services have been provisioned) and an input dataset file:
 
 ```python
 # Creating a Simulator object
@@ -167,38 +91,3 @@ simulator.run_model()
 for service in Service.all():
     print(f"{service}. Host: {service.server}")
 ```
-
-
-
-# Check Out EdgeSimPy's Paper
-
-> **:tada: We are glad to inform that EdgeSimPy's paper has been published in the Future Generation Computer Systems journal :tada:**
-
-- **Access the paper in the journal's page:** [https://doi.org/10.1016/j.future.2023.06.013](https://doi.org/10.1016/j.future.2023.06.013)
-- **Download the paper with no charges:** [PDF here](https://raw.githubusercontent.com/EdgeSimPy/edgesimpy/master/docs/assets/EdgeSimPy-Paper-FGCS.pdf)
-
-**If you use EdgeSimPy in an academic work, we would appreciate citations according to the following reference:**
-
-```bibtex
-@article{souza2023edgesimpy,
-    author={Paulo S. Souza and Tiago Ferreto and Rodrigo N. Calheiros},
-    title={EdgeSimPy: Python-Based Modeling and Simulation of Edge Computing Resource Management Policies},
-    journal={Future Generation Computer Systems},
-    year={2023},
-    issn={0167-739X},
-    volume={148},
-    pages={446-459},
-    doi={https://doi.org/10.1016/j.future.2023.06.013},
-    publisher={Elsevier}
-}
-```
-
-
-# Collaborators
-
-* Paulo S. Souza ([email](mailto:paulo.severo@edu.pucrs.br), [website](http://paulosevero.github.io/))
-* Tiago C. Ferreto ([email](mailto:tiago.ferreto@pucrs.br), [website](https://tiagoferreto.github.io/))
-* Rodrigo N. Calheiros ([email](mailto:r.calheiros@westernsydney.edu.au), [website](https://staff.cdms.westernsydney.edu.au/~rcalheiros/))
-* Carlos H. Kayser ([email](mailto:carlos.kayser@edu.pucrs.br), [website](https://scholar.google.com/citations?user=XOpUgdgAAAAJ&hl=en&oi=ao))
-* Felipe P. Rubin ([email](mailto:felipe.rubin@edu.pucrs.br), [website](https://scholar.google.com.br/citations?hl=en-US&user=ilxJcssAAAAJ&view_op=list_works&sortby=pubdate))
-* Ângelo V. Crestani ([email](mailto:angelo.crestani@edu.pucrs.br))
