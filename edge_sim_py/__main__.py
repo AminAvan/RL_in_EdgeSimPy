@@ -672,15 +672,11 @@ def stopping_criterion(model: object):
 
         # print(f"service.server: {service.server.}")
 
-
     if (old_provisioned_services < provisioned_services):
         old_provisioned_services = provisioned_services
         print(f"provisioned_services:{old_provisioned_services}")
         print(f"EdgeServer.is_potential_host: {EdgeServer.is_potential_host}")
         print(f"Time Step: {simulator.schedule.steps}")
-        # for service in Service.all():
-        #     if service.server == None:
-        #         print(f"{service}: {service._Service__migrations}")
         semi_end_time_edgesimpy = time.time()
         semi_duration_edgesimpy = semi_end_time_edgesimpy - start_time_edgesimpy
         print(f"Execution time: {semi_duration_edgesimpy:.2f} seconds")
@@ -693,9 +689,7 @@ def stopping_criterion(model: object):
 
 # @measure_memory
 def wrapped_Service_Provisioning(parameters):
-    # result = My_Second_Service_Provisioning(parameters)
     # result = Best_Fit_Service_Provisioning(parameters)
-    # result = lapse(parameters)
     # result = lapse_ICCPS(parameters)
     # result = DAMR(parameters)
     result = MARS(parameters)
@@ -705,38 +699,25 @@ def wrapped_Service_Provisioning(parameters):
     return result
 
 
-
 # Define variables as a global variables outside of the functions
 best_nodes = []
 worst_nodes = []
 
 # logs_directory = f"logs/algorithm=FFSP;dataset=sample_dataset2;"  ## baseline alg with example dataset
 logs_directory = f"logs/algorithm=FFSP;dataset=dataset1;"  ## baseline alg with mine datasets
-# input_file="/mnt/c/Users/100807003/PycharmProjects/EdgeSimPy/edge_sim_py/dataset_generator/datasets/dataset1.json" ## mad4pg
 
 # Creating a Simulator object
 simulator = Simulator(
     dump_interval=5,
     tick_duration=1,
     tick_unit="seconds",
-    stopping_criterion=stopping_criterion,     ## normal
-    # stopping_criterion=mad4pg_stopping_criterion,   ## for mad4pg
-    # resource_management_algorithm=First_Fit_Service_Provisioning,    ## all services are provisioned 262/262
-    # resource_management_algorithm=Best_Fit_Service_Provisioning,       ## 197 services are provisioned out of 262
-    # resource_management_algorithm=My_Second_Service_Provisioning,
+    stopping_criterion=stopping_criterion,
     resource_management_algorithm=wrapped_Service_Provisioning,
-    # resource_management_algorithm=Test_My_Second_Service_Provisioning,
-    # resource_management_algorithm=mad4pg_provisioning,
-    # resource_management_algorithm=lapse,
     logs_directory=logs_directory,
 )
 
-### Loading a sample dataset from GitHub
-# simulator.initialize(input_file=r"C:\Users\100807003\PycharmProjects\EdgeSimPy\datasets\sample_dataset2.json")
-simulator.initialize(input_file=r"C:\Users\100807003\PycharmProjects\EdgeSimPy\edge_sim_py\dataset_generator\datasets\dataset1.json")    ## run on windows
-# simulator.initialize(input_file="/mnt/c/Users/100807003/PycharmProjects/EdgeSimPy/edge_sim_py/dataset_generator/datasets/dataset1.json") ## run in wsl
-# simulator.initialize(input_file=input_file) ## run in wsl
-
+### Loading the dataset
+simulator.initialize(input_file=r"C:\Users\100807003\PycharmProjects\EdgeSimPy\edge_sim_py\dataset_generator\datasets\dataset1.json")
 
 # Start the timer
 start_time_edgesimpy = time.time()
