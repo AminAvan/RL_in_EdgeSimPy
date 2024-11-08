@@ -355,8 +355,6 @@ def lapse(parameters):
     def get_norm(metadata: dict, attr_name: str, min: dict, max: dict) -> float:
         normalized_value = min_max_norm(x=metadata[attr_name], min=min[attr_name], max=max[attr_name])
         return normalized_value
-    #############################################
-    ###########################################################
     #########################################################
     # if (EdgeServer.is_potential_host < 261): ## commented by Amin
     apps = Application.all()
@@ -622,10 +620,7 @@ def lapse_ICCPS(parameters):
                 # if not service.server:
                 if service.server == None and not service.being_provisioned:
                     possible_edge_servers = EdgeServer.all()
-#############################################################################
-#############################################################################
-#############################################################################
-#############################################################################
+
 
 def EDF_algorithm(parameters):
     # Override 'has_capacity_to_host' for all instances of the EdgeServer class
@@ -661,54 +656,6 @@ def EDF_algorithm(parameters):
                         break
 
 
-
-#############################################################################
-#############################################################################
-#############################################################################
-"""
-from edge_sim_py import Simulator
-from edgesimpy_wrapper import EdgeSimPyWrapper
-from mad4pg_service_provisioning import MAD4PGServiceProvisioning
-
-def stopping_criterion(model):
-    # Implement your stopping criterion here
-    return False  # placeholder
-
-if __name__ == "__main__":
-    environment_file = "path_to_your_environment_file.json"
-    
-    simulator = Simulator(
-        dump_interval=5,
-        tick_duration=1,
-        tick_unit="seconds",
-        stopping_criterion=stopping_criterion,
-        resource_management_algorithm=None,
-        logs_directory="logs/MAD4PG_simulation/"
-    )
-    
-    simulator.initialize(input_file=environment_file)
-    
-    env_wrapper = EdgeSimPyWrapper(simulator)
-    
-    mad4pg_provisioning = MAD4PGServiceProvisioning(
-        agent_number=9,
-        agent_action_size=27,
-        environment_wrapper=env_wrapper
-    )
-    
-    simulator.resource_management_algorithm = mad4pg_provisioning
-    
-    simulator.run_model()
-"""
-#############################################################################
-# from edge_sim_py.mad4pg_files.edgesimpy_wrapper_mad4pg import EdgeSimPyWrapper
-# from edge_sim_py.mad4pg_files.mad4pg_service_provisioning import MAD4PGServiceProvisioning
-# def mad4pg_stopping_criterion(model):
-#     return model.current_tick >= 1000
-
-#############################################################################
-
-
 old_provisioned_services = 0
 def stopping_criterion(model: object):
     # Defining a variable that will help us to count the number of services successfully provisioned within the infrastructure
@@ -739,143 +686,6 @@ def stopping_criterion(model: object):
         print(f"Execution time: {semi_duration_edgesimpy:.2f} seconds")
         resource_tracker.report()
         print()
-
-    #################################################
-    #################################################
-    #################################################
-    # for my RL algorithm to construct prunned MDP
-    # if ((provisioned_services == Service.count()) or (provisioned_services == EdgeServer.is_potential_host)):
-    #     global best_nodes
-    #     global worst_nodes
-    #     number_of_cells = (len(EdgeServer.all())) * (len(User.all()))
-    #     weight_value_for_best_nodes = (2 * (number_of_cells) * (+1))
-    #     weight_value_for_worst_nodes = (2 * (number_of_cells) * (-1))
-    #
-    #     # Create a pruned directed graph from the best nodes and worst nodes
-    #     pruned_G = nx.DiGraph()
-    #
-    #     # Add the starter node for the pruned directed graph
-    #     starter_node_in_pruned_graph = tuple(0 for _ in range(number_of_cells))
-    #     pruned_G.add_node(starter_node_in_pruned_graph)
-    #
-    #     print(f"len(best_nodes): {len(best_nodes)}")
-    #     print(f"len(worst_nodes): {len(worst_nodes)}")
-    #
-    #     ## old
-    #     # # constructing the edges and nodes of the pruned directed graph
-    #     # for i in range(len(best_nodes)):
-    #     #     pruned_G.add_node(best_nodes[i])
-    #     #     pruned_G.add_edge(starter_node_in_pruned_graph, best_nodes[i], weight=weight_value_for_best_nodes)
-    #     #     # print(f"best_nodes[i]: {best_nodes[i]}")
-    #     #     # print()
-    #     #     pruned_G.add_node(worst_nodes[i])
-    #     #     pruned_G.add_edge(starter_node_in_pruned_graph, worst_nodes[i], weight=weight_value_for_worst_nodes)
-    #     #     # print(f"worst_nodes[i]: {worst_nodes[i]}")
-    #     #     starter_node_in_pruned_graph = best_nodes[i]
-    #
-    #     # Create unique node identifiers by combining node content with an index
-    #     for i in range(len(best_nodes)):
-    #         unique_best_node = (best_nodes[i], i)  # Append index to make each node unique
-    #         unique_worst_node = (worst_nodes[i], i)
-    #
-    #         pruned_G.add_node(unique_best_node)  # Add the uniquely identified node
-    #         pruned_G.add_edge(starter_node_in_pruned_graph, unique_best_node, weight=weight_value_for_best_nodes)
-    #
-    #         pruned_G.add_node(unique_worst_node)
-    #         pruned_G.add_edge(starter_node_in_pruned_graph, unique_worst_node, weight=weight_value_for_worst_nodes)
-    #
-    #         starter_node_in_pruned_graph = unique_best_node  # Update for next iteration
-    #
-    #     print("pruned_G", pruned_G)
-    #     # Save pruned_G to a GraphML file
-    #     nx.write_graphml(pruned_G, r'C:\Users\100807003\PycharmProjects\EdgeSimPy\edge_sim_py\pruned_G.graphml')
-    #     print("=========================================")
-    #
-    #     ## starting procedure of finding optimal policy based on the MDGP ##
-    #     # tranforming the nx-graph into a MDP template
-    #     # tranforming the nx-graph into a MDP template
-    #     def graph_to_mdp(pruned_G):
-    #         num_nodes = len(pruned_G.nodes)
-    #         transition_probabilities = np.full((num_nodes, 2, num_nodes), 0.0, dtype=object)
-    #         rewards = np.zeros((num_nodes, 2, num_nodes), dtype=int)
-    #         possible_actions = []
-    #         nodes_list_of_pruned_G = list(pruned_G.nodes)
-    #
-    #         for node in pruned_G.nodes:
-    #             successors = list(pruned_G.successors(node))
-    #             # print("node", node)
-    #             # print("successors", successors)
-    #
-    #             if successors:
-    #                 # Define possible actions based on the number of successors
-    #                 possible_actions.append(list(range(len(successors))))
-    #
-    #                 # Iterate over successors only, not always assuming there are exactly 2 actions
-    #                 for action, next_node in enumerate(successors):
-    #                     # Update transition probabilities and rewards
-    #                     transition_probabilities[
-    #                         nodes_list_of_pruned_G.index(node), action, nodes_list_of_pruned_G.index(next_node)
-    #                     ] = 1.0
-    #                     rewards[
-    #                         nodes_list_of_pruned_G.index(node), action, nodes_list_of_pruned_G.index(next_node)
-    #                     ] = pruned_G[node][next_node]['weight']
-    #
-    #             else:
-    #                 # If no successors, only one action possible (e.g., staying in the same state or a terminal state)
-    #                 possible_actions.append([0])
-    #
-    #         return transition_probabilities, rewards, possible_actions
-    #
-    #     transition_probabilities, rewards, possible_actions = graph_to_mdp(pruned_G)
-    #     print(f"graph_to_mdp(pruned_G) is DONE")
-    #     # print("Transition Probabilities:")
-    #     # print(transition_probabilities)
-    #     # print("\nRewards:")
-    #     # print(rewards)
-    #     # print("\nPossible Actions:")
-    #     # print(possible_actions)
-    #     # print("")
-    #
-    #     # Q-value approach
-    #     Q_values = np.full(((len(pruned_G.nodes)), (len(pruned_G.nodes))), -np.inf)  # -np.inf for impossible actions
-    #     # print(f"before Q_values: {Q_values}")
-    #     for state, actions in enumerate(possible_actions):
-    #         Q_values[state, actions] = 0.0  # for all possible actions
-    #     # print(f"after Q_values: {Q_values}")
-    #     # print("")
-    #
-    #     # # now, Q-value iteration algorithm (it applies Equation 18-3 repeatedly) to all Q-values, for every state and every possible action
-    #     gamma = 0.95  # the discount factor
-    #     print(f"gamma: {gamma}")
-    #     for iteration in range(90):
-    #         Q_prev = Q_values.copy()
-    #         for s in range(len(pruned_G.nodes)):
-    #             for a in possible_actions[s]:
-    #                 Q_values[s, a] = np.sum([
-    #                     transition_probabilities[s][a][sp]
-    #                     * (rewards[s][a][sp] + gamma * Q_prev[sp].max())
-    #                     for sp in range(len(pruned_G.nodes))])
-    #     print(f"end of for iteration in range(90):")
-    #     # the resulting Q-values, which give us the optimal policy for this MDP when using a discount factor
-    #     # print(f'Q_values giving us optimal policy for this MDP when using discount factor (gamma={gamma}):\n\n',
-    #     #       Q_values)
-    #     # print(f'Q_values giving us optimal policy for this MDP when using discount factor (gamma={gamma}).')
-    #     print("==========================================================")
-    #
-    #     # For example, when the agent is in state s0 and it chooses action a0, the expected sum of discounted future rewards is as below:
-    #     # print("Sum of discounted future rewards when agent is in state s0 and it chooses action a0:", Q_values[0][0])
-    #
-    #     # For each state, it is possible to find the action that has the highest Q-value:
-    #     # print("optimal action for each state:", Q_values.argmax(axis=1))
-    #     np.save(r'C:\Users\100807003\PycharmProjects\EdgeSimPy\edge_sim_py\Q_values.npy', Q_values)
-    ###################################
-    ##########################################
-    ###############################################
-
-
-    # As EdgeSimPy will halt the simulation whenever this function returns True, its output will be a boolean expression
-    # that checks if the number of provisioned services equals to the number of services spawned in our simulation
-
 
     return (provisioned_services == Service.count()) or (provisioned_services == EdgeServer.is_potential_host)
 
