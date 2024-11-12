@@ -14,6 +14,12 @@ EdgeSimPy was designed to streamline the prototyping of resource management poli
 ## Required Packages
 All packages required by EdgeSimPy are listed in the pyproject.toml file, which should be installed using Poetry in Python.
 
+## Build Instructions
+Considering that you already installed a recent version of [Poetry](https://python-poetry.org/), you can install the required packages for EdgeSimPy using the following command:
+```
+poetry install
+```
+
 ## Input Files
 
 Before diving into EdgeSimPy, you'll need a scenario input file written in JSON. EdgeSimPy input files must be organized according to a well-defined structure comprised of two distinct information groups: **attributes** and **relationships**.
