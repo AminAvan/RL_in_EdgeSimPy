@@ -59,7 +59,9 @@ def load_msgpack_logs(logs_directory):
 
     return datasets
 
-logs_directory = f"{os.getcwd()}/logs/algorithm=FFSP;dataset=dataset1;"
+
+scheduling_algorithm = "lapse"
+logs_directory = f"{os.getcwd()}/logs/algorithm={scheduling_algorithm};dataset=dataset1;"
 datasets = load_msgpack_logs(logs_directory)
 ##############################################################################################################################
 

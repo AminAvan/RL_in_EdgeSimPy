@@ -494,12 +494,21 @@ def stopping_criterion(model: object):
 
 ###################################################################################
 
+# Map algorithm names to functions
+algorithm_functions = {
+    "lapse": lapse,
+    "MARS": MARS,
+    "BestFit": Best_Fit_Service_Provisioning,
+    "EDF": EDF_algorithm
+}
+
+# Define the name of the scheduling algorithm, that could be "lapse", "MARS", "BestFit", "EDF"
+scheduling_algorithm = "lapse"
+
 # @measure_memory
-def wrapped_Service_Provisioning(parameters):
-    # result = Best_Fit_Service_Provisioning(parameters)
-    result = lapse(parameters)
-    # result = MARS(parameters)
-    # result = EDF_algorithm(parameters)
+def wrapped_Service_Provisioning(parameters, algorithm_name=scheduling_algorithm):
+    # Get the function based on the algorithm name
+    result = algorithm_functions[algorithm_name](parameters)
     process = psutil.Process(os.getpid())
     resource_tracker.update(process.memory_info().rss)
     return result
@@ -510,7 +519,7 @@ best_nodes = []
 worst_nodes = []
 
 # logs_directory = f"logs/algorithm=FFSP;dataset=sample_dataset2;"  ## baseline alg with example dataset
-logs_directory = f"logs/algorithm=FFSP;dataset=dataset1;"  ## baseline alg with mine datasets
+logs_directory = f"logs/algorithm={scheduling_algorithm};dataset=dataset1;"  ## baseline alg with mine datasets
 
 # Creating a Simulator object
 simulator = Simulator(
