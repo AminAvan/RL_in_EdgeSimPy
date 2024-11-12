@@ -1,15 +1,8 @@
-<p align="center">
-    <h3 align="center">EdgeSimPy</h3>
-    <p align="center">🚀 The Next-Generation Edge Computing Simulation Toolkit 🚀</p>
-</p>
 
 ---
 # Overview
-EdgeSimPy is a Python-based Edge Computing simulator with easy-to-grasp abstractions for edge servers, network devices, and applications, and built-in models for user mobility, application composition, and power consumption. An overview of EdgeSimPy use cases is shown in the figure below.
+The original repository of EdgeSimPy can be found [here](). We have added features to the original source code, developing it into a framework for testing and experimenting with scheduling algorithms for real-time applications in edge computing.
 
-<img src="/docs/assets/edgesimpy-features.jpg" alt="EdgeSimPy Use Cases" width="60%" />
-
-EdgeSimPy was designed to streamline the prototyping of resource management policies through realistic simulations. To do this, EdgeSimPy provides a set of unique functional abstractions (e.g., container registries, images, and layers) that replicate the application provisioning method of widely used platforms such as [Docker](https://www.docker.com/), allowing seamless integration with repositories like [DockerHub](https://hub.docker.com/).
 
 ## Required Packages
 All packages required by EdgeSimPy are listed in the pyproject.toml file, which should be installed using Poetry in Python.
@@ -18,6 +11,7 @@ All packages required by EdgeSimPy are listed in the pyproject.toml file, which 
 Considering that you already installed a recent version of [Poetry](https://python-poetry.org/), you can install the required packages for EdgeSimPy using the following command:
 ```bash
 poetry install
+poetry shell
 ```
 
 ## Input Files
