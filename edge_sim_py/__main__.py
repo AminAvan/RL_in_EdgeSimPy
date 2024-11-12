@@ -403,20 +403,14 @@ def lapse(parameters):
                     ),
                 )
 
-                for es_metadata in edge_servers_metadata:  ## was and stuck
-                    edge_server = es_metadata["object"]   ## was and stuck
-                    # print(f"edge_server type f1: {type(edge_server)}")
-                # for edge_server in EdgeServer.all():        ## is & not stuck
-                    # print(f"edge_server type f2: {type(edge_server)}")
-                    # if has_capacity_to_host(edge_server, service):
+                for es_metadata in edge_servers_metadata:
+                    edge_server = es_metadata["object"]
+
                     if edge_server.has_capacity_to_host(service=service):
                         service.provision(target_server=edge_server)
                         source = edge_server.network_switch
-                        # place(service=service, edge_server=edge_server)  ## was
-                        # source = edge_server.network_switch   ## was
                         break
 
-                # if not service.server:
                 if service.server == None and not service.being_provisioned:
                     possible_edge_servers = EdgeServer.all()
 
