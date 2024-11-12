@@ -4,16 +4,15 @@
 </p>
 
 ---
-
+# Overview
 EdgeSimPy is a Python-based Edge Computing simulator with easy-to-grasp abstractions for edge servers, network devices, and applications, and built-in models for user mobility, application composition, and power consumption. An overview of EdgeSimPy use cases is shown in the figure below.
 
 <img src="/docs/assets/edgesimpy-features.jpg" alt="EdgeSimPy Use Cases" width="60%" />
 
 EdgeSimPy was designed to streamline the prototyping of resource management policies through realistic simulations. To do this, EdgeSimPy provides a set of unique functional abstractions (e.g., container registries, images, and layers) that replicate the application provisioning method of widely used platforms such as [Docker](https://www.docker.com/), allowing seamless integration with repositories like [DockerHub](https://hub.docker.com/).
 
-# Overview
-
-This section describes EdgeSimPy's architecture and main components. You can also learn more details about EdgeSimPy by reading our research paper ([link here](https://doi.org/10.1016/j.future.2023.06.013), [PDF here](https://raw.githubusercontent.com/EdgeSimPy/edgesimpy/master/docs/assets/EdgeSimPy-Paper-FGCS.pdf)).
+## Required Packages
+All packages required by EdgeSimPy are listed in the pyproject.toml file, which should be installed using Poetry in Python.
 
 ## Input Files
 
