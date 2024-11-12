@@ -452,6 +452,8 @@ def EDF_algorithm(parameters):
                         # After start migrating the service we can move on to the next service
                         break
 
+
+
 scheduling_time_exceeded = False
 service_scheduling_duration = time.time()
 old_provisioned_services = 0
@@ -470,9 +472,13 @@ def stopping_criterion(model: object):
 
     # Since services constitute the components of applications, the maximum allowable time for scheduling
     # a single service is inspired by the '30 FPS' benchmark for real-time responsiveness. Accordingly,
-    # the maximum scheduling time is defined as (1/30) * (total number of services * total number of edge servers).
+    # the maximum scheduling time is defined as (1/30) * (total number of services * total number of edge servers) [2].
     # Therefore, the value of 'service_scheduling_duration' get updated as soon as a service is succesfully scheduled by
     # the 'if (old_provisioned_services < provisioned_services):' condition.
+    # [2]: Wang, J., Shi, R., Zheng, W., Xie, W., Kao, D., & Liang, H. N. (2023).
+    #       Effect of frame rate on user experience, performance, and simulator sickness in virtual reality.
+    #       IEEE Transactions on Visualization and Computer Graphics, 29(5), 2478-2488.
+
     elapsed_time = time.time() - service_scheduling_duration
     if elapsed_time >= scheduling_time_limitation:
         scheduling_time_exceeded = True
