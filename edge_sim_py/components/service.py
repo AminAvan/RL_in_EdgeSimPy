@@ -65,6 +65,8 @@ class Service(ComponentManager, Agent):
         self.memory_demand = memory_demand
         self.cpu_cycles_demand = cpu_cycles_demand
         self.processing_power_demand = 0 # (self.cpu_cycles_demand * self.memory_demand)
+        self.number_of_provisioning_attempt = 0
+        self.number_of_provisioning_attempt_limitation = False
 
 
         # Service state
@@ -174,12 +176,15 @@ class Service(ComponentManager, Agent):
                 if len(layers_on_target_server) > 0:
                     migration["status"] = "pulling_layers"
 
+
+            # print(f"{self}...{self._Service__migrations[-1]['status']}...len(image.layers_digests):{len(image.layers_digests)}...len(layers_downloaded):{len(layers_downloaded)}")
+
             if migration["status"] == "pulling_layers" and len(image.layers_digests) == len(layers_downloaded):
                 # Once all the layers that compose the service's image are pulled, the service container is deprovisioned on its
                 # origin host even though it still is in there (that's why it is still on the origin's services list). This action
                 # is only taken in case the current provisioning process regards a migration.
                 if self.server:
-                    self.server.cpu_demand -= self.cpu_demand
+                    # self.server.cpu_demand -= self.cpu_demand
                     self.server.memory_demand -= self.memory_demand
                     self.server.processing_power_demand -= self.processing_power_demand
 
@@ -206,6 +211,7 @@ class Service(ComponentManager, Agent):
 
                 if self.state == 0 or self.server == None:
                     # Stateless Services: migration is set to finished immediately after layers are pulled
+
                     migration["status"] = "finished"
                 else:
                     # Stateful Services: state must be migrated to the target host after layers are pulled
@@ -240,6 +246,13 @@ class Service(ComponentManager, Agent):
                 migration["pulling_layers_time"] += 1
             elif migration["status"] == "migrating_service_state":
                 migration["migrating_service_state_time"] += 1
+
+            ### amin adds
+            self.number_of_provisioning_attempt += 1
+            # if (self.number_of_provisioning_attempt > 300):
+            if (self.number_of_provisioning_attempt > 524):
+                # print(f"{self}")
+                self.number_of_provisioning_attempt_limitation = True
 
             if migration["status"] == "finished":
                 # Storing when the migration has finished

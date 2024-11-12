@@ -42,7 +42,7 @@ class ResourceTracker:
         total_time = time.time() - self.start_time
         print(f"Total memory consumed: {self.total_memory / (1024 * 1024):.2f} MiB")
         print(f"Total power consumption: {self.total_power:.2f} Watt-seconds")
-        print(f"Number of calls: {self.call_count}")
+        # print(f"Number of calls: {self.call_count}")
         print(f"Total execution time: {total_time:.2f} seconds")
         print(f"Average power over time: {(self.total_power / total_time):.2f} Watts")
 
@@ -129,6 +129,7 @@ def has_capacity_to_host_proposed(self, service: object) -> bool:
     free_disk = self.disk - self.disk_demand
     free_processing_power = self.processing_power
 
+
     user_service_deadline = next(iter(service.application.users[0].delay_slas.values()))
     user_service_exe_time = (service.processing_power_demand / free_processing_power)
     user_service_utilization = (user_service_exe_time / user_service_deadline)
@@ -146,17 +147,17 @@ def has_capacity_to_host_proposed(self, service: object) -> bool:
         #     EdgeServer.is_negative_freq_capacity = EdgeServer.is_negative_freq_capacity + 1
 
         EdgeServer.is_potential_host = EdgeServer.is_potential_host + 1
-        print(f"EdgeServer.is_potential_host: {EdgeServer.is_potential_host}.")
+        # print(f"EdgeServer.is_potential_host: {EdgeServer.is_potential_host}.")
         if(len(service.all()) == EdgeServer.is_potential_host):
-            print(f"All services are hosted!")
+            # print(f"All services are hosted!")
             # print(f"missed applications: {EdgeServer.is_negative_freq_capacity}, users: {len(User.all())}, miss-ratio of users: {EdgeServer.is_negative_freq_capacity/(len(User.all()))}")
             s_total_cpu_util = 0
             s_total_mem_util = 0
             for s in EdgeServer.all():
                 s_total_cpu_util += round(s.total_cpu_utilization, 2)
                 s_total_mem_util += round((s.memory_demand/s.memory), 2)
-            print(f"Average CPU load of all edge servers: {((s_total_cpu_util/len(EdgeServer.all()))*100)}%")
-            print(f"Average memory load of all edge servers: {((s_total_mem_util / len(EdgeServer.all())) * 100)}%\n")
+            # print(f"Average CPU load of all edge servers: {((s_total_cpu_util/len(EdgeServer.all()))*100)}%")
+            # print(f"Average memory load of all edge servers: {((s_total_mem_util / len(EdgeServer.all())) * 100)}%\n")
 
         can_host = True
     else:
@@ -210,218 +211,16 @@ def MARS(parameters):
 
 def lapse(parameters):
     """A cost-based heuristic algorithm to optimize the placement of applications on
-    heterogeneous edge computing infrastructures [1].
+        heterogeneous edge computing infrastructures [1].
 
-    [1] Kayser, Carlos Henrique, Marcos Dias de Assunção, and Tiago Ferreto.
-    "Lapse: Latency & Power-Aware Placement of Data Stream Applications on Edge Computing."
-    CLOSER. 2024.
+        [1] Kayser, Carlos Henrique, Marcos Dias de Assunção, and Tiago Ferreto.
+        "Lapse: Latency & Power-Aware Placement of Data Stream Applications on Edge Computing."
+        CLOSER. 2024.
 
-    Args:
-        parameters (dict, optional): Algorithm parameters. Defaults to {}.
+        Args:
+            parameters (dict, optional): Algorithm parameters. Defaults to {}.
     """
-    EdgeServer.has_capacity_to_host = has_capacity_to_host_proposed
 
-
-    def get_app_total_demand(application: Application) -> float:
-        app_demand = 0
-        for service in application.services:
-            app_demand += service.cpu_demand * service.cpu_cycles_demand * service.memory_demand
-
-        return app_demand
-
-
-    def get_all_shortest_path_between(origin_network_switch: object, target_network_switch: object) -> int:
-        topology = origin_network_switch.model.topology
-
-        paths = list(
-            nx.all_shortest_paths(topology, source=origin_network_switch, target=target_network_switch, weight="delay"))
-
-        return paths
-
-
-    def get_edge_servers_between(source: object, target: object) -> list:
-        topology = source.model.topology
-
-        best_path_servers = 0
-        possible_edge_servers = None
-
-        paths_between_sensor_and_target = get_all_shortest_path_between(source, target)
-
-        for path in paths_between_sensor_and_target:
-            edge_servers_in_path = []
-
-            # search for edge servers in the path
-            for switch in path:
-                for es in switch.edge_servers:
-                    if es not in edge_servers_in_path:
-                        edge_servers_in_path.append(es)
-
-                # search for edge servers on neighboors network switches
-                for neighbor in list(topology.neighbors(switch)):
-                    for es in neighbor.edge_servers:
-                        if es not in edge_servers_in_path:
-                            edge_servers_in_path.append(es)
-
-            # Choose the path with the most edge servers
-            if len(edge_servers_in_path) > best_path_servers:
-                best_path_servers = len(edge_servers_in_path)
-                possible_edge_servers = edge_servers_in_path
-
-        return possible_edge_servers
-
-    def find_shortest_path(origin_network_switch: object, target_network_switch: object) -> int:
-        topology = origin_network_switch.model.topology
-        path = []
-
-        if not hasattr(topology, "delay_shortest_paths"):
-            topology.delay_shortest_paths = {}
-
-        key = (origin_network_switch, target_network_switch)
-
-        if key in topology.delay_shortest_paths.keys():
-            path = topology.delay_shortest_paths[key]
-        else:
-            path = nx.shortest_path(G=topology, source=origin_network_switch, target=target_network_switch,
-                                    weight="delay")
-            topology.delay_shortest_paths[key] = path
-
-        return path
-
-    def lapse_calculate_path_delay(origin_network_switch: object, target_network_switch: object) -> int:
-        topology = origin_network_switch.model.topology
-
-        path = find_shortest_path(origin_network_switch=origin_network_switch,
-                                  target_network_switch=target_network_switch)
-        delay = topology.calculate_path_delay(path=path)
-
-        return delay
-
-    def get_edge_servers_metadata(source: object, sink: object, app: object, edge_servers: object = None) -> list:
-        metadata = []
-
-        edge_servers_list = edge_servers if edge_servers else EdgeServer.all()
-
-        for edge_server in edge_servers_list:
-            # Compute the percentage of services that can be hosted on the edge server
-            app_demand = 0
-            for service in app.services:
-                if not service.server:
-                    # app_demand += service.input_event_rate * service.mips_demand
-                    app_demand += service.cpu_demand * service.cpu_cycles_demand * service.memory_demand
-
-            edge_server_attrs = {
-                "object": edge_server,
-                "path_delay_source": lapse_calculate_path_delay(source, edge_server.network_switch),
-                "path_delay_sink": lapse_calculate_path_delay(sink, edge_server.network_switch),
-                "max_power_consumption": edge_server.power_model_parameters["max_power_consumption"],
-            }
-
-            metadata.append(edge_server_attrs)
-
-        return metadata
-
-    def find_minimum_and_maximum(metadata: list):
-        min_and_max = {
-            "minimum": {},
-            "maximum": {},
-        }
-
-        for metadata_item in metadata:
-            for attr_name, attr_value in metadata_item.items():
-                if attr_name != "object":
-                    # Updating the attribute's minimum value
-                    if (
-                            attr_name not in min_and_max["minimum"]
-                            or attr_name in min_and_max["minimum"]
-                            and attr_value < min_and_max["minimum"][attr_name]
-                    ):
-                        min_and_max["minimum"][attr_name] = attr_value
-
-                    # Updating the attribute's maximum value
-                    if (
-                            attr_name not in min_and_max["maximum"]
-                            or attr_name in min_and_max["maximum"]
-                            and attr_value > min_and_max["maximum"][attr_name]
-                    ):
-                        min_and_max["maximum"][attr_name] = attr_value
-
-        return min_and_max
-
-    def min_max_norm(x, min, max):
-        if min == max:
-            return 1
-        return (x - min) / (max - min)
-
-    def get_norm(metadata: dict, attr_name: str, min: dict, max: dict) -> float:
-        normalized_value = min_max_norm(x=metadata[attr_name], min=min[attr_name], max=max[attr_name])
-        return normalized_value
-    #########################################################
-    # if (EdgeServer.is_potential_host < 261): ## commented by Amin
-    apps = Application.all()
-
-    # Sorts applications based on their processing time SLA (from lowest to highest),
-    # number of services (from highest to lowest), and input demand (from highest to lowest)
-    apps = sorted(
-        apps,
-        key=lambda app: (
-            get_app_total_demand(app),
-            -list(app.users[0].delay_slas.values())[0]
-        ),
-    )
-
-
-    for app in apps:
-        for base_station in BaseStation.all():
-        #
-        #     if len(base_station.edge_servers) > 0: ## commented by Amin
-            source = app.users[0].base_station.network_switch
-            # sink = app.services[-1].server.network_switch ## point
-            sink = base_station.network_switch
-
-            possible_edge_servers = get_edge_servers_between(source, sink)
-
-            for service in app.services:
-                # print(f"service: {service}")
-                # print(f"service.server: {service.server}")
-                if service.server != None and service.being_provisioned:  ## uncommented by amin
-                    continue        ## uncommented by amin
-
-                # if service.server == None and not service.being_provisioned: ## commented by amin
-                while service.server == None and not service.being_provisioned:
-
-                    edge_servers_metadata = get_edge_servers_metadata(source, sink, app, edge_servers=possible_edge_servers)
-
-                    min_and_max = find_minimum_and_maximum(metadata=edge_servers_metadata)
-
-                    edge_servers_metadata = sorted(
-                        edge_servers_metadata,
-                        key=lambda m: (
-                            get_norm(m, "path_delay_source", min=min_and_max["minimum"], max=min_and_max["maximum"])
-                            + get_norm(m, "path_delay_sink", min=min_and_max["minimum"], max=min_and_max["maximum"])
-                            + get_norm(m, "max_power_consumption", min=min_and_max["minimum"], max=min_and_max["maximum"]),
-                        ),
-                    )
-
-                    for es_metadata in edge_servers_metadata:
-                        edge_server = es_metadata["object"]
-
-                        # if has_capacity_to_host(edge_server, service):
-                        if edge_server.has_capacity_to_host(service=service):
-                            # print(f"service:{service} {service.application}, edge_server:{edge_server}")
-                            # print()
-                            # print(f"service.server: {service.server}")
-                            # place(service=service, edge_server=edge_server)
-                            service.provision(target_server=edge_server)
-                            source = edge_server.network_switch
-                            # Start provisioning the service in the edge server
-                            break
-
-                    # if not service.server: ## comment by Amin
-                    if service.server == None and not service.being_provisioned:
-                        possible_edge_servers = EdgeServer.all()
-#############################################################################
-
-def lapse_ICCPS(parameters):
     EdgeServer.has_capacity_to_host = has_capacity_to_host_proposed
 
     def find_shortest_path(origin_network_switch: object, target_network_switch: object) -> int:
@@ -636,10 +435,8 @@ def EDF_algorithm(parameters):
 
     # Sort the priorities_list based on deadline
     sorted_priorities_list = sorted(priorities_list, key=lambda x: (x[1]), reverse=True)
-    # for i in sorted_priorities_list:
-    #     print(f"Sorted priority list: {i}")
     for user in sorted_priorities_list:
-        # print(user[0])
+
         for service in user[0].applications[0].services:
             # We don't want to migrate services are already being migrated
             if service.server == None and not service.being_provisioned:
@@ -655,13 +452,14 @@ def EDF_algorithm(parameters):
                         # After start migrating the service we can move on to the next service
                         break
 
-
+scheduling_time_exceeded = False
+service_scheduling_duration = time.time()
 old_provisioned_services = 0
 def stopping_criterion(model: object):
     # Defining a variable that will help us to count the number of services successfully provisioned within the infrastructure
     provisioned_services = 0
-    global old_provisioned_services
-    global time_to_stop
+    scheduling_time_limitation = (1 / 30) * (len(Service.all()) * len(EdgeServer.all()))
+    global old_provisioned_services, service_scheduling_duration, scheduling_time_exceeded
 
     # Iterating over the list of services to count the number of services provisioned within the infrastructure
     for service in Service.all():
@@ -670,12 +468,21 @@ def stopping_criterion(model: object):
         if service.server != None:
             provisioned_services += 1
 
-        # print(f"service.server: {service.server.}")
+    # Since services constitute the components of applications, the maximum allowable time for scheduling
+    # a single service is inspired by the '30 FPS' benchmark for real-time responsiveness. Accordingly,
+    # the maximum scheduling time is defined as (1/30) * (total number of services * total number of edge servers).
+    # Therefore, the value of 'service_scheduling_duration' get updated as soon as a service is succesfully scheduled by
+    # the 'if (old_provisioned_services < provisioned_services):' condition.
+    elapsed_time = time.time() - service_scheduling_duration
+    if elapsed_time >= scheduling_time_limitation:
+        scheduling_time_exceeded = True
 
+    # This condition checks whether the service can be properly provisioned to the edge server based on
+    # the decision made by the scheduling algorithm
     if (old_provisioned_services < provisioned_services):
+        service_scheduling_duration = time.time()
         old_provisioned_services = provisioned_services
-        print(f"provisioned_services:{old_provisioned_services}")
-        print(f"EdgeServer.is_potential_host: {EdgeServer.is_potential_host}")
+        print(f"{old_provisioned_services} of {len(Service.all())} services are successfully scheduled.")
         print(f"Time Step: {simulator.schedule.steps}")
         semi_end_time_edgesimpy = time.time()
         semi_duration_edgesimpy = semi_end_time_edgesimpy - start_time_edgesimpy
@@ -683,16 +490,15 @@ def stopping_criterion(model: object):
         resource_tracker.report()
         print()
 
-    return (provisioned_services == Service.count()) or (provisioned_services == EdgeServer.is_potential_host)
+    return (provisioned_services == Service.count()) or (provisioned_services == EdgeServer.is_potential_host) or (scheduling_time_exceeded == True)
 
 ###################################################################################
 
 # @measure_memory
 def wrapped_Service_Provisioning(parameters):
     # result = Best_Fit_Service_Provisioning(parameters)
-    # result = lapse_ICCPS(parameters)
-    # result = DAMR(parameters)
-    result = MARS(parameters)
+    result = lapse(parameters)
+    # result = MARS(parameters)
     # result = EDF_algorithm(parameters)
     process = psutil.Process(os.getpid())
     resource_tracker.update(process.memory_info().rss)
@@ -716,7 +522,7 @@ simulator = Simulator(
     logs_directory=logs_directory,
 )
 
-### Loading the dataset
+## Loading the dataset
 simulator.initialize(input_file=r"C:\Users\100807003\PycharmProjects\EdgeSimPy\edge_sim_py\dataset_generator\datasets\dataset1.json")
 
 # Start the timer
