@@ -16,7 +16,7 @@ All packages required by EdgeSimPy are listed in the pyproject.toml file, which 
 
 ## Build Instructions
 Considering that you already installed a recent version of [Poetry](https://python-poetry.org/), you can install the required packages for EdgeSimPy using the following command:
-```
+```bash
 poetry install
 ```
 
