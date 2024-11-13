@@ -492,7 +492,10 @@ def stopping_criterion(model: object):
 
     return (provisioned_services == Service.count()) or (provisioned_services == EdgeServer.is_potential_host) or (scheduling_time_exceeded == True)
 
-###################################################################################
+#######################################################################################################################
+##################################################
+## Determining the name of Scheduling Algorithm ##
+##################################################
 
 # Map algorithm names to functions
 algorithm_functions = {
@@ -503,7 +506,7 @@ algorithm_functions = {
 }
 
 # Define the name of the scheduling algorithm, that could be "lapse", "MARS", "BestFit", "EDF"
-scheduling_algorithm = "lapse"
+scheduling_algorithm = "EDF"
 
 # @measure_memory
 def wrapped_Service_Provisioning(parameters, algorithm_name=scheduling_algorithm):
@@ -531,8 +534,16 @@ simulator = Simulator(
     logs_directory=logs_directory,
 )
 
-## Loading the dataset
-simulator.initialize(input_file=r"C:\Users\100807003\PycharmProjects\EdgeSimPy\edge_sim_py\dataset_generator\datasets\dataset1.json")
+#########################
+## Loading the dataset ##
+#########################
+# Get the directory of the current script
+current_dir = os.path.dirname(__file__)
+# Define the relative path to the dataset, using the script's directory as the base
+dataset_path = os.path.join(current_dir, "dataset_generator", "datasets", "dataset1.json")
+# Initialize the simulator with the absolute path
+simulator.initialize(input_file=dataset_path)
+
 
 # Start the timer
 start_time_edgesimpy = time.time()
