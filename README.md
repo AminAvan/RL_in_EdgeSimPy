@@ -8,7 +8,7 @@ The original repository of EdgeSimPy can be found [here](https://github.com/Edge
 All packages required by EdgeSimPy are listed in the pyproject.toml file, which should be installed using Poetry in Python.
 
 ## Build Instructions
-Assuming you have already installed a recent version of [Poetry](https://python-poetry.org/) and your Python version is ```>=3.10,<3.11```, you can install the required packages for EdgeSimPy using the following command:
+Assuming you have already installed a recent version of [Poetry](https://python-poetry.org/) (can be installed with `curl -sSL https://install.python-poetry.org | python -`) and your Python version is ```>=3.10,<3.11```, you can install the required packages for EdgeSimPy using the following command:
 ```bash
 poetry install
 poetry shell
