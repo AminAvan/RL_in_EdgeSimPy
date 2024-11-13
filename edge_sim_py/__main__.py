@@ -504,7 +504,6 @@ algorithm_functions = {
     "BestFit": Best_Fit_Service_Provisioning,
     "EDF": EDF_algorithm
 }
-
 # Define the name of the scheduling algorithm, that could be "lapse", "MARS", "BestFit", "EDF"
 scheduling_algorithm = "EDF"
 

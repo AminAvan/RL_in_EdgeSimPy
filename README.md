@@ -13,9 +13,11 @@ Assuming you have already installed a recent version of [Poetry](https://python-
 poetry install
 poetry shell
 ```
-
 After completing the above step, you need to change the 'Python Interpreter' in your IDE to point to the 'Poetry Environment' location. The path was output by `poetry shell`, and you need to append `\Scripts\python.exe` to the end, resulting in a path like `[output from poetry shell]\Scripts\python.exe`.
 
+
+## Selecting & Running Scheduling Algorithms
+In the `edge_sim_py/__main__.py` file, the `algorithm_functions` function poses all available scheduling algorithms. Set your preferred algorithm name as the value of the `scheduling_algorithm` variable, located just after this function.
 
 ## Input Files
 
