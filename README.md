@@ -14,7 +14,7 @@ poetry install
 poetry shell
 ```
 
-After conducting the abovementioned step, it is needed to change 'Python Interpreter' in your IDE to the where 'Poetry Environment' address is, where the address of it is output of `poetry shell` with adding `\Scripts\python.exe` such as `[address resulted from poetry shell]\Scripts\python.exe`
+After completing the above step, you need to change the 'Python Interpreter' in your IDE to point to the 'Poetry Environment' location. The path was output by `poetry shell`, and you need to append `\Scripts\python.exe` to the end, resulting in a path like `[output from poetry shell]\Scripts\python.exe`.
 
 
 ## Input Files
