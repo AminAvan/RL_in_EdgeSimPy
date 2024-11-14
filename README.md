@@ -17,7 +17,25 @@ After completing the above step, you need to change the 'Python Interpreter' in 
 
 
 ## Selecting & Running Scheduling Algorithms
-In the `edge_sim_py/__main__.py` file, the `algorithm_functions` function poses all available scheduling algorithms. Set your preferred algorithm name as the value of the `scheduling_algorithm` variable, located just after this function.
+In the [main](edge_sim_py/__main__.py) file, the `algorithm_functions` function poses all available scheduling algorithms. Set your preferred algorithm name as the value of the `scheduling_algorithm` variable, located just after this function.
+
+After selecting your preferred scheduling algorithm, run `edge_sim_py/__main__.py`. While the file is running, the following information will be printed regularly as an online report of the scheduling process until completion. 
+```
+'...' out of '...' services are successfully scheduled.
+runtime: '...' seconds
+memory consumption: '...' MB until '...' seconds
+power consumption: '...' Watt-seconds until '...' seconds
+```
+* `runtime`: the time it takes for the algorithm to generate an optimal/near-optimal schedule for `'...' out of '...' services` based on service attributes & edge server resources, plus the time required to provision these services according to the schedule.
+* `memory consumption`: the memory used by the algorithm during scheduling & provisioning for `'...' out of '...' services`.
+* `power consumption`: the power consumed by the algorithm during scheduling & provisioning for `'...' out of '...' services`.
+
+Upon completion of the scheduling process, the following information will be displayed:
+```
+Total runtime: '...' seconds
+Total memory consumption: '...' MB
+Total power consumption: '...' Watt-seconds
+```
 
 ## Input Files
 

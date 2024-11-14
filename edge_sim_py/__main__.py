@@ -40,11 +40,15 @@ class ResourceTracker:
 
     def report(self):
         total_time = time.time() - self.start_time
-        print(f"Total memory consumed: {self.total_memory / (1024 * 1024):.2f} MiB")
-        print(f"Total power consumption: {self.total_power:.2f} Watt-seconds")
+        print(f"runtime: {total_time:.2f} seconds")
+        print(f"memory consumption: {self.total_memory / (1024 * 1024):.2f} MB until {total_time:.2f} seconds")
+        print(f"power consumption: {self.total_power:.2f} Watt-seconds until {total_time:.2f} seconds")
         # print(f"Number of calls: {self.call_count}")
-        print(f"Total execution time: {total_time:.2f} seconds")
-        print(f"Average power over time: {(self.total_power / total_time):.2f} Watts")
+
+
+    def final_report(self):
+        print(f"Total memory consumption: {self.total_memory / (1024 * 1024):.2f} MB")
+        print(f"Total power consumption: {self.total_power:.2f} Watt-seconds")
 
 resource_tracker = ResourceTracker()
 
@@ -138,7 +142,7 @@ def has_capacity_to_host_proposed(self, service: object) -> bool:
     # Checking if the host would have resources to host the registry and its (additional) layers
     if (free_cpu_utilization <= 1 and free_memory >= service.memory_demand and free_disk >= additional_disk_demand):  ### if (free_cpu >= service.cpu_demand and free_memory >= service.memory_demand and free_disk >= additional_disk_demand):
         # print(f"free_cpu_utilization: {free_cpu_utilization}, free_memory: {free_memory}, free_disk: {free_disk}")
-        # calculating true execution time of service on the host server
+        # calculating true runtime of service on the host server
         self.execution_time_of_service[str(service.id)] = user_service_exe_time
         self.total_cpu_utilization = (self.total_cpu_utilization + user_service_utilization)
 
@@ -482,11 +486,11 @@ def stopping_criterion(model: object):
     if (old_provisioned_services < provisioned_services):
         service_scheduling_duration = time.time()
         old_provisioned_services = provisioned_services
-        print(f"{old_provisioned_services} of {len(Service.all())} services are successfully scheduled.")
-        print(f"Time Step: {simulator.schedule.steps}")
-        semi_end_time_edgesimpy = time.time()
-        semi_duration_edgesimpy = semi_end_time_edgesimpy - start_time_edgesimpy
-        print(f"Execution time: {semi_duration_edgesimpy:.2f} seconds")
+        print(f"{old_provisioned_services} out of {len(Service.all())} services are successfully scheduled.")
+        # print(f"Time Step of EdgeSimPy: {simulator.schedule.steps}")
+        # semi_end_time_edgesimpy = time.time()
+        # semi_duration_edgesimpy = semi_end_time_edgesimpy - start_time_edgesimpy
+        # print(f"runtime: {semi_duration_edgesimpy:.2f} seconds")
         resource_tracker.report()
         print()
 
@@ -553,6 +557,6 @@ simulator.run_model()
 # End the timer and calculate the duration
 end_time_edgesimpy = time.time()
 duration_edgesimpy = end_time_edgesimpy - start_time_edgesimpy
-print(f"Execution time: {duration_edgesimpy:.2f} seconds")
+print(f"Total runtime: {duration_edgesimpy:.2f} seconds")
 
-resource_tracker.report()
+resource_tracker.final_report()
