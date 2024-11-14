@@ -369,8 +369,6 @@ for i in range(len(central_node_coords)):
 current_dir_dataset = os.path.dirname(__file__)
 read_file = os.path.join(current_dir_dataset, "container_images.json")
 
-print()
-
 with open("container_images.json", "r", encoding="UTF-8") as read_file:
     container_image_specifications = json.load(read_file)
 
@@ -657,23 +655,8 @@ for user in User.all():
 
     users.append(user_metadata)
 
-print("\n\n==== NETWORK DISTANCE (DELAY) BETWEEN USERS AND EDGE SERVERS ====")
-for user_metadata in users:
-    user_attrs = {
-        "object": user_metadata["object"],
-        "sla": user_metadata["object"].delay_slas[str(user_metadata["object"].applications[0].id)],
-        "min": user_metadata["min_delay"],
-        "max": user_metadata["max_delay"],
-        "avg": round(user_metadata["avg_delay"]),
-        "delays": user_metadata["delays"],
-    }
-    print(f"{user_attrs}")
-    if user_attrs["min"] > user_attrs["sla"]:
-        print(f"\n\nWARNING: {user_attrs['object']} delay SLA is not achievable!\n\n")
-
 
 # Calculating the infrastructure occupation and information about the services
-edge_server_cpu_capacity = 0
 edge_server_memory_capacity = 0
 service_cpu_demand = 0
 service_memory_demand = 0
@@ -683,95 +666,108 @@ avg_cpu_cycles_demand = 0
 avg_edge_server_cpu_cycle_capacity = 0
 
 for edge_server in EdgeServer.all():
-    edge_server_cpu_capacity += edge_server.cpu
     edge_server_memory_capacity += edge_server.memory
     edge_server_cpu_cycle_capacity += (edge_server.cpu_cycle * edge_server.cpu)  ## clock frequency of each core multiply to number of cores
 
 avg_edge_server_cpu_cycle_capacity = (edge_server_cpu_cycle_capacity / len(EdgeServer.all()))
-print(f"\navg_edge_server_cpu_cycle_capacity:{avg_edge_server_cpu_cycle_capacity}")
+# print(f"\navg_edge_server_cpu_cycle_capacity:{avg_edge_server_cpu_cycle_capacity}")
 
 for service in Service.all():
-    service_cpu_demand += service.cpu_demand
     service_memory_demand += service.memory_demand
     service_cpu_cycles_demand_demand += service.cpu_cycles_demand
 
 avg_cpu_cycles_demand = round((service_cpu_cycles_demand_demand / len(Service.all())), 1)
-print(f"\navg_cpu_cycles_demand:{avg_cpu_cycles_demand}")
+# print(f"\navg_cpu_cycles_demand:{avg_cpu_cycles_demand}")
 
 avg_execution_time = avg_cpu_cycles_demand / avg_edge_server_cpu_cycle_capacity
-print(f"\navg_execution_time:{avg_execution_time}")
+# print(f"\navg_execution_time:{avg_execution_time}")
 
-
-overall_cpu_occupation = round((service_cpu_demand / edge_server_cpu_capacity) * 100, 1)
 overall_memory_occupation = round((service_memory_demand / edge_server_memory_capacity) * 100, 1)
 overall_clock_frequency_occupation = round((service_cpu_cycles_demand_demand / edge_server_cpu_cycle_capacity) * 100, 1)
 
 print("\n\n==== INFRASTRUCTURE OCCUPATION OVERVIEW ====")
 print(f"Edge Servers: {EdgeServer.count()}")
-print(f"\tCPU Capacity: {edge_server_cpu_capacity}")
-print(f"\tRAM Capacity: {edge_server_memory_capacity}")
-print(f"\tClock Frequency Capacity: {edge_server_cpu_cycle_capacity}")
-print(f"Services: {Service.count()}")
-print(f"\tCPU Demand: {service_cpu_demand}")
-print(f"\t\t[High Latency Sensitivity] {sum([s.cpu_demand for s in Service.all() if s.application == 2])}")
+print(f"\tTotal CPU computational capacity: {edge_server_cpu_cycle_capacity} Hz")  ## regarding number of cores and their clock frequency
+print(f"\tTotal RAM capacity: {edge_server_memory_capacity} MB")
 
-print(f"\tCPU Cycles Demand: {service_cpu_cycles_demand_demand}")
+print(f"\nEdge users: {User.count()}")
+total_CLS_edge_users = 0  ## Critical Sensitivity
+total_HLS_edge_users = 0  ## High Sensitivity
+total_MLS_edge_users = 0  ## Moderate Sensitivity
+total_LLS_edge_users = 0  ## Low Sensitivity
+for a in Application.all():
+    if ((list(a.users[0].delay_slas.values())[0] == 22) or (list(a.users[0].delay_slas.values())[0] == 23)):
+        total_CLS_edge_users = total_CLS_edge_users + 1
+        for app, values in valid_values_for_apps.items():
+            if ((22) or (23)) in values:
+                CLS_app_name = app
+    elif ((list(a.users[0].delay_slas.values())[0] == 44) or (list(a.users[0].delay_slas.values())[0] == 46)):
+        total_HLS_edge_users = total_HLS_edge_users + 1
+        for app, values in valid_values_for_apps.items():
+            if ((44) or (46)) in values:
+                HLS_app_name = app
+    elif ((list(a.users[0].delay_slas.values())[0] == 2800) or (list(a.users[0].delay_slas.values())[0] == 4000)):
+        total_MLS_edge_users = total_MLS_edge_users + 1
+        for app, values in valid_values_for_apps.items():
+            if ((2800) or (4000)) in values:
+                MLS_app_name = app
+    elif ((list(a.users[0].delay_slas.values())[0] == 5600) or (list(a.users[0].delay_slas.values())[0] == 8000)):
+        total_LLS_edge_users = total_LLS_edge_users + 1
+        for app, values in valid_values_for_apps.items():
+            if ((5600) or (8000)) in values:
+                LLS_app_name = app
+print(f"\t{CLS_app_name} [Critical Sensitivity]: {total_CLS_edge_users} ({round(((total_CLS_edge_users/User.count())*100),2)}%)")
+print(f"\t{HLS_app_name} [High Sensitivity]: {total_HLS_edge_users} ({round(((total_HLS_edge_users/User.count())*100),2)}%)")
+print(f"\t{MLS_app_name} [Moderate Sensitivity]: {total_MLS_edge_users} ({round(((total_MLS_edge_users/User.count())*100),2)}%)")
+print(f"\t{LLS_app_name} [Low Sensitivity]: {total_LLS_edge_users} ({round(((total_LLS_edge_users/User.count())*100),2)}%)")
+
+print(f"\nServices of {User.count()} edge users: {Service.count()}")
+
+print(f"\tTotal CPU Cycles Demands: {service_cpu_cycles_demand_demand}")
 total_cpu_cycles_CLS = 0  ## Critical Sensitivity
 total_cpu_cycles_HLS = 0  ## High Sensitivity
 total_cpu_cycles_MLS = 0  ## Moderate Sensitivity
 total_cpu_cycles_LLS = 0  ## Low Sensitivity
 for a in Application.all():
-    if ((list(a.users[0].delay_slas.values())[0] == 4) or (list(a.users[0].delay_slas.values())[0] == 7)):
+    if ((list(a.users[0].delay_slas.values())[0] == 22) or (list(a.users[0].delay_slas.values())[0] == 23)):
         for i in a.services:
             total_cpu_cycles_CLS = total_cpu_cycles_CLS + i.cpu_cycles_demand
-    elif ((list(a.users[0].delay_slas.values())[0] == 11) or (list(a.users[0].delay_slas.values())[0] == 17)):
+    elif ((list(a.users[0].delay_slas.values())[0] == 44) or (list(a.users[0].delay_slas.values())[0] == 46)):
         for i in a.services:
             total_cpu_cycles_HLS = total_cpu_cycles_HLS + i.cpu_cycles_demand
-    elif ((list(a.users[0].delay_slas.values())[0] == 20) or (list(a.users[0].delay_slas.values())[0] == 26)):
+    elif ((list(a.users[0].delay_slas.values())[0] == 2800) or (list(a.users[0].delay_slas.values())[0] == 4000)):
         for i in a.services:
             total_cpu_cycles_MLS = total_cpu_cycles_MLS + i.cpu_cycles_demand
-    elif ((list(a.users[0].delay_slas.values())[0] == 22) or (list(a.users[0].delay_slas.values())[0] == 28)):
+    elif ((list(a.users[0].delay_slas.values())[0] == 5600) or (list(a.users[0].delay_slas.values())[0] == 8000)):
         for i in a.services:
             total_cpu_cycles_LLS = total_cpu_cycles_LLS + i.cpu_cycles_demand
-print(f"\t\t[Critical Sensitivity] {total_cpu_cycles_CLS} ({round(((total_cpu_cycles_CLS/service_cpu_cycles_demand_demand)*100),2)}%)")
-print(f"\t\t[High Sensitivity] {total_cpu_cycles_HLS} ({round(((total_cpu_cycles_HLS/service_cpu_cycles_demand_demand)*100),2)}%)")
-print(f"\t\t[Moderate Sensitivity] {total_cpu_cycles_MLS} ({round(((total_cpu_cycles_MLS/service_cpu_cycles_demand_demand)*100),2)}%)")
-print(f"\t\t[Low Sensitivity] {total_cpu_cycles_LLS} ({round(((total_cpu_cycles_LLS/service_cpu_cycles_demand_demand)*100),2)}%)")
+print(f"\t\t[Critical Sensitivity]: {total_cpu_cycles_CLS} ({round(((total_cpu_cycles_CLS/service_cpu_cycles_demand_demand)*100),2)}%)")
+print(f"\t\t[High Sensitivity]: {total_cpu_cycles_HLS} ({round(((total_cpu_cycles_HLS/service_cpu_cycles_demand_demand)*100),2)}%)")
+print(f"\t\t[Moderate Sensitivity]: {total_cpu_cycles_MLS} ({round(((total_cpu_cycles_MLS/service_cpu_cycles_demand_demand)*100),2)}%)")
+print(f"\t\t[Low Sensitivity]: {total_cpu_cycles_LLS} ({round(((total_cpu_cycles_LLS/service_cpu_cycles_demand_demand)*100),2)}%)")
 
-print(f"\tRAM Demand: {service_memory_demand}")
+print(f"\tTotal RAM Demand: {service_memory_demand} MB")
 total_memory_CLS = 0  ## Critical Sensitivity
 total_memory_HLS = 0  ## High Sensitivity
 total_memory_MLS = 0  ## Moderate Sensitivity
 total_memory_LLS = 0  ## Low Sensitivity
 for a in Application.all():
-    if ((list(a.users[0].delay_slas.values())[0] == 4) or (list(a.users[0].delay_slas.values())[0] == 7)):
+    if ((list(a.users[0].delay_slas.values())[0] == 22) or (list(a.users[0].delay_slas.values())[0] == 23)):
         for i in a.services:
             total_memory_CLS = total_memory_CLS + i.memory_demand
-    elif ((list(a.users[0].delay_slas.values())[0] == 11) or (list(a.users[0].delay_slas.values())[0] == 17)):
+    elif ((list(a.users[0].delay_slas.values())[0] == 44) or (list(a.users[0].delay_slas.values())[0] == 46)):
         for i in a.services:
             total_memory_HLS = total_memory_HLS + i.memory_demand
-    elif ((list(a.users[0].delay_slas.values())[0] == 20) or (list(a.users[0].delay_slas.values())[0] == 26)):
+    elif ((list(a.users[0].delay_slas.values())[0] == 2800) or (list(a.users[0].delay_slas.values())[0] == 4000)):
         for i in a.services:
             total_memory_MLS = total_memory_MLS + i.memory_demand
-    elif ((list(a.users[0].delay_slas.values())[0] == 22) or (list(a.users[0].delay_slas.values())[0] == 28)):
+    elif ((list(a.users[0].delay_slas.values())[0] == 5600) or (list(a.users[0].delay_slas.values())[0] == 8000)):
         for i in a.services:
             total_memory_LLS = total_memory_LLS + i.memory_demand
-print(f"\t\t[Critical Sensitivity] {total_memory_CLS} ({round(((total_memory_CLS/service_memory_demand)*100),2)}%)")
-print(f"\t\t[High Sensitivity] {total_memory_HLS} ({round(((total_memory_HLS/service_memory_demand)*100),2)}%)")
-print(f"\t\t[Moderate Sensitivity] {total_memory_MLS} ({round(((total_memory_MLS/service_memory_demand)*100),2)}%)")
-print(f"\t\t[Low Sensitivity] {total_memory_LLS} ({round(((total_memory_LLS/service_memory_demand)*100),2)}%)")
-
-print(f"Overall Occupation")
-print(f"\tCPU: {overall_cpu_occupation}%")
-print(f"\tRAM: {overall_memory_occupation}%")
-print(f"\tClock Freq: {overall_clock_frequency_occupation}%")
-
-"""
-'crowd counting': [4, 7],               # 1 for proc in edge server
-'face recognition': [11, 17],           # 2 for proc in edge server
-'crowd counting ml dev': [20, 26],      # 5 for proc in edge server
-'face recognition ml dev': [22, 28],    # 7 for proc in edge server
-"""
+print(f"\t\t[Critical Sensitivity]: {total_memory_CLS} ({round(((total_memory_CLS/service_memory_demand)*100),2)}%)")
+print(f"\t\t[High Sensitivity]: {total_memory_HLS} ({round(((total_memory_HLS/service_memory_demand)*100),2)}%)")
+print(f"\t\t[Moderate Sensitivity]: {total_memory_MLS} ({round(((total_memory_MLS/service_memory_demand)*100),2)}%)")
+print(f"\t\t[Low Sensitivity]: {total_memory_LLS} ({round(((total_memory_LLS/service_memory_demand)*100),2)}%)")
 
 # ### Exporting scenario
 # Application._to_dict = application_to_dict
