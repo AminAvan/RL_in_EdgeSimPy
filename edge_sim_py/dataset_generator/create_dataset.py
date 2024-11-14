@@ -107,7 +107,6 @@ def display_topology(topology: object, output_filename: str = "topology"):
 
 
 
-
 # Application -> provisioned
 def application_to_dict(self) -> dict:
     """Method that overrides the way the object is formatted to JSON."
@@ -485,10 +484,12 @@ def random_user_placement():
 # """
 
 # Defining applications/services specifications
-# app(crowd counting) -> "number_of_objects": 228, "number_of_services": 5 (alpine, python, nginx, redis, mobilenetssd)
-# app(face recognition) -> "number_of_objects": 25, "number_of_services": 5 (ubuntu, python, envoy, aerospike, yolov8)
-# app(ml model training&development of crowd counting) -> "number_of_objects": 7, "number_of_services": 6 (ubuntu, python, envoy, kafka, pytorch, mobilenetssd)
-# app(ml model training&development of face recognition) -> "number_of_objects": 3, "number_of_services": 6 (ubuntu, python, envoy, kafka, tensorflow, yolov8)
+"""
+app(crowd counting) -> "number_of_objects": 228, "number_of_services": 5 (alpine, python, nginx, redis, mobilenetssd)
+app(face recognition) -> "number_of_objects": 25, "number_of_services": 5 (ubuntu, python, envoy, aerospike, yolov8)
+app(ml model training&development of crowd counting) -> "number_of_objects": 7, "number_of_services": 6 (ubuntu, python, envoy, kafka, pytorch, mobilenetssd)
+app(ml model training&development of face recognition) -> "number_of_objects": 3, "number_of_services": 6 (ubuntu, python, envoy, kafka, tensorflow, yolov8)
+"""
 
 # ## for 10x10
 # application_specifications = [
@@ -513,7 +514,7 @@ application_specifications = [
      "name_of_services": ['ubuntu', 'python', 'envoy', 'kafka', 'tensorflow', 'yolov8']},
 ]
 
-# Define valid delay SLA values for each application -- each edge take '3' as delay -- Training time could also be 1,000x to 100,000x longer than inference time per face image.
+# Define deadline values for each application
 valid_values_for_apps = {
     'crowd counting': [22, 23],       # 1 for proc in edge server
     'face recognition': [44, 46],       # 2 for proc in edge server
@@ -521,7 +522,7 @@ valid_values_for_apps = {
     'face recognition ml dev': [5600, 8000], # 7 for proc in edge server
 }
 
-# Generate delay SLAs for each application
+# Generate deadline for each application
 delay_slas = []
 for app_spec in application_specifications:
     app_label = app_spec["label_of_app"]
@@ -530,21 +531,6 @@ for app_spec in application_specifications:
     delay_slas.extend(uniform(n_items=n_items, valid_values=valid_values, shuffle_distribution=True))
 
 
-# ## Defining service demands -- all 876 services can be hosted
-# service_demand_values = [
-#     {"label": 'ubuntu', "cpu": 1, "memory": 500, "cpu_cycles_demand": (2_000 * 500)},
-#     {"label": 'alpine', "cpu": 1, "memory": 60, "cpu_cycles_demand": (5_00 * 60)},
-#     {"label": 'nginx', "cpu": 1, "memory": 60, "cpu_cycles_demand": (3_00 * 60)},
-#     {"label": 'redis', "cpu": 1, "memory": 60, "cpu_cycles_demand": (1_000 * 60)},
-#     {"label": 'kafka', "cpu": 1, "memory": 440, "cpu_cycles_demand": (2_000 * 440)},
-#     {"label": 'aerospike', "cpu": 1, "memory": 380, "cpu_cycles_demand": (1_000 * 380)},
-#     {"label": 'envoy', "cpu": 1, "memory": 120, "cpu_cycles_demand": (2_000 * 120)},
-#     {"label": 'python', "cpu": 1, "memory": 60, "cpu_cycles_demand": (5_000 * 60)},
-#     {"label": 'pytorch', "cpu": 1, "memory": 1000, "cpu_cycles_demand": (20_000 * 1000)},
-#     {"label": 'tensorflow', "cpu": 1, "memory": 1000, "cpu_cycles_demand": (20_000 * 1000)},
-#     {"label": 'yolov8', "cpu": 1, "memory": 1000, "cpu_cycles_demand": (40_000 * 1000)},
-#     {"label": 'mobilenetssd', "cpu": 1, "memory": 500, "cpu_cycles_demand": (10_000 * 500)},
-# ]
 ## Defining service demands
 service_demand_values = [
     {"label": 'ubuntu', "cpu": 1, "memory": 350, "cpu_cycles_demand": (25_000 * 350)},
@@ -769,7 +755,11 @@ print(f"\t\t[High Sensitivity]: {total_memory_HLS} ({round(((total_memory_HLS/se
 print(f"\t\t[Moderate Sensitivity]: {total_memory_MLS} ({round(((total_memory_MLS/service_memory_demand)*100),2)}%)")
 print(f"\t\t[Low Sensitivity]: {total_memory_LLS} ({round(((total_memory_LLS/service_memory_demand)*100),2)}%)")
 
-# ### Exporting scenario
+##########################
+### Exporting scenario ###
+# If you want to export your dataset,
+# please uncomment the following lines & change the dataset name to your preferred name
+##########################
 # Application._to_dict = application_to_dict
 # User._to_dict = user_to_dict
 # EdgeServer._to_dict = edge_server_to_dict
