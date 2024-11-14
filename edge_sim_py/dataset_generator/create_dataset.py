@@ -757,9 +757,11 @@ print(f"\t\t[Low Sensitivity]: {total_memory_LLS} ({round(((total_memory_LLS/ser
 
 ##########################
 ### Exporting scenario ###
-# If you want to export your dataset,
-# please uncomment the following lines & change the dataset name to your preferred name
 ##########################
+"""
+If you want to export your dataset,
+    please uncomment the following lines & change the dataset name to your preferred name
+"""
 # Application._to_dict = application_to_dict
 # User._to_dict = user_to_dict
 # EdgeServer._to_dict = edge_server_to_dict
