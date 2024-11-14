@@ -19,7 +19,7 @@ After completing the above step, you need to change the 'Python Interpreter' in 
 ## Selecting & Running Scheduling Algorithms
 In the [main](edge_sim_py/__main__.py) file, the `algorithm_functions` function poses all available scheduling algorithms. Set your preferred algorithm name as the value of the `scheduling_algorithm` variable, located just after this function.
 
-After selecting your preferred scheduling algorithm, run `edge_sim_py/__main__.py`. While the file is running, the following information will be printed regularly as an online report of the scheduling process until completion. 
+After selecting your preferred scheduling algorithm, run [main](edge_sim_py/__main__.py). While the file is running, the following information will be printed regularly as an online report of the scheduling process until completion.
 ```
 '...' out of '...' services are successfully scheduled.
 runtime: '...' seconds
@@ -36,6 +36,12 @@ Total runtime: '...' seconds
 Total memory consumption: '...' MB
 Total power consumption: '...' Watt-seconds
 ```
+
+## Dataset
+We modify & introduce new parameters in the [dataset generator](edge_sim_py/dataset_generator/create_dataset.py) to produce a dataset that incorporates real-time parameters for the specified services within edge user applications.
+
+We generate a dataset for a video surveillance scenario, where there are four different applications are defined in this dataset including 1) crowd counting, 2) face recognition, 3) machine learning model development for crowd counting, and 4) machine learning model development for face recognition. 
+
 
 ## Input Files
 

@@ -12,6 +12,9 @@ import numpy as np
 import random
 import json
 import copy
+import os
+#################################
+
 # Enforcing Matplotlib and NetworkX versions that don't produce visualization errors
 if matplotlib.__version__ != '3.5.0':
     subprocess.check_call(["pip", "install", "matplotlib==3.5.0"])
@@ -360,9 +363,14 @@ for i in range(len(central_node_coords)):
     base_station._connect_to_edge_server(edge_server=edge_server)
 
 
+####################################################################
+### Reading specifications of tools' images from container images ##
+####################################################################
+current_dir_dataset = os.path.dirname(__file__)
+read_file = os.path.join(current_dir_dataset, "container_images.json")
 
-### Reading specifications of tools' images from container images
-read_file = r"C:\Users\100807003\PycharmProjects\EdgeSimPy\edge_sim_py\dataset_generator\container_images.json"
+print()
+
 with open("container_images.json", "r", encoding="UTF-8") as read_file:
     container_image_specifications = json.load(read_file)
 
