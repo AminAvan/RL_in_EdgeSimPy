@@ -38,10 +38,23 @@ Total power consumption: '...' Watt-seconds
 ```
 
 ## Dataset
-We modify & introduce new parameters in the [dataset generator](edge_sim_py/dataset_generator/create_dataset.py) to produce a dataset that incorporates real-time parameters for the specified services within edge user applications.
+We modify & introduce new parameters in the [dataset generator](edge_sim_py/dataset_generator/create_dataset.py) to generate a dataset incorporating real-time parameters specific to the services within edge user applications.
 
-We generate a dataset for a video surveillance scenario, where there are four different applications are defined in this dataset including 1) crowd counting, 2) face recognition, 3) machine learning model development for crowd counting, and 4) machine learning model development for face recognition. 
+This [dataset](edge_sim_py/dataset_generator/datasets/dataset1.json) simulates a video surveillance scenario with four applications:
+1) Crowd counting
+   2) services: alpine, python, nginx, redis, mobilenetssd.
+2) Face recognition
+   3) services: ubuntu, python, envoy, aerospike, yolov8.
+3) Machine learning model development for crowd counting
+   4) services: ubuntu, python, envoy, kafka, pytorch, mobilenetssd.
+4) Machine learning model development for face recognition
+   5) services: ubuntu, python, envoy, kafka, tensorflow, yolov8.
 
+In [dataset](edge_sim_py/dataset_generator/datasets/dataset1.json), all services are characterized by a list of dictionaries named `service_demand_values`, which each dic includes the following information:
+* `"label"`: name of service
+* `"cpu"`: we set this variable to `1` for all services, as it was previously used to indicate CPU demand in terms of the number of cores. However, we now determine the CPU demand of a service based on the processor cycles needed per second for processing `1MB` of its data.
+* `"memory: y"`: amount of memory (RAM) required by a service to operate.
+* `"cpu_cycles_demand": (x * y)"`: The total required processor cycles are calculated by multiplying `x` (the cycles needed per second to process `1MB` of data) by `y`.
 
 ## Input Files
 
