@@ -86,4 +86,10 @@ Services of 52 edge users: 262
 
 ## Monitoring
 
-Once the simulation starts, EdgeSimPy monitor the entity's state at the end of each time step. Simulation logs are stored in MessagePack, a fast binary serialization format. Instead of writing data to disk each time step, EdgeSimPy stores the simulation output at configurable intervals of time steps, reducing the I/O pressure during the simulation. You can also customize which entity metrics are monitored at each time step by overriding the entity's `collect()` method.
+We can monitor the entity's state at the end of each time step of EdgeSimPy using [monitoring](edge_sim_py/monitoring.py). Simulation logs are stored in MessagePack, and you can customize which entity metrics are monitored at each time step by overriding the entity's `collect()` method.
+
+Based on the current [monitoring](edge_sim_py/monitoring.py) code, various details about each edge server can be obtained, including its coordinates, its availability, RAM capacity, disk capacity, processor demand (based on cycles demand), memory demand, storage demand, and the IDs of services hosted on the server.
+
+In addition, the current [monitoring](edge_sim_py/monitoring.py) provides details about each service, including its ID, availability status, associated application ID, the ID of the hosting edge-server, and migration status.
+
+Finally, the current [monitoring](edge_sim_py/monitoring.py) prints `'m' out of 'M' services are experienced failures (missed/lost/failed), potentially affecting 'n' of the 'N' users.`

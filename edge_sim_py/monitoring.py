@@ -103,7 +103,7 @@ max_instance_id = datasets["Service"]["Instance ID"].max()
 # showing all the columns of the "Service"
 # print(datasets["Service"].columns)
 # selecting specific columns
-selected_columns_service = ['Object', 'Time Step', 'Instance ID', 'Available', 'Application', 'Server', 'Being Provisioned', 'Last Migration']
+selected_columns_service = ['Object', 'Time Step', 'Instance ID', 'Available', 'Application', 'Server', 'Last Migration']
 ### filtering the rows
 filtered_col_service = datasets["Service"][(datasets["Service"]["Time Step"] == (time_step_value))]
 print(filtered_col_service[selected_columns_service])
@@ -115,7 +115,6 @@ for status in filtered_col_service[selected_columns_service]['Available']:
     # Check if 'miss' is present in the dictionary values
     if status == False:
         service_miss_count += 1
-
 
 
 """
@@ -136,7 +135,7 @@ total_users = 0
 
 # showing all the columns of the "User"
 # print(datasets["User"].columns)
-# print()
+
 # selecting specific columns
 selected_columns_user = ['Object', 'Time Step', 'Instance ID', 'Required Deadline', 'Round Trip Time', 'In Server Processing Time', 'Response Time', 'Deadline Status']
 # # printing the selected columns from User
@@ -153,8 +152,5 @@ for status in filtered_col_user[selected_columns_user]['Deadline Status']:
     # Check if 'miss' is present in the dictionary values
     if not status.values():
         might_miss_count += 1
-#
-# # Print the count of 'miss'
-# print(f"\nmight_miss_count: {might_miss_count}")
 
 print(f"\n{service_miss_count} out of {(len(filtered_col_service[selected_columns_service]['Available']))} services are experienced failures (missed/lost/failed), potentially affecting {might_miss_count} of the {total_users} users.")
