@@ -10,30 +10,18 @@ import json
 import requests
 ####################################################
 
-
-# # Gathering the list of msgpack files in the current directory
-# logs_directory = f"{os.getcwd()}/logs/algorithm=FFSP;dataset=dataset1;"
-# dataset_files = [file for file in os.listdir(logs_directory) if ".msgpack" in file]
-#
-#
-# """
-# The line
-# datasets[file.replace(".msgpack", "")] = pd.DataFrame(msgpack.unpackb(data_file.read(), strict_map_key=False))
-# does not create new files on disk.
-# Instead, it reads the content of existing MessagePack files, converts them into DataFrames, and
-# stores these DataFrames in a dictionary in memory.
-# """
+"""
+The line
+datasets[file.replace(".msgpack", "")] = pd.DataFrame(msgpack.unpackb(data_file.read(), strict_map_key=False))
+does not create new files on disk.
+Instead, it reads the content of existing MessagePack files, converts them into DataFrames, and
+stores these DataFrames in a dictionary in memory.
+"""
 # Adjust display settings to show all columns and increase width
 pd.set_option('display.max_columns', None)
 pd.set_option('display.width', 1000)
 # Set the maximum number of rows to display
 pd.set_option('display.max_rows', 100000)  # Set this to the desired number, or None for unlimited rows
-#
-# # ### Reading msgpack files found
-# datasets = {}
-# for file in dataset_files:
-#     with open(f"logs/algorithm=FFSP;dataset=dataset1;/{file}", "rb") as data_file:
-#         datasets[file.replace(".msgpack", "")] = pd.DataFrame(msgpack.unpackb(data_file.read(), strict_map_key=False))
 
 ##############################################################################################################################
 def load_msgpack_logs(logs_directory):
@@ -59,6 +47,9 @@ def load_msgpack_logs(logs_directory):
 
     return datasets
 
+##################################
+### Determining name algorithm ###
+##################################
 
 scheduling_algorithm = "lapse"
 logs_directory = f"{os.getcwd()}/logs/algorithm={scheduling_algorithm};dataset=dataset1;"
