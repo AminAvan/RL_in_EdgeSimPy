@@ -160,4 +160,4 @@ for status in filtered_col_user[selected_columns_user]['Deadline Status']:
 # # Print the count of 'miss'
 # print(f"\nmight_miss_count: {might_miss_count}")
 
-print(f"Out of {(len(filtered_col_service[selected_columns_service]['Available']))} services, {service_miss_count} experienced failures (missed/lost/failed), potentially affecting {might_miss_count} of the {total_users} users.")
+print(f"{service_miss_count} out of {(len(filtered_col_service[selected_columns_service]['Available']))} services are experienced failures (missed/lost/failed), potentially affecting {might_miss_count} of the {total_users} users.")
