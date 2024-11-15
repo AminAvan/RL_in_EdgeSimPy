@@ -169,7 +169,7 @@ def has_capacity_to_host_proposed(self, service: object) -> bool:
     return can_host
 
 
-def MARS(parameters):
+def MASS(parameters):
     # Override 'has_capacity_to_host' for all instances of the EdgeServer class
     EdgeServer.has_capacity_to_host = has_capacity_to_host_proposed
 
@@ -504,11 +504,11 @@ def stopping_criterion(model: object):
 # Map algorithm names to functions
 algorithm_functions = {
     "lapse": lapse,
-    "MARS": MARS,
+    "MASS": MASS,
     "BestFit": Best_Fit_Service_Provisioning,
     "EDF": EDF_algorithm
 }
-# Define the name of the scheduling algorithm, that could be "lapse", "MARS", "BestFit", "EDF"
+# Define the name of the scheduling algorithm, that could be "lapse", "MASS", "BestFit", "EDF"
 scheduling_algorithm = "EDF"
 
 # @measure_memory
