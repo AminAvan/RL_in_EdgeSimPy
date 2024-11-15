@@ -132,7 +132,7 @@ def has_capacity_to_host_proposed(self, service: object) -> bool:
     free_memory = self.memory - self.memory_demand
     free_disk = self.disk - self.disk_demand
     free_processing_power = self.processing_power
-
+    
 
     user_service_deadline = next(iter(service.application.users[0].delay_slas.values()))
     user_service_exe_time = (service.processing_power_demand / free_processing_power)

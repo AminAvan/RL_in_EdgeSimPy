@@ -72,7 +72,7 @@ max_instance_id = datasets["EdgeServer"]["Instance ID"].max()
 
 # ## showing all the columns of the "EdgeServer"
 # print(datasets["EdgeServer"].columns)
-selected_columns = ['Object', 'Time Step', 'Instance ID', 'Coordinates', 'Available', 'CPU', 'RAM', 'Disk', 'CPU Demand', 'RAM Demand', 'Disk Demand', 'Services', 'Registries', 'Layers', 'Images', 'Download Queue', 'Waiting Queue', 'Power Consumption']
+selected_columns = ['Object', 'Time Step', 'Instance ID', 'Coordinates', 'Available', 'RAM', 'Disk', 'Processor Power Demand', 'RAM Demand', 'Disk Demand', 'Services', 'Registries', 'Layers', 'Images', 'Download Queue', 'Waiting Queue', 'Power Consumption']
 # print(datasets["EdgeServer"][selected_columns])
 
 ### Filter rows with specific condition - last "Time Step"
@@ -85,7 +85,6 @@ print()
 # Sum of the 'Power Consumption' of all edge servers and number of services in edge computing
 total_power_consumption = round((filtered_df[selected_columns]['Power Consumption'].sum()), 2)
 total_unique_services = datasets["Service"]["Instance ID"].nunique()
-print(f"Total Power Consumption of EdgeServers is {total_power_consumption} with {total_unique_services} services.")
 print()
 
 
@@ -108,18 +107,16 @@ selected_columns_service = ['Object', 'Time Step', 'Instance ID', 'Available', '
 ### filtering the rows
 filtered_col_service = datasets["Service"][(datasets["Service"]["Time Step"] == (time_step_value))]
 print(filtered_col_service[selected_columns_service])
+
 # Initialize a counter for 'miss'
 service_miss_count = 0
-
 # Iterate over each row in the 'Deadline Status' column
 for status in filtered_col_service[selected_columns_service]['Available']:
     # Check if 'miss' is present in the dictionary values
     if status == False:
         service_miss_count += 1
 
-# Print the count of 'miss'
-# print(f"\nNumber of 'miss-service': {service_miss_count} -- miss-rate: {(service_miss_count) / (len(filtered_col_service[selected_columns_service]['Available']))}")
-print()
+
 
 """
 Edge Users detailed logs
@@ -160,4 +157,4 @@ for status in filtered_col_user[selected_columns_user]['Deadline Status']:
 # # Print the count of 'miss'
 # print(f"\nmight_miss_count: {might_miss_count}")
 
-print(f"{service_miss_count} out of {(len(filtered_col_service[selected_columns_service]['Available']))} services are experienced failures (missed/lost/failed), potentially affecting {might_miss_count} of the {total_users} users.")
+print(f"\n{service_miss_count} out of {(len(filtered_col_service[selected_columns_service]['Available']))} services are experienced failures (missed/lost/failed), potentially affecting {might_miss_count} of the {total_users} users.")
