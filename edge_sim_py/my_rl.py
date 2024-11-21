@@ -128,13 +128,12 @@ def select_action(state):
 episode_durations = []
 
 
-def plot_durations(show_result=False,episode = int):
+def plot_durations(show_result=False):
     plt.figure(1)
     durations_t = torch.tensor(episode_durations, dtype=torch.float)
     if show_result:
         plt.title('Result')
-    elif (episode % 10 == 0):
-        print("hi")
+    else:
         plt.clf()
         plt.title('Training...')
     plt.xlabel('Episode')
@@ -212,7 +211,7 @@ if torch.cuda.is_available() or torch.backends.mps.is_available():
     print("GPU accessible")
 else:
     num_episodes = 50
-    print("GPU not ")
+    print("GPU not found")
 
 for i_episode in range(num_episodes):
     # Initialize the environment and get its state
@@ -248,7 +247,8 @@ for i_episode in range(num_episodes):
 
         if done:
             episode_durations.append(t + 1)
-            plot_durations(episode = i_episode)
+            if (i_episode % 10 == 0):
+                plot_durations()
             break
 
 print('Complete')
