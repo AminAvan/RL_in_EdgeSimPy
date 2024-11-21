@@ -140,19 +140,20 @@ def plot_durations(show_result=False):
     plt.ylabel('Duration')
     plt.plot(durations_t.numpy())
 
-    ## Plot cumulative rewards
-    plt.figure()
-    plt.title("Cumulative Rewards per Episode")
-    plt.plot(episode_rewards)
-    plt.xlabel("Episode")
-    plt.ylabel("Total Reward")
-    plt.show()
-
     # Take 100 episode averages and plot them too
     if len(durations_t) >= 100:
         means = durations_t.unfold(0, 100, 1).mean(1).view(-1)
         means = torch.cat((torch.zeros(99), means))
         plt.plot(means.numpy())
+
+    # Second Plot: Cumulative Rewards
+    plt.figure(2)  # Explicitly create a separate figure
+    plt.clf()  # Clear the previous plot
+    plt.title("Cumulative Rewards per Episode")
+    plt.plot(episode_rewards)
+    plt.xlabel("Episode")
+    plt.ylabel("Total Reward")
+    plt.show()
 
     plt.pause(0.001)  # pause a bit so that plots are updated
     if is_ipython:
@@ -233,6 +234,7 @@ for i_episode in range(num_episodes):
         action = select_action(state)
         observation, reward, terminated, truncated, _ = env.step(action.item())
         reward = torch.tensor([reward], device=device)
+        print((f"reward:{reward.item()}"))
         total_reward += reward.item()  # Accumulate reward
         done = terminated or truncated
 
@@ -261,8 +263,8 @@ for i_episode in range(num_episodes):
         if done:
             episode_durations.append(t + 1)
             episode_rewards.append(total_reward)  # Append total reward
-            if (i_episode % 50 == 0):
-                plot_durations()
+            # if (i_episode > 0) and (i_episode % 50 == 0):
+            #     plot_durations()
             break
 
 print('Complete')
