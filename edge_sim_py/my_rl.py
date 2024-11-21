@@ -126,7 +126,7 @@ def select_action(state):
 
 
 episode_durations = []
-
+episode_rewards = []
 
 def plot_durations(show_result=False):
     plt.figure(1)
@@ -139,6 +139,15 @@ def plot_durations(show_result=False):
     plt.xlabel('Episode')
     plt.ylabel('Duration')
     plt.plot(durations_t.numpy())
+
+    ## Plot cumulative rewards
+    plt.figure()
+    plt.title("Cumulative Rewards per Episode")
+    plt.plot(episode_rewards)
+    plt.xlabel("Episode")
+    plt.ylabel("Total Reward")
+    plt.show()
+
     # Take 100 episode averages and plot them too
     if len(durations_t) >= 100:
         means = durations_t.unfold(0, 100, 1).mean(1).view(-1)
@@ -210,10 +219,13 @@ if torch.cuda.is_available() or torch.backends.mps.is_available():
     num_episodes = 600
     print("GPU accessible")
 else:
-    num_episodes = 50
+    num_episodes = 600
     print("GPU not found")
 
 for i_episode in range(num_episodes):
+    # Initialize total reward for this episode
+    total_reward = 0
+
     # Initialize the environment and get its state
     state, info = env.reset()
     state = torch.tensor(state, dtype=torch.float32, device=device).unsqueeze(0)
@@ -221,6 +233,7 @@ for i_episode in range(num_episodes):
         action = select_action(state)
         observation, reward, terminated, truncated, _ = env.step(action.item())
         reward = torch.tensor([reward], device=device)
+        total_reward += reward.item()  # Accumulate reward
         done = terminated or truncated
 
         if terminated:
@@ -247,7 +260,8 @@ for i_episode in range(num_episodes):
 
         if done:
             episode_durations.append(t + 1)
-            if (i_episode % 10 == 0):
+            episode_rewards.append(total_reward)  # Append total reward
+            if (i_episode % 50 == 0):
                 plot_durations()
             break
 
