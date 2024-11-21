@@ -15,6 +15,12 @@ pyrapl = "^0.2.3.1"
 psutil = "^6.0.0"
 scikit-learn = "^1.5.2"
 matplotlib = "3.5.0"
+torch = "^2.5.1"
+torchvision = "^0.20.1"
+torchaudio = "^2.5.1"
+gym = "^0.26.2"
+gymnasium = "^1.0.0"
+ipython = "^8.29.0"
 
 [tool.poetry.dev-dependencies]
 black = "^22.8.0"
