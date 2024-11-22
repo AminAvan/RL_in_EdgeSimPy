@@ -14,6 +14,8 @@ import psutil
 from functools import wraps
 # from pyrapl import measurement
 import subprocess
+
+import my_rl
 ####################################################
 
 class ResourceTracker:
@@ -450,6 +452,13 @@ def EDF_algorithm(parameters):
                         # After start migrating the service we can move on to the next service
                         break
 
+def rl(parameters):
+    # Override 'has_capacity_to_host' for all instances of the EdgeServer class
+    EdgeServer.has_capacity_to_host = has_capacity_to_host_proposed
+    print(f"bef  my_rl.n_actions: {my_rl.n_actions}")
+
+    print(f"aft  my_rl.n_actions: {my_rl.n_actions}")
+    my_rl.train()
 
 
 scheduling_time_exceeded = False
@@ -506,10 +515,11 @@ algorithm_functions = {
     "lapse": lapse,
     "MASS": MASS,
     "BestFit": Best_Fit_Service_Provisioning,
-    "EDF": EDF_algorithm
+    "EDF": EDF_algorithm,
+    "rl": rl
 }
 # Define the name of the scheduling algorithm, that could be "lapse", "MASS", "BestFit", "EDF"
-scheduling_algorithm = "EDF"
+scheduling_algorithm = "rl"
 
 # @measure_memory
 def wrapped_Service_Provisioning(parameters, algorithm_name=scheduling_algorithm):
@@ -560,3 +570,4 @@ duration_edgesimpy = end_time_edgesimpy - start_time_edgesimpy
 print(f"Total runtime: {duration_edgesimpy:.2f} seconds")
 
 resource_tracker.final_report()
+

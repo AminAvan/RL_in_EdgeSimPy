@@ -11,6 +11,8 @@ import torch.nn as nn
 import torch.optim as optim
 import torch.nn.functional as F
 
+import edge_sim_py
+
 ###########################################################################
 
 env = gym.make("CartPole-v1")
@@ -77,6 +79,7 @@ class DQN(nn.Module):
 
 ##############
 ## Training
+
 # BATCH_SIZE is the number of transitions sampled from the replay buffer
 # GAMMA is the discount factor as mentioned in the previous section
 # EPS_START is the starting value of epsilon
@@ -93,7 +96,9 @@ TAU = 0.005
 LR = 1e-4
 
 # Get number of actions from gym action space
-n_actions = env.action_space.n
+n_actions = len(edge_sim_py.Service.all())
+print(f"n_actions: {n_actions}")
+
 # Get the number of state observations
 state, info = env.reset()
 n_observations = len(state)
@@ -216,58 +221,58 @@ def optimize_model():
 
 ###########################################
 ## Training loop -- main training loop
-if torch.cuda.is_available() or torch.backends.mps.is_available():
-    num_episodes = 600
-    print("GPU accessible")
-else:
-    num_episodes = 600
-    print("GPU not found")
+def train():
+    if torch.cuda.is_available() or torch.backends.mps.is_available():
+        num_episodes = 600
+        print("GPU accessible")
+    else:
+        num_episodes = 600
+        print("GPU not found")
 
-for i_episode in range(num_episodes):
-    # Initialize total reward for this episode
-    total_reward = 0
+    for i_episode in range(num_episodes):
+        # Initialize total reward for this episode
+        total_reward = 0
 
-    # Initialize the environment and get its state
-    state, info = env.reset()
-    state = torch.tensor(state, dtype=torch.float32, device=device).unsqueeze(0)
-    for t in count():
-        action = select_action(state)
-        observation, reward, terminated, truncated, _ = env.step(action.item())
-        reward = torch.tensor([reward], device=device)
-        print((f"reward:{reward.item()}"))
-        total_reward += reward.item()  # Accumulate reward
-        done = terminated or truncated
+        # Initialize the environment and get its state
+        state, info = env.reset()
+        state = torch.tensor(state, dtype=torch.float32, device=device).unsqueeze(0)
+        for t in count():
+            action = select_action(state)
+            observation, reward, terminated, truncated, _ = env.step(action.item())
+            reward = torch.tensor([reward], device=device)
+            total_reward += reward.item()  # Accumulate reward
+            done = terminated or truncated
 
-        if terminated:
-            next_state = None
-        else:
-            next_state = torch.tensor(observation, dtype=torch.float32, device=device).unsqueeze(0)
+            if terminated:
+                next_state = None
+            else:
+                next_state = torch.tensor(observation, dtype=torch.float32, device=device).unsqueeze(0)
 
-        # Store the transition in memory
-        memory.push(state, action, next_state, reward)
+            # Store the transition in memory
+            memory.push(state, action, next_state, reward)
 
-        # Move to the next state
-        state = next_state
+            # Move to the next state
+            state = next_state
 
-        # Perform one step of the optimization (on the policy network)
-        optimize_model()
+            # Perform one step of the optimization (on the policy network)
+            optimize_model()
 
-        # Soft update of the target network's weights
-        # θ′ ← τ θ + (1 −τ )θ′
-        target_net_state_dict = target_net.state_dict()
-        policy_net_state_dict = policy_net.state_dict()
-        for key in policy_net_state_dict:
-            target_net_state_dict[key] = policy_net_state_dict[key]*TAU + target_net_state_dict[key]*(1-TAU)
-        target_net.load_state_dict(target_net_state_dict)
+            # Soft update of the target network's weights
+            # θ′ ← τ θ + (1 −τ )θ′
+            target_net_state_dict = target_net.state_dict()
+            policy_net_state_dict = policy_net.state_dict()
+            for key in policy_net_state_dict:
+                target_net_state_dict[key] = policy_net_state_dict[key]*TAU + target_net_state_dict[key]*(1-TAU)
+            target_net.load_state_dict(target_net_state_dict)
 
-        if done:
-            episode_durations.append(t + 1)
-            episode_rewards.append(total_reward)  # Append total reward
-            # if (i_episode > 0) and (i_episode % 50 == 0):
-            #     plot_durations()
-            break
+            if done:
+                episode_durations.append(t + 1)
+                episode_rewards.append(total_reward)  # Append total reward
+                if (i_episode > 0) and (i_episode % 50 == 0):
+                    plot_durations()
+                break
 
-print('Complete')
-plot_durations(show_result=True)
-plt.ioff()
-plt.show()
+    print('Complete')
+    plot_durations(show_result=True)
+    plt.ioff()
+    plt.show()
