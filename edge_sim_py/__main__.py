@@ -463,7 +463,7 @@ def rl(parameters):
 
     # Override 'has_capacity_to_host' for all instances of the EdgeServer class
     EdgeServer.has_capacity_to_host = has_capacity_to_host_proposed
-    my_rl.train()
+    # my_rl.train()
 
 
 scheduling_time_exceeded = False
