@@ -452,18 +452,21 @@ def EDF_algorithm(parameters):
                         # After start migrating the service we can move on to the next service
                         break
 
-# rl_start = True
+rl_start = True
 # rl_initialize = False
 def rl(parameters):
-    # global rl_start, rl_initialize
-    # if (rl_start == True):
-    #     rl_initialize = True
-    #     my_rl.initialize(rl_initialize)
-    #     rl_start = False
 
-    # Override 'has_capacity_to_host' for all instances of the EdgeServer class
+    global rl_start, rl_initialize
+    if (rl_start == True):
+        my_rl.initialize()
+        # rl_initialize = True
+        # my_rl.initialize(rl_initialize)
+        rl_start = False
+
+    # # Override 'has_capacity_to_host' for all instances of the EdgeServer class
     EdgeServer.has_capacity_to_host = has_capacity_to_host_proposed
-    my_rl.main()
+    my_rl.rl_training()
+    # # if edge_server.has_capacity_to_host(service=service):
 
 
 scheduling_time_exceeded = False

@@ -17,6 +17,9 @@ import torch.nn.functional as F
 
 # import edge_sim_py
 import sys
+
+import edge_sim_py
+
 ##########################################################
 
 env = gym.make("CartPole-v1")
@@ -88,9 +91,21 @@ def initialize():
 
     global policy_net, target_net, optimizer, memory  # Declare these as global variables
     # Get number of actions from gym action space
-    n_actions = env.action_space.n
+
+    n_actions = len(edge_sim_py.Service.all())
+    print(f"actions of edgesimpy--number of services: {n_actions}")
+    # n_actions = env.action_space.n
+    # print(f"actions of cartpole: {n_actions}")
+
     # Get the number of state observations
-    state, info = env.reset()
+    services_status_values = [
+        service.server if service.server is not None or service.being_provisioned else 0
+        for service in edge_sim_py.Service.all()
+    ]
+    state = services_status_values
+    print(f"state: {state}")
+    # state, info = env.reset()
+    # print(f"state: {state}")
     n_observations = len(state)
 
     policy_net = DQN(n_observations, n_actions).to(device)
@@ -200,11 +215,17 @@ def rl_training():
 
     for i_episode in range(num_episodes):
         # Initialize the environment and get its state
-        state, info = env.reset()
+        services_status_values = [
+            service.server if service.server is not None or service.being_provisioned else 0
+            for service in edge_sim_py.Service.all()
+        ]
+        state = services_status_values
+
         state = torch.tensor(state, dtype=torch.float32, device=device).unsqueeze(0)
         for t in count():
             action = select_action(state)
-            observation, reward, terminated, truncated, _ = env.step(action.item())
+            observation, reward, terminated, truncated, _ = edge_sim_py.Simulator.step() ### ????
+
             reward = torch.tensor([reward], device=device)
             done = terminated or truncated
 
