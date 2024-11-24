@@ -215,11 +215,11 @@ def rl_training():
 
     for i_episode in range(num_episodes):
         # Initialize the environment and get its state
-        services_status_values = [
-            service.server if service.server is not None or service.being_provisioned else 0
-            for service in edge_sim_py.Service.all()
-        ]
-        state = services_status_values
+        # services_status_values = [  ## amin
+        #     service.server if service.server is not None or service.being_provisioned else 0    ## amin
+        #     for service in edge_sim_py.Service.all()    ## amin
+        # ]   ## amin
+        # state = services_status_values ## amin
 
         state = torch.tensor(state, dtype=torch.float32, device=device).unsqueeze(0)
         for t in count():

@@ -466,7 +466,240 @@ def rl(parameters):
     # # Override 'has_capacity_to_host' for all instances of the EdgeServer class
     EdgeServer.has_capacity_to_host = has_capacity_to_host_proposed
     my_rl.rl_training()
+
+    if edge_server.has_capacity_to_host(service=service):
+        # Start provisioning the service in the edge server
+        service.provision(target_server=edge_server)
+
+        # After start migrating the service we can move on to the next service
     # # if edge_server.has_capacity_to_host(service=service):
+
+
+
+## my proposed RL-approach for scheduling - Deadline and Resource Aware State Pruning (DRASP)
+# In 'def My_Proposed_Pruned_Method_For_RL_train(parameters)' I train the RL-agent to obtain the optimal policy via my method
+def My_Proposed_Pruned_Method_For_RL_train(parameters):
+    # Override 'has_capacity_to_host' for all instances of the EdgeServer class
+    EdgeServer.has_capacity_to_host = has_capacity_to_host_proposed
+
+    # calculating number of cell in the matrix of each node of MDP based on the users and edgeservers
+    number_of_cells = (len(EdgeServer.all())) * (len(User.all()))
+
+    # original MDP graph of users
+    nodes_in_org_graph = 2 ** (number_of_cells)
+    edges_in_org_graph = nodes_in_org_graph * (len(Service.all()))
+
+    # to determine most prior users
+    priorities_list = []
+
+    for usr in User.all():
+        freq, memory = 0, 0
+        priority = 1 / list(usr.delay_slas.values())[0]
+
+        for i in range(len(usr.applications[0].services)):
+            memory += usr.applications[0].services[i].memory_demand
+            freq += usr.applications[0].services[i].cpu_cycles_demand
+
+        comp_user = freq * memory
+        # last item in 'priorities_list' represent 'being assign or not', where '0' means not assigned yet
+        priorities_list.append((usr, priority, comp_user, memory, 0))
+
+    # print(f"Priority list: {priorities_list}")
+
+    # Sort the priorities_list based on the fourth item (priority) in descending order
+    sorted_priorities_list = sorted(priorities_list, key=lambda x: (x[1], -x[2]), reverse=True)
+    # print(f"Sorted priority list: {sorted_priorities_list}")
+
+    # Function to dynamically update the tuple
+    def update_tuple(original_tuple, user, server):
+        # Convert the tuple to a list to allow modification
+        mutable_list = list(original_tuple)
+
+        # Each user has 4 servers, so calculate the index based on user and server
+        index = (user - 1) * len(EdgeServer.all()) + (server - 1)
+
+        # Update the value at the calculated index
+        mutable_list[index] = 1
+
+        # Convert the list back to a tuple
+        updated_tuple = tuple(mutable_list)
+
+        return updated_tuple
+
+    # global best_nodes, worst_nodes
+    all_sudo_permu = []
+    G_small = nx.DiGraph()
+    # Define global lists for best nodes & worst nodes of MDP graph
+    global best_nodes
+    weight_value_for_best_nodes = ((len(EdgeServer.all())) * (len(User.all())) * (+1))
+    global worst_nodes
+    weight_value_for_worst_nodes = ((len(EdgeServer.all())) * (len(User.all())) * (-1))
+    # Start the traversal from node "0"
+    start_node = tuple(0 for _ in range(number_of_cells))
+
+    # Generate all permutations where one of the zeros is changed to "1" at a time
+    for i in range(len(start_node)):
+        if (start_node[i] == 0):
+            sudo_permu = list(start_node)
+            sudo_permu[i] = 1
+            tuple_sudo_permu = tuple(sudo_permu)
+            all_sudo_permu.append(tuple_sudo_permu)
+
+    # Add edges from start_node to all_sudo_permu
+    for node in all_sudo_permu:
+        G_small.add_edge(start_node, node)
+
+    visited_nodes = set()
+    queue = [start_node]
+
+
+    # We can always call the 'all()' method to get a list with all created instances of a given class
+    # for user in sorted_priorities_list:
+    for idx, user in enumerate(sorted_priorities_list):
+        for service in user[0].applications[0].services:
+            # We don't want to migrate services are already being migrated
+            if service.server == None and not service.being_provisioned:
+
+                # Let's iterate over the list of edge servers to find a suitable host for our service
+                for edge_server in EdgeServer.all():
+
+                    # We must check if the edge server has enough resources to host the service
+                    if edge_server.has_capacity_to_host(service=service):
+                        # Start provisioning the service in the edge server
+                        service.provision(target_server=edge_server)
+
+                        # create best_node tuple
+                        # print(f"user[0].id: {user[0].id}")
+                        # print(f"edge_server.id: {edge_server.id}")
+                        best_nodes.append(update_tuple(start_node, user[0].id, edge_server.id))
+                        # print(f"best node:{update_tuple(start_node, user[0].id, edge_server.id)}")
+                        if idx == len(sorted_priorities_list) - 1:
+                            # print("Processing the last user:", user)
+                            for s in EdgeServer.all():
+                                # print(f"{s}.cpu_U: {s.total_cpu_utilization}")
+                                # print(f"{s}.memory_U: {(s.memory_demand / s.memory)}")
+                                if ((s.memory < (s.memory_demand + service.memory_demand)) and (s.total_cpu_utilization + service.cpu_demand > 1)):
+                                    worst_node = update_tuple(start_node, user[0].id, s.id)
+                                elif ((s.memory < (s.memory_demand + service.memory_demand)) or (s.total_cpu_utilization + service.cpu_demand > 1)):
+                                    worst_node = update_tuple(start_node, user[0].id, s.id)
+                            worst_nodes.append(worst_node)
+                        elif idx != len(sorted_priorities_list) - 1:
+                            last_user = sorted_priorities_list[-1]  # Access the last user
+                            worst_nodes.append(update_tuple(start_node, last_user[0].id, edge_server.id))
+                            # print(f"worst node:{update_tuple(start_node, last_user[0].id, edge_server.id)}")
+
+                        # After start migrating the service we can move on to the next service
+                        break
+
+# In 'def Testing_My_Proposed_Pruned_Method_For_RL(parameters)' I test the RL-agent that was trained by 'My_Proposed_Pruned_Method_For_RL_train'.
+def Testing_My_Proposed_Pruned_Method_For_RL(parameters):
+    if (EdgeServer.is_provisioned <= len(Service.all())):
+        # Load the Q_values from the .npy file
+        Q_values_loaded = np.load(r'C:\Users\100807003\PycharmProjects\EdgeSimPy\edge_sim_py\Q_values.npy')
+        max_steps = len(Q_values_loaded)
+
+        # Load the graph from the GraphML file
+        pruned_G = nx.read_graphml(r'C:\Users\100807003\PycharmProjects\EdgeSimPy\edge_sim_py\pruned_G.graphml')
+
+        # Now you can use Q_values_loaded in your test code
+        start_state = next(iter(pruned_G.nodes()))  # Get the first node (tuple or other representation)
+        # print(f"Start state: {start_state}")
+
+        # Example function to derive the optimal policy
+        def get_optimal_policy(Q_values_loaded):
+            optimal_policy = []
+            for state in range(len(Q_values_loaded)):
+                best_action = np.argmax(Q_values_loaded[state])  # Get the action with the highest Q-value
+                optimal_policy.append(best_action)
+            return optimal_policy
+
+        # Example function to test the RL algorithm
+        def test_rl_algorithm(Q_values_loaded, pruned_G, start_state, max_steps):
+            current_state = start_state  # Start from the initial state
+            optimal_policy = get_optimal_policy(Q_values_loaded)  # Extract the optimal policy from Q-values
+
+            # print(f"Starting test from state {current_state}")
+
+            # Convert nodes to a list for index lookups
+            node_list = list(pruned_G.nodes())
+
+            for step in range(max_steps):
+                try:
+                    current_state_index = node_list.index(current_state)  # Find index of current_state
+                except ValueError:
+                    print(f"Error: State {current_state} not found in graph. Ending test.")
+                    break
+
+                # Use the optimal policy to decide the action for the current state
+                action = optimal_policy[current_state_index]
+                # print(f"Step {step + 1}: In state {current_state}")
+
+                # Simulate moving to the next state by using the loaded graph (pruned_G)
+                if current_state in pruned_G:
+                    neighbors = list(pruned_G.neighbors(current_state))
+                    if neighbors:
+                        # Use the action to select the next state from the neighbors
+                        next_state = neighbors[action % len(neighbors)]
+                        # print(f"Moving to {next_state}")
+
+                        # Convert the string to an actual tuple using ast.literal_eval
+                        next_state_tuple = ast.literal_eval(next_state)
+                        # Access the first element, which is the large tuple
+                        first_tuple = next_state_tuple[0]
+                        # Find the index of '1' in the first tuple
+                        index_of_one = first_tuple.index(1)
+                        # print(f"Index of '1': {index_of_one}")
+
+                        # Reverse the formula to get user and server
+                        selected_user = (index_of_one // len(EdgeServer.all())) + 1  # Integer division to get user
+                        selected_server = (index_of_one % len(EdgeServer.all())) + 1  # Modulus to get server
+
+                        selected_user = next((user for user in User.all() if user.id == selected_user), None)
+                        selected_server = next((edge_server for edge_server in EdgeServer.all() if edge_server.id == selected_server), None)
+                        # print(f"SELECTED user: {selected_user}")
+                        # print(f"SELECTED server: {selected_server}")
+
+                        # for service in selected_user.applications[0].services:
+                        #     print(f"SERVICE: {service} of {selected_user}")
+                            # if service.server == None and not service.being_provisioned:
+
+                        selected_service = next((service for service in selected_user.applications[0].services
+                                                 if service.server is None and not service.being_provisioned), None)
+
+                        if selected_service is not None:
+                            user_service_exe_time = (selected_service.processing_power_demand / selected_server.processing_power)
+                            selected_server.execution_time_of_service[str(selected_service.id)] = user_service_exe_time
+                            selected_service.provision(target_server=selected_server)
+                            EdgeServer.is_provisioned = EdgeServer.is_provisioned + 1
+                            # print(f"SERVICE: {selected_service} of {selected_user} on {selected_server}")
+                        # else:
+                        #     print("No matching service found.")
+                    else:
+                        # print(f"No neighbors for state {current_state}, ending test.")
+                        break
+                else:
+                    print(f"State {current_state} not found in pruned_G. Ending test.")
+                    break
+
+                # Check if the action leads to an invalid state in the Q-values
+                if Q_values_loaded[current_state_index][action] == -np.inf:
+                    print(f"Action {action} is invalid in state {current_state}. Ending test.")
+                    break
+
+                # Move to the next state
+                current_state = next_state  # Continue using the tuple-based states
+
+                # Add termination condition (e.g., if you reach a terminal state)
+                next_state_index = node_list.index(current_state)
+                if Q_values_loaded[next_state_index][action] == 0:
+                    print(f"Reached terminal state {current_state}. Ending test.")
+                    break
+            else:
+                print("Reached max steps.")
+
+        # Run the test from a start state
+        test_rl_algorithm(Q_values_loaded, pruned_G, start_state=start_state, max_steps=max_steps)
+
 
 
 scheduling_time_exceeded = False
