@@ -16,6 +16,7 @@ from functools import wraps
 import subprocess
 
 import my_rl
+import rl_in_edgesimpy
 ####################################################
 
 class ResourceTracker:
@@ -475,6 +476,14 @@ def rl(parameters):
     # # if edge_server.has_capacity_to_host(service=service):
 
 
+my_rl_in_edgesimpy_start = True
+def my_rl_in_edgesimpy(parameters):
+    global my_rl_in_edgesimpy_start
+    if (my_rl_in_edgesimpy_start == True):
+        rl_in_edgesimpy.initialize()
+        my_rl_in_edgesimpy_start = False
+
+    rl_in_edgesimpy.rl_training()
 
 ## my proposed RL-approach for scheduling - Deadline and Resource Aware State Pruning (DRASP)
 # In 'def My_Proposed_Pruned_Method_For_RL_train(parameters)' I train the RL-agent to obtain the optimal policy via my method
@@ -757,10 +766,12 @@ algorithm_functions = {
     "MASS": MASS,
     "BestFit": Best_Fit_Service_Provisioning,
     "EDF": EDF_algorithm,
-    "rl": rl
+    "rl": rl,
+    "my_rl_in_edgesimpy": my_rl_in_edgesimpy
 }
 # Define the name of the scheduling algorithm, that could be "lapse", "MASS", "BestFit", "EDF"
 scheduling_algorithm = "rl"
+# scheduling_algorithm = "my_rl_in_edgesimpy"
 
 # @measure_memory
 def wrapped_Service_Provisioning(parameters, algorithm_name=scheduling_algorithm):

@@ -92,22 +92,23 @@ def initialize():
     global policy_net, target_net, optimizer, memory  # Declare these as global variables
     # Get number of actions from gym action space
 
-    # n_actions = len(edge_sim_py.Service.all())  ## amin
+    n_actions = len(edge_sim_py.Service.all())  ## amin
     # print(f"actions of edgesimpy--number of services: {n_actions}")  ## amin
-    n_actions = env.action_space.n
-    print(f"number of actions: {n_actions}")
+    # n_actions = env.action_space.n ## was
     # print(f"actions of cartpole: {n_actions}")
 
     # Get the number of state observations
-    # services_status_values = [ ## amin
-    #     service.server if service.server is not None or service.being_provisioned else 0
-    #     for service in edge_sim_py.Service.all()
-    # ]
-    # state = services_status_values  ## amin
-
-    state, info = env.reset()
+    services_status_values = [ ## amin
+        service.server if service.server is not None or service.being_provisioned else 0
+        for service in edge_sim_py.Service.all()
+    ]
+    state = services_status_values  ## amin
+    # state, info = env.reset() ## was
     # print(f"state: {state}")
-    n_observations = len(state)
+
+    # n_observations = len(state) ## was
+    n_observations = len(state)  ## amin
+    # print(f"n_observations: {n_observations}")
 
     policy_net = DQN(n_observations, n_actions).to(device)
     target_net = DQN(n_observations, n_actions).to(device)
@@ -133,6 +134,7 @@ def select_action(state):
             return policy_net(state).max(1).indices.view(1, 1)
     else:
         return torch.tensor([[env.action_space.sample()]], device=device, dtype=torch.long)
+
 
 episode_durations = []
 
@@ -218,18 +220,22 @@ def rl_training():
 
     for i_episode in range(num_episodes):
         # Initialize the environment and get its state
-        # services_status_values = [  ## amin
-        #     service.server if service.server is not None or service.being_provisioned else 0    ## amin
-        #     for service in edge_sim_py.Service.all()    ## amin
-        # ]   ## amin
-        # state = services_status_values ## amin
-        state, info = env.reset()
-        state = torch.tensor(state, dtype=torch.float32, device=device).unsqueeze(0)
+        services_status_values = [  ## amin
+            service.server if service.server is not None or service.being_provisioned else 0    ## amin
+            for service in edge_sim_py.Service.all()    ## amin
+        ]   ## amin
+        state = services_status_values ## amin
+        # state, info = env.reset() ## was
+        state = torch.tensor(state, dtype=torch.float32, device=device).unsqueeze(0) ## until here good
+        print(f"state: {state}")
+        sys.exit(0)
         for t in count():
             action = select_action(state)
             # observation, reward, terminated, truncated, _ = edge_sim_py.Simulator.step() ### ???? ## amin
             observation, reward, terminated, truncated, _ = env.step(action.item()) # I think 'observation' is the 'next_step'
             # or it become the 'next_step'
+
+
             reward = torch.tensor([reward], device=device)
             done = terminated or truncated
 
