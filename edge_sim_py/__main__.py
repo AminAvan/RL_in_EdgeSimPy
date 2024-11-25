@@ -568,8 +568,8 @@ def my_rl_in_edgesimpy(parameters):
         total_num_servers = len(EdgeServer.all())
 
         # Determine the task and server indices
-        task_index = action // total_num_servers
-        server_index = action % total_num_servers
+        task_index = (action // total_num_servers) + 1 ## the task(service) 0 represents the first service which its ID is '1'
+        server_index = (action % total_num_servers) + 1 ## the server 0 represents the first server which its ID is '1'
 
         # Validate indices
         if task_index >= total_num_tasks:
@@ -701,25 +701,24 @@ def my_rl_in_edgesimpy(parameters):
         # state, info = env.reset() ## was
         state = torch.tensor(state, dtype=torch.float32, device=device).unsqueeze(0)
         for t in count():
-            action = select_action(state)
-            print(f"action x: {action}")
-            print(f"action.item(): {action.item()}")
+            action = select_action(state) ## amin
+            # print(f"action x: {action}") ## amin
+            # print(f"action.item(): {action.item()}") ## amin
 
-            rl_task, rl_server = map_action_to_task_server(action.item())
-            print(f"Action {action.item()} corresponds to Task {rl_task} and Server {rl_server}.")
+            rl_task, rl_server = map_action_to_task_server(action.item()) ## amin
+            # print(f"Action {action.item()} corresponds to Task {rl_task} and Server {rl_server}.") ## amin
 
-            # selected_service = next((s for s in Service._instances if s.id == (action.item()+1)), None) ## add (+1) as the 'action.item()' provide '0' which refer to the service with 'id:1' the first one
-            # if selected_service:
-            #     print(f"Selected service: {selected_service.label}, ID: {selected_service.id}")
-            # else:
-            #     print("No service found with the given ID!")
-            # if edge_server.has_capacity_to_host(service=selected_service):
-            #     selected_service.provision(target_server=edge_server)
-            #     print("can host")
-            # else:
-            #     print("cannot host")
+            rl_selected_service = next((s for s in Service._instances if s.id == (rl_task)), None) ## amin
+            rl_selected_server = next((s for s in EdgeServer._instances if s.id == (rl_server)), None)  ## amin
+
+            if rl_selected_server.has_capacity_to_host(service=rl_selected_service): ## amin
+                rl_selected_service.provision(target_server=rl_selected_server)     ## amin
+                print("can host")   ## amin
+            else:   ## amin
+                print("cannot host")    ## amin
 
             sys.exit(0) ##################????????????!!!!!!!!!!!!!!!!!!????################
+
             observation, reward, terminated, truncated, _ = env.step(action.item())
             reward = torch.tensor([reward], device=device)
             done = terminated or truncated
