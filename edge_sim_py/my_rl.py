@@ -230,7 +230,9 @@ def rl_training():
             # observation, reward, terminated, truncated, _ = edge_sim_py.Simulator.step() ### ???? ## amin
             observation, reward, terminated, truncated, _ = env.step(action.item()) # I think 'observation' is the 'next_step'
             # or it become the 'next_step'
+            print(f"before reward: {reward}")
             reward = torch.tensor([reward], device=device)
+            print(f"after reward: {reward}")
             done = terminated or truncated
 
             if terminated:

@@ -544,6 +544,15 @@ def my_rl_in_edgesimpy(parameters):
             x = F.relu(self.layer2(x))
             return self.layer3(x)
 
+    priorities_list = [] ## amin
+    for usr in User.all():  ## amin
+        # Calculating the urgency of each user's deadline       ## amin
+        priority = 1 / list(usr.delay_slas.values())[0]     ## amin
+        # Assign users along sith their deadline-priority   ## amin
+        priorities_list.append((usr, priority)) ## amin
+    # Sort the priorities_list based on deadline    ## amin
+    sorted_priorities_list = sorted(priorities_list, key=lambda x: (x[1]), reverse=True)    ## amin
+
     BATCH_SIZE = 128
     GAMMA = 0.99
     EPS_START = 0.9
@@ -712,25 +721,16 @@ def my_rl_in_edgesimpy(parameters):
             rl_selected_server = next((s for s in EdgeServer._instances if s.id == (rl_server)), None)  ## amin
 
             if rl_selected_server.has_capacity_to_host(service=rl_selected_service): ## amin
-                rl_selected_service.provision(target_server=rl_selected_server)     ## amin
-                print("can host")   ## amin
-            else:   ## amin
+                for user in sorted_priorities_list:  ## amin
+                    for service in user[0].applications[0].services:  ## amin
+                        if service == rl_selected_service:
+                            print(f"it is earliest service: {service}")
+                            rl_selected_service.provision(target_server=rl_selected_server)     ## amin
+                print("can host")       ## amin
+            else:                       ## amin
                 print("cannot host")    ## amin
 
             ### check if the selected action is belong to the earliest deadline task(service) that is un-assigned to any edgeserver?!
-            # priorities_list = []
-            # for usr in User.all():
-            #     # Calculating the urgency of each user's deadline
-            #     priority = 1 / list(usr.delay_slas.values())[0]
-            #
-            #     # Assign users along sith their deadline-priority
-            #     priorities_list.append((usr, priority))
-            #
-            # # Sort the priorities_list based on deadline
-            # sorted_priorities_list = sorted(priorities_list, key=lambda x: (x[1]), reverse=True)
-            # for user in sorted_priorities_list:
-            #
-            #     for service in user[0].applications[0].services:
 
             sys.exit(0) ##################????????????!!!!!!!!!!!!!!!!!!????################
 
@@ -1057,8 +1057,8 @@ algorithm_functions = {
     "my_rl_in_edgesimpy": my_rl_in_edgesimpy
 }
 # Define the name of the scheduling algorithm, that could be "lapse", "MASS", "BestFit", "EDF"
-# scheduling_algorithm = "rl"
-scheduling_algorithm = "my_rl_in_edgesimpy"
+scheduling_algorithm = "rl"
+# scheduling_algorithm = "my_rl_in_edgesimpy"
 
 # @measure_memory
 def wrapped_Service_Provisioning(parameters, algorithm_name=scheduling_algorithm):
