@@ -492,6 +492,9 @@ def rl(parameters):
 
 
 def my_rl_in_edgesimpy(parameters):
+    # Override 'has_capacity_to_host' for all instances of the EdgeServer class
+    EdgeServer.has_capacity_to_host = has_capacity_to_host_proposed
+
     env = gym.make("CartPole-v1")
 
     # set up matplotlib
@@ -676,7 +679,18 @@ def my_rl_in_edgesimpy(parameters):
             action = select_action(state)
             print(f"action x: {action}")
             print(f"action.item(): {action.item()}")
-            sys.exit(0)
+            selected_service = next((s for s in Service._instances if s.id == (action.item()+1)), None) ## add (+1) as the 'action.item()' provide '0' which refer to the service with 'id:1' the first one
+            if selected_service:
+                print(f"Selected service: {selected_service.label}, ID: {selected_service.id}")
+            else:
+                print("No service found with the given ID!")
+            if edge_server.has_capacity_to_host(service=selected_service):
+                selected_service.provision(target_server=edge_server)
+                print("can host")
+            else:
+                print("cannot host")
+
+            sys.exit(0) ##################????????????!!!!!!!!!!!!!!!!!!????################
             observation, reward, terminated, truncated, _ = env.step(action.item())
             reward = torch.tensor([reward], device=device)
             done = terminated or truncated
