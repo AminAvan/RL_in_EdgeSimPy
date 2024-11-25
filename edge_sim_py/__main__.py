@@ -717,6 +717,21 @@ def my_rl_in_edgesimpy(parameters):
             else:   ## amin
                 print("cannot host")    ## amin
 
+            ### check if the selected action is belong to the earliest deadline task(service) that is un-assigned to any edgeserver?!
+            # priorities_list = []
+            # for usr in User.all():
+            #     # Calculating the urgency of each user's deadline
+            #     priority = 1 / list(usr.delay_slas.values())[0]
+            #
+            #     # Assign users along sith their deadline-priority
+            #     priorities_list.append((usr, priority))
+            #
+            # # Sort the priorities_list based on deadline
+            # sorted_priorities_list = sorted(priorities_list, key=lambda x: (x[1]), reverse=True)
+            # for user in sorted_priorities_list:
+            #
+            #     for service in user[0].applications[0].services:
+
             sys.exit(0) ##################????????????!!!!!!!!!!!!!!!!!!????################
 
             observation, reward, terminated, truncated, _ = env.step(action.item())
