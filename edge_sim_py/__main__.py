@@ -552,11 +552,36 @@ def my_rl_in_edgesimpy(parameters):
     TAU = 0.005
     LR = 1e-4
 
+    def map_action_to_task_server(action):
+        """
+        Maps an action index to a task and server.
+
+        Args:
+            action (int): The action index.
+            total_num_tasks (int): Total number of tasks.
+            total_num_servers (int): Total number of servers.
+
+        Returns:
+            (int, int): A tuple of (task_index, server_index).
+        """
+        total_num_tasks = len(Service.all())
+        total_num_servers = len(EdgeServer.all())
+
+        # Determine the task and server indices
+        task_index = action // total_num_servers
+        server_index = action % total_num_servers
+
+        # Validate indices
+        if task_index >= total_num_tasks:
+            raise ValueError("Action index out of bounds for the given number of tasks and servers.")
+
+        return task_index, server_index
+    
     # Get number of actions from gym action space
     # n_actions = env.action_space.n ## was
-    n_actions = len(Service.all())  ## amin
-    # Get the number of state observations
+    n_actions = (len(Service.all())*len(EdgeServer.all()))  ## amin
 
+    # Get the number of state observations
     services_status_values = [  ## amin
         service.server if service.server is not None or service.being_provisioned else 0
         for service in Service.all()
@@ -679,16 +704,20 @@ def my_rl_in_edgesimpy(parameters):
             action = select_action(state)
             print(f"action x: {action}")
             print(f"action.item(): {action.item()}")
-            selected_service = next((s for s in Service._instances if s.id == (action.item()+1)), None) ## add (+1) as the 'action.item()' provide '0' which refer to the service with 'id:1' the first one
-            if selected_service:
-                print(f"Selected service: {selected_service.label}, ID: {selected_service.id}")
-            else:
-                print("No service found with the given ID!")
-            if edge_server.has_capacity_to_host(service=selected_service):
-                selected_service.provision(target_server=edge_server)
-                print("can host")
-            else:
-                print("cannot host")
+
+            rl_task, rl_server = map_action_to_task_server(action.item())
+            print(f"Action {action.item()} corresponds to Task {rl_task} and Server {rl_server}.")
+
+            # selected_service = next((s for s in Service._instances if s.id == (action.item()+1)), None) ## add (+1) as the 'action.item()' provide '0' which refer to the service with 'id:1' the first one
+            # if selected_service:
+            #     print(f"Selected service: {selected_service.label}, ID: {selected_service.id}")
+            # else:
+            #     print("No service found with the given ID!")
+            # if edge_server.has_capacity_to_host(service=selected_service):
+            #     selected_service.provision(target_server=edge_server)
+            #     print("can host")
+            # else:
+            #     print("cannot host")
 
             sys.exit(0) ##################????????????!!!!!!!!!!!!!!!!!!????################
             observation, reward, terminated, truncated, _ = env.step(action.item())
