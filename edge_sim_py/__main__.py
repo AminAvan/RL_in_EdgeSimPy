@@ -718,18 +718,48 @@ def my_rl_in_edgesimpy(parameters):
             # print(f"Action {action.item()} corresponds to Task {rl_task} and Server {rl_server}.") ## amin
 
             rl_selected_service = next((s for s in Service._instances if s.id == (rl_task)), None) ## amin
+            # rl_selected_application = next((s for s in Application._instances if s.id == (rl_task)), None)  ## amin
+            rl_selected_application = next(    ## amin
+                (app for app in Application._instances if rl_task in [service.id for service in app.services]),  ## amin
+                None      ## amin
+            )     ## amin
+            rl_selected_user = next((user for user in User._instances if rl_selected_application in user.applications), None)
             rl_selected_server = next((s for s in EdgeServer._instances if s.id == (rl_server)), None)  ## amin
 
-            if rl_selected_server.has_capacity_to_host(service=rl_selected_service): ## amin
-                for user in sorted_priorities_list:  ## amin
-                    for service in user[0].applications[0].services:  ## amin
-                        if service == rl_selected_service:
-                            print(f"it is earliest service: {service}")
-                            rl_selected_service.provision(target_server=rl_selected_server)     ## amin
-                print("can host")       ## amin
-            else:                       ## amin
-                print("cannot host")    ## amin
+            print(f"rl_selected_user: {rl_selected_user}")
+            print(f"sorted_priorities_list[0][0]: {sorted_priorities_list[0][0]}")
 
+            if (rl_selected_server.has_capacity_to_host(service=rl_selected_service)) and (sorted_priorities_list[0][0] == rl_selected_user): ## amin
+                rl_selected_service.provision(target_server=rl_selected_server)     ## amin
+                print(f"can host and service {rl_selected_service} is the earliest service")       ## amin
+            else:
+                print(f"can host but service {rl_selected_service} is NOT the earliest service")  ## amin
+
+            def rl_service_compute_delay(user, application, service):
+                print(f"rl_service_compute_delay: {user}, {application}, {service}")
+                topology = Topology.first()
+                # Initializes the service's delay with the time it takes to communicate its client and his base station
+                delay = user.base_station.wireless_delay
+                print(f"delay: {delay}")
+                # Adding the communication path delay to the service's delay
+                print("Communication Paths:", user.communication_paths)
+                print("Application ID as string:", str(application.id))
+                if len(communication_path) > 0:
+                for path in user.communication_paths[str(application.id)]:
+                    delay += topology.calculate_path_delay(path=[NetworkSwitch.find_by_id(i) for i in path])
+
+
+
+                print(f"delay: {delay}")
+                # Calculating the execution time of each service on the EdgeServers
+                application_execution_time = round(service.server.execution_time_of_service[str(service.id)], 2)
+                print(f"application_execution_time: {application_execution_time}")
+                # Since an application may consist of multiple services, we use the maximum service time as the application's response time
+                # Calculate the current response time
+                current_response_time = round(((delay * 2) + application_execution_time), 2)
+                print(f"current_response_time: {current_response_time}")
+
+            rl_service_compute_delay(rl_selected_user, rl_selected_application, rl_selected_service)
             ### check if the selected action is belong to the earliest deadline task(service) that is un-assigned to any edgeserver?!
 
             sys.exit(0) ##################????????????!!!!!!!!!!!!!!!!!!????################
@@ -1057,8 +1087,8 @@ algorithm_functions = {
     "my_rl_in_edgesimpy": my_rl_in_edgesimpy
 }
 # Define the name of the scheduling algorithm, that could be "lapse", "MASS", "BestFit", "EDF"
-scheduling_algorithm = "rl"
-# scheduling_algorithm = "my_rl_in_edgesimpy"
+# scheduling_algorithm = "rl"
+scheduling_algorithm = "my_rl_in_edgesimpy"
 
 # @measure_memory
 def wrapped_Service_Provisioning(parameters, algorithm_name=scheduling_algorithm):

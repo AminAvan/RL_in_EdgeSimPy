@@ -211,6 +211,48 @@ def rl_training():
         torch.nn.utils.clip_grad_value_(policy_net.parameters(), 100)
         optimizer.step()
 
+    def compute_reward(task, server, deadline_success, load_success):
+        """
+        Compute the reward for the RL agent.
+
+        Args:
+            task (Task): The task being allocated.
+            server (Server): The server to which the task is allocated.
+            deadline_success (bool): Whether task allocation succeeded.
+            load_success (bool): Whether the allocation succeeded.
+            metrics (dict): Additional metrics (e.g., latency, server utilization, deadline met).
+
+        Returns:
+            float: The reward for the action.
+        """
+        reward = 0
+
+        # Positive reward for successful allocation
+        if deadline_success:
+            reward += 1  # Base reward for success
+
+            # Reward for efficient utilization
+            utilization_factor = metrics.get("utilization", 0)
+            reward += 0.5 * utilization_factor  # Adjust weight as needed
+
+            # Reward for low latency
+            latency = metrics.get("latency", float("inf"))
+            reward += 1.0 / max(latency, 1)  # Inverse of latency
+
+        # Negative reward for missing deadlines
+        if not metrics.get("deadline_met", True):
+            reward -= 2  # Penalty for missing a deadline
+
+        # Negative reward for server overload
+        if metrics.get("server_overloaded", False):
+            reward -= 1  # Penalty for causing overload
+
+        # Negative reward for excessive migrations
+        if metrics.get("migration_cost", 0) > 0:
+            reward -= 0.1 * metrics["migration_cost"]  # Weight migration penalty
+
+        return reward
+    
     if torch.cuda.is_available() or torch.backends.mps.is_available():
         num_episodes = 600
     else:
