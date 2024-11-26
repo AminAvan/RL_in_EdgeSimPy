@@ -737,8 +737,7 @@ def my_rl_in_edgesimpy(parameters):
                 print(f"can host and service {rl_selected_service} is the earliest service")       ## amin
                 ################################################################
                 topology = Topology.first()
-                # service_hosts_base_station = [rl_selected_service.server.base_station for rl_selected_service in rl_selected_application.services if rl_selected_service.server]
-                print(f"rl_selected_server.base_station: {rl_selected_server.base_station}")
+                communication_chain = [rl_selected_user.base_station, rl_selected_server.base_station]
             else:
                 print(f"can host but service {rl_selected_service} is NOT the earliest service")  ## amin
 
@@ -1068,6 +1067,7 @@ algorithm_functions = {
 }
 # Define the name of the scheduling algorithm, that could be "lapse", "MASS", "BestFit", "EDF"
 # scheduling_algorithm = "rl"
+# scheduling_algorithm = "EDF"
 scheduling_algorithm = "my_rl_in_edgesimpy"
 
 # @measure_memory
