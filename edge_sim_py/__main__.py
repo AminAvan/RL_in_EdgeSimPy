@@ -736,6 +736,7 @@ def my_rl_in_edgesimpy(parameters):
                     print(f"can host and service {rl_selected_service} is the earliest service")       ## amin
                     ################################################################
                     ##############calculating the response time##################
+                    #### Calculate the one-way delay from the user to the candidate edge server for the service
                     communication_paths = []
                     topology = Topology.first()
                     communication_chain = [rl_selected_user.base_station, rl_selected_server.base_station]
@@ -761,11 +762,16 @@ def my_rl_in_edgesimpy(parameters):
                         communication_paths.append([network_switch.id for network_switch in path])
                         ########
                         delay = 0.0
+                        roundtrip_time = 0.0
                         # Initializes the application's delay with the time it takes to communicate its client and his base station
                         delay = rl_selected_user.base_station.wireless_delay
                         for path in communication_paths:
                             delay += topology.calculate_path_delay(path=[NetworkSwitch.find_by_id(i) for i in path])
                         print(f"delay {delay}")
+                        roundtrip_time = (2 * delay)
+                        current_response_time = round(
+                            (roundtrip_time + rl_selected_server.execution_time_of_service[str(rl_selected_service.id)]), 2)
+                        print(f"current_response_time: {current_response_time}, exection time: {rl_selected_server.execution_time_of_service[str(rl_selected_service.id)]}")
             else:
                 print(f"can host but service {rl_selected_service} is NOT the earliest service")  ## amin
 
