@@ -162,6 +162,7 @@ def has_capacity_to_host_proposed(self, service: object) -> bool:
         # calculating true runtime of service on the host server
         self.execution_time_of_service[str(service.id)] = user_service_exe_time
         self.total_cpu_utilization = (self.total_cpu_utilization + user_service_utilization)
+        self.total_memory_utilization = (self.memory_demand + service.memory_demand) / self.memory
 
         # # print(f"free_cpu_cycle of {self}:{free_cpu_cycle}")
         # if (free_cpu_cycle < 0):
@@ -625,6 +626,61 @@ def my_rl_in_edgesimpy(parameters):
 
     episode_durations = []
 
+    def compute_reward(earliest_deadline_service, enough_capacity, service_deadline_met, cpu_utilization_factor,
+                       memory_utilization_factor, response_time_factor, deadline_miss_severity):
+        """
+        Compute the reward for the RL agent in a real-time task scheduling scenario.
+
+        Args:
+            earliest_deadline_service (bool): Whether the service with the earliest deadline was selected.
+            enough_capacity (bool): Whether the selected server had enough capacity to host the service.
+            service_deadline_met (bool): Whether the service's deadline was met.
+            cpu_utilization_factor (float): CPU utilization factor of the server.
+            memory_utilization_factor (float): Memory utilization factor of the server.
+            response_time_factor (float): Factor representing the response time (lower is better).
+            deadline_miss_severity (float): A severity factor representing how far a task missed its deadline (e.g., ratio of actual response time to deadline).
+
+        Returns:
+            float: The computed reward.
+        """
+        reward = 0
+
+        ######################
+        ## Positive Rewards ##
+        ######################
+        # Reward for selecting the service with the earliest deadline
+        if earliest_deadline_service:
+            reward += 2  # Increased weight for prioritizing critical tasks
+
+        # Reward for efficient resource utilization (CPU and memory within capacity)
+        if enough_capacity:
+            reward += max(0, 1 - abs(cpu_utilization_factor - 1))  # Reward closer to 1
+            reward += max(0, 1 - abs(memory_utilization_factor - 1))  # Reward closer to 1
+
+        # Reward for meeting service deadlines
+        if service_deadline_met:
+            reward += 5 / max(response_time_factor, 1)  # Higher reward for low response times
+
+        ######################
+        ## Negative Rewards ##
+        ######################
+        # Penalty for failing to select the earliest deadline service
+        if not earliest_deadline_service:
+            reward -= 1  # Moderate penalty for deprioritization
+
+        # Penalty for exceeding server capacity
+        if not enough_capacity:
+            reward -= 1 * max(0, cpu_utilization_factor - 1)  # Penalize overload
+            reward -= 1 * max(0, memory_utilization_factor - 1)  # Penalize overload
+
+        # Severe penalty for missing deadlines
+        if not service_deadline_met:
+            # Exponential penalty based on severity of the deadline miss
+            penalty = 10 * (deadline_miss_severity ** 2)
+            reward -= penalty
+
+        return reward
+
     def plot_durations(show_result=False):
         plt.figure(1)
         durations_t = torch.tensor(episode_durations, dtype=torch.float)
@@ -728,13 +784,21 @@ def my_rl_in_edgesimpy(parameters):
 
             # print(f"sorted_priorities_list[0][0]: {sorted_priorities_list[0][0]}")  ## amin
             # print(f"cpu U of {rl_selected_server}: {rl_selected_server.total_cpu_utilization}")
+            print(f"cpu U of {rl_selected_server}: {rl_selected_server.total_cpu_utilization}")
+            print(f"memory U of {rl_selected_server}: {rl_selected_server.total_memory_utilization}")
 
-            if rl_selected_server.has_capacity_to_host(service=rl_selected_service):  ## amin
-                # bool_not_overload===True ## put some positive reward in reward-function
-                if sorted_priorities_list[0][0] == rl_selected_user: ## amin ##
-                    # bool_EDF===True ## the earliest deadline task is allocated
+            selected_EDF_service = False
+            server_poses_capacity = False
+            service_deadline_likely_met = False
+            if sorted_priorities_list[0][0] == rl_selected_user:  ## amin ##
+                selected_EDF_service = True  ## the earliest deadline task is allocated
+                if rl_selected_server.has_capacity_to_host(service=rl_selected_service):  ## amin
+                    server_poses_capacity = True ## put some positive reward in reward-function
                     rl_selected_service.provision(target_server=rl_selected_server)     ## amin
                     print(f"can host and service {rl_selected_service} is the earliest service")       ## amin
+                    print(f"cpu U of {rl_selected_server}: {rl_selected_server.total_cpu_utilization}")
+                    print(
+                        f"memory U of {rl_selected_server}: {rl_selected_server.total_memory_utilization}")
                     ################################################################
                     ##############calculating the response time##################
                     #### Calculate the one-way delay from the user to the candidate edge server for the service
@@ -775,53 +839,17 @@ def my_rl_in_edgesimpy(parameters):
                     print(f"response_time_for_service: {response_time_for_service}")
                     #################################################
                     if (response_time_for_service < list(rl_selected_user.delay_slas.values())[0]):
-                        bool_deadline_will_be_met = True
+                        service_deadline_likely_met = True
             else:
                 print(f"can host but service {rl_selected_service} is NOT the earliest service")  ## amin
-            #######################################################################################
-            # def compute_reward(task, server, allocation_success, metrics):
-            #     """
-            #     Compute the reward for the RL agent.
-            #
-            #     Args:
-            #         task (Task): The task being allocated.
-            #         server (Server): The server to which the task is allocated.
-            #         allocation_success (bool): Whether the allocation succeeded.
-            #         metrics (dict): Additional metrics (e.g., latency, server utilization, deadline met).
-            #
-            #     Returns:
-            #         float: The reward for the action.
-            #     """
-            #     reward = 0
-            #
-            #     # Positive reward for successful allocation
-            #     if allocation_success:
-            #         reward += 1  # Base reward for success
-            #
-            #         # Reward for efficient utilization
-            #         utilization_factor = metrics.get("utilization", 0)
-            #         reward += 0.5 * utilization_factor  # Adjust weight as needed
-            #
-            #         # Reward for low latency
-            #         latency = metrics.get("latency", float("inf"))
-            #         reward += 1.0 / max(latency, 1)  # Inverse of latency
-            #
-            #     # Negative reward for missing deadlines
-            #     if not metrics.get("deadline_met", True):
-            #         reward -= 2  # Penalty for missing a deadline
-            #
-            #     # Negative reward for server overload
-            #     if metrics.get("server_overloaded", False):
-            #         reward -= 1  # Penalty for causing overload
-            #
-            #     # Negative reward for excessive migrations
-            #     if metrics.get("migration_cost", 0) > 0:
-            #         reward -= 0.1 * metrics["migration_cost"]  # Weight migration penalty
-            #
-            #     return reward
-            #######################################################################################
 
+            ##################????????????!!!!!!!!!!!!!!!!!!????################
+
+            # reward = compute_reward(selected_EDF_service, server_poses_capacity, service_deadline_likely_met, rl_selected_server.total_cpu_utilization,
+            #                memory_utilization_factor, response_time_factor, deadline_miss_severity)
+            # print(f"reward: {reward}")
             sys.exit(0) ##################????????????!!!!!!!!!!!!!!!!!!????################
+            ##################????????????!!!!!!!!!!!!!!!!!!????################
 
             observation, reward, terminated, truncated, _ = env.step(action.item())
             reward = torch.tensor([reward], device=device)

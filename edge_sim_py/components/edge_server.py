@@ -82,6 +82,7 @@ class EdgeServer(ComponentManager, Agent):
 
         # Edge server demand
         self.total_cpu_utilization = 0.0
+        self.total_memory_utilization = 0.0
         self.cpu_demand = 0
         self.memory_demand = 0
         self.disk_demand = 0
