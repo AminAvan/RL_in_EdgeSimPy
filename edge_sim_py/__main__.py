@@ -626,6 +626,32 @@ def my_rl_in_edgesimpy(parameters):
 
     episode_durations = []
 
+    def get_service_criticality_level(input_value):
+        """
+        Determine the processing level based on the input value.
+
+        Args:
+            input_value (int): The input integer value.
+
+        Returns:
+            str: The processing level as a string.
+        """
+        # Define the valid ranges and their corresponding outputs
+        valid_ranges = {
+            (22, 23): "3",
+            (44, 46): "2",
+            (2800, 4000): "1.2",
+            (5600, 8000): "1",
+        }
+
+        # Check which range the input_value belongs to
+        for (lower, upper), output in valid_ranges.items():
+            if lower <= input_value <= upper:
+                return output
+
+        # If no matching range is found
+        return 0
+
     def compute_reward(earliest_deadline_service, enough_capacity, service_deadline_met, cpu_utilization_factor,
                        memory_utilization_factor, response_time_factor, deadline_miss_severity):
         """
@@ -784,8 +810,7 @@ def my_rl_in_edgesimpy(parameters):
 
             # print(f"sorted_priorities_list[0][0]: {sorted_priorities_list[0][0]}")  ## amin
             # print(f"cpu U of {rl_selected_server}: {rl_selected_server.total_cpu_utilization}")
-            print(f"cpu U of {rl_selected_server}: {rl_selected_server.total_cpu_utilization}")
-            print(f"memory U of {rl_selected_server}: {rl_selected_server.total_memory_utilization}")
+            # print(f"memory U of {rl_selected_server}: {rl_selected_server.total_memory_utilization}")
 
             selected_EDF_service = False
             server_poses_capacity = False
@@ -796,9 +821,9 @@ def my_rl_in_edgesimpy(parameters):
                     server_poses_capacity = True ## put some positive reward in reward-function
                     rl_selected_service.provision(target_server=rl_selected_server)     ## amin
                     print(f"can host and service {rl_selected_service} is the earliest service")       ## amin
-                    print(f"cpu U of {rl_selected_server}: {rl_selected_server.total_cpu_utilization}")
-                    print(
-                        f"memory U of {rl_selected_server}: {rl_selected_server.total_memory_utilization}")
+                    # print(f"cpu U of {rl_selected_server}: {rl_selected_server.total_cpu_utilization}")
+                    # print(
+                    #     f"memory U of {rl_selected_server}: {rl_selected_server.total_memory_utilization}")
                     ################################################################
                     ##############calculating the response time##################
                     #### Calculate the one-way delay from the user to the candidate edge server for the service
@@ -845,9 +870,10 @@ def my_rl_in_edgesimpy(parameters):
 
             ##################????????????!!!!!!!!!!!!!!!!!!????################
 
-            # reward = compute_reward(selected_EDF_service, server_poses_capacity, service_deadline_likely_met, rl_selected_server.total_cpu_utilization,
-            #                memory_utilization_factor, response_time_factor, deadline_miss_severity)
-            # print(f"reward: {reward}")
+            service_criticality_level = get_service_criticality_level(list(rl_selected_user.delay_slas.values())[0])
+            reward = compute_reward(selected_EDF_service, server_poses_capacity, service_deadline_likely_met, rl_selected_server.total_cpu_utilization,
+                           rl_selected_server.total_memory_utilization, response_time_for_service, service_criticality_level)
+            print(f"reward: {reward}")
             sys.exit(0) ##################????????????!!!!!!!!!!!!!!!!!!????################
             ##################????????????!!!!!!!!!!!!!!!!!!????################
 
