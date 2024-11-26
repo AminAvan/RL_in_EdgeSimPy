@@ -278,11 +278,11 @@ class Simulator(ComponentManager, Model):
         # Running resource management algorithm
         self.resource_management_algorithm(parameters=self.resource_management_algorithm_parameters)
 
-        # Activating agents
-        self.schedule.step()
-
-        # Updating the "current_step" attribute inside the resource management algorithm's parameters
-        self.resource_management_algorithm_parameters["current_step"] = self.schedule.steps + 1
+        # # Activating agents
+        # self.schedule.step()
+        #
+        # # Updating the "current_step" attribute inside the resource management algorithm's parameters
+        # self.resource_management_algorithm_parameters["current_step"] = self.schedule.steps + 1
 
     def collect(self) -> dict:
         """Method that collects a set of model-level metrics.
