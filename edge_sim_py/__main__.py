@@ -726,7 +726,8 @@ def my_rl_in_edgesimpy(parameters):
             rl_selected_user = next((user for user in User._instances if rl_selected_application in user.applications), None)
             rl_selected_server = next((s for s in EdgeServer._instances if s.id == (rl_server)), None)  ## amin
 
-            print(f"sorted_priorities_list[0][0]: {sorted_priorities_list[0][0]}")  ## amin
+            # print(f"sorted_priorities_list[0][0]: {sorted_priorities_list[0][0]}")  ## amin
+            # print(f"cpu U of {rl_selected_server}: {rl_selected_server.total_cpu_utilization}")
 
             if rl_selected_server.has_capacity_to_host(service=rl_selected_service):  ## amin
                 # bool_not_overload===True ## put some positive reward in reward-function
@@ -761,17 +762,20 @@ def my_rl_in_edgesimpy(parameters):
                         # Adding the best path found to the communication path
                         communication_paths.append([network_switch.id for network_switch in path])
                         ########
-                        delay = 0.0
-                        roundtrip_time = 0.0
-                        # Initializes the application's delay with the time it takes to communicate its client and his base station
-                        delay = rl_selected_user.base_station.wireless_delay
-                        for path in communication_paths:
-                            delay += topology.calculate_path_delay(path=[NetworkSwitch.find_by_id(i) for i in path])
-                        print(f"delay {delay}")
-                        roundtrip_time = (2 * delay)
-                        current_response_time = round(
-                            (roundtrip_time + rl_selected_server.execution_time_of_service[str(rl_selected_service.id)]), 2)
-                        print(f"current_response_time: {current_response_time}, exection time: {rl_selected_server.execution_time_of_service[str(rl_selected_service.id)]}")
+                    delay = 0.0
+                    roundtrip_time = 0.0
+                    # Initializes the application's delay with the time it takes to communicate its client and his base station
+                    delay = rl_selected_user.base_station.wireless_delay
+                    for path in communication_paths:
+                        delay += topology.calculate_path_delay(path=[NetworkSwitch.find_by_id(i) for i in path])
+
+                    roundtrip_time = (2 * delay)
+                    response_time_for_service = round(
+                        (roundtrip_time + rl_selected_server.execution_time_of_service[str(rl_selected_service.id)]), 2)
+                    print(f"response_time_for_service: {response_time_for_service}")
+                    #################################################
+                    if (response_time_for_service < list(rl_selected_user.delay_slas.values())[0]):
+                        bool_deadline_will_be_met = True
             else:
                 print(f"can host but service {rl_selected_service} is NOT the earliest service")  ## amin
             #######################################################################################
