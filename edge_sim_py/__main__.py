@@ -726,18 +726,46 @@ def my_rl_in_edgesimpy(parameters):
             rl_selected_user = next((user for user in User._instances if rl_selected_application in user.applications), None)
             rl_selected_server = next((s for s in EdgeServer._instances if s.id == (rl_server)), None)  ## amin
 
-            print(f"rl_selected_service: {rl_selected_service}")
-            print(f"rl_selected_user: {rl_selected_user}")
-            print(f"rl_selected_application: {rl_selected_application}")
-            print(f"rl_selected_server: {rl_selected_server}")
-            print(f"sorted_priorities_list[0][0]: {sorted_priorities_list[0][0]}")
+            print(f"sorted_priorities_list[0][0]: {sorted_priorities_list[0][0]}")  ## amin
 
-            if (rl_selected_server.has_capacity_to_host(service=rl_selected_service)) and (sorted_priorities_list[0][0] == rl_selected_user): ## amin
-                rl_selected_service.provision(target_server=rl_selected_server)     ## amin
-                print(f"can host and service {rl_selected_service} is the earliest service")       ## amin
-                ################################################################
-                topology = Topology.first()
-                communication_chain = [rl_selected_user.base_station, rl_selected_server.base_station]
+            if rl_selected_server.has_capacity_to_host(service=rl_selected_service):  ## amin
+                # bool_not_overload===True ## put some positive reward in reward-function
+                if sorted_priorities_list[0][0] == rl_selected_user: ## amin ##
+                    # bool_EDF===True ## the earliest deadline task is allocated
+                    rl_selected_service.provision(target_server=rl_selected_server)     ## amin
+                    print(f"can host and service {rl_selected_service} is the earliest service")       ## amin
+                    ################################################################
+                    ##############calculating the response time##################
+                    communication_paths = []
+                    topology = Topology.first()
+                    communication_chain = [rl_selected_user.base_station, rl_selected_server.base_station]
+                    for i in range(len(communication_chain) - 1):
+
+                        # Defining origin and target nodes
+                        origin = communication_chain[i]
+                        target = communication_chain[i + 1]
+
+                        # Finding and storing the best communication path between the origin and target nodes
+                        if origin == target:
+                            path = []
+                        else:
+                            path = nx.shortest_path(
+                                G=topology,
+                                source=origin.network_switch,
+                                target=target.network_switch,
+                                weight="delay",
+                                method="dijkstra",
+                            )
+
+                        # Adding the best path found to the communication path
+                        communication_paths.append([network_switch.id for network_switch in path])
+                        ########
+                        delay = 0.0
+                        # Initializes the application's delay with the time it takes to communicate its client and his base station
+                        delay = rl_selected_user.base_station.wireless_delay
+                        for path in communication_paths:
+                            delay += topology.calculate_path_delay(path=[NetworkSwitch.find_by_id(i) for i in path])
+                        print(f"delay {delay}")
             else:
                 print(f"can host but service {rl_selected_service} is NOT the earliest service")  ## amin
 
