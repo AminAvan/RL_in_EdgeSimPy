@@ -545,14 +545,14 @@ def my_rl_in_edgesimpy(parameters):
             x = F.relu(self.layer2(x))
             return self.layer3(x)
 
-    priorities_list = [] ## amin
-    for usr in User.all():  ## amin
-        # Calculating the urgency of each user's deadline       ## amin
-        priority = 1 / list(usr.delay_slas.values())[0]     ## amin
-        # Assign users along sith their deadline-priority   ## amin
-        priorities_list.append((usr, priority)) ## amin
-    # Sort the priorities_list based on deadline    ## amin
-    sorted_priorities_list = sorted(priorities_list, key=lambda x: (x[1]), reverse=True)    ## amin
+    # priorities_list = [] ## amin
+    # for usr in User.all():  ## amin
+    #     # Calculating the urgency of each user's deadline       ## amin
+    #     priority = 1 / list(usr.delay_slas.values())[0]     ## amin
+    #     # Assign users along sith their deadline-priority   ## amin
+    #     priorities_list.append((usr, priority)) ## amin
+    # # Sort the priorities_list based on deadline    ## amin
+    # sorted_priorities_list = sorted(priorities_list, key=lambda x: (x[1]), reverse=True)    ## amin
 
     BATCH_SIZE = 128
     GAMMA = 0.99
@@ -626,6 +626,29 @@ def my_rl_in_edgesimpy(parameters):
 
     episode_durations = []
 
+    def update_state(state, id):
+        """
+        Creates a new list by updating the n-th item to '1' based on the input id
+        without modifying the original list.
+
+        Args:
+            state (list): The original list of 0s.
+            id (int): The index (1-based) to update in the list.
+
+        Returns:
+            list: A new list with the n-th item set to '1'.
+        """
+        # Create a copy of the original list
+        updated_state = state[:]
+
+        # Ensure id is within valid range
+        if 1 <= id <= len(updated_state):
+            updated_state[id - 1] = 1  # Convert 1-based index to 0-based index
+        else:
+            print("Error: id is out of range")
+
+        return updated_state
+
     def get_service_criticality_level(input_value):
         """
         Determine the processing level based on the input value.
@@ -634,7 +657,7 @@ def my_rl_in_edgesimpy(parameters):
             input_value (int): The input integer value.
 
         Returns:
-            str: The processing level as a string.
+            float: The processing level as a string.
         """
         # Define the valid ranges and their corresponding outputs
         valid_ranges = {
@@ -647,24 +670,23 @@ def my_rl_in_edgesimpy(parameters):
         # Check which range the input_value belongs to
         for (lower, upper), output in valid_ranges.items():
             if lower <= input_value <= upper:
-                return output
+                return float(output)
 
         # If no matching range is found
         return 0
 
-    def compute_reward(earliest_deadline_service, enough_capacity, service_deadline_met, cpu_utilization_factor,
-                       memory_utilization_factor, response_time_factor, deadline_miss_severity):
+    def compute_reward(enough_capacity, service_deadline_met, cpu_utilization_factor,
+                       memory_utilization_factor, response_time_factor, deadline_critical_level):
         """
         Compute the reward for the RL agent in a real-time task scheduling scenario.
 
         Args:
-            earliest_deadline_service (bool): Whether the service with the earliest deadline was selected.
             enough_capacity (bool): Whether the selected server had enough capacity to host the service.
             service_deadline_met (bool): Whether the service's deadline was met.
             cpu_utilization_factor (float): CPU utilization factor of the server.
             memory_utilization_factor (float): Memory utilization factor of the server.
             response_time_factor (float): Factor representing the response time (lower is better).
-            deadline_miss_severity (float): A severity factor representing how far a task missed its deadline (e.g., ratio of actual response time to deadline).
+            deadline_critical_level (float): A severity factor representing how far a task missed its deadline (e.g., ratio of actual response time to deadline).
 
         Returns:
             float: The computed reward.
@@ -675,8 +697,7 @@ def my_rl_in_edgesimpy(parameters):
         ## Positive Rewards ##
         ######################
         # Reward for selecting the service with the earliest deadline
-        if earliest_deadline_service:
-            reward += 2  # Increased weight for prioritizing critical tasks
+        reward += 1 * (deadline_critical_level ** 2)
 
         # Reward for efficient resource utilization (CPU and memory within capacity)
         if enough_capacity:
@@ -691,8 +712,6 @@ def my_rl_in_edgesimpy(parameters):
         ## Negative Rewards ##
         ######################
         # Penalty for failing to select the earliest deadline service
-        if not earliest_deadline_service:
-            reward -= 1  # Moderate penalty for deprioritization
 
         # Penalty for exceeding server capacity
         if not enough_capacity:
@@ -702,7 +721,7 @@ def my_rl_in_edgesimpy(parameters):
         # Severe penalty for missing deadlines
         if not service_deadline_met:
             # Exponential penalty based on severity of the deadline miss
-            penalty = 10 * (deadline_miss_severity ** 2)
+            penalty = 10 * (deadline_critical_level ** 2)
             reward -= penalty
 
         return reward
@@ -789,6 +808,8 @@ def my_rl_in_edgesimpy(parameters):
             for service in Service.all()  ## amin
         ]  ## amin
         state = services_status_values  ## amin
+        # print(f"len(state): {len(state)}")
+        # print(f"state: {state}")
         # state, info = env.reset() ## was
         state = torch.tensor(state, dtype=torch.float32, device=device).unsqueeze(0)
         for t in count():
@@ -812,68 +833,88 @@ def my_rl_in_edgesimpy(parameters):
             # print(f"cpu U of {rl_selected_server}: {rl_selected_server.total_cpu_utilization}")
             # print(f"memory U of {rl_selected_server}: {rl_selected_server.total_memory_utilization}")
 
-            selected_EDF_service = False
+            wrong_counter = 0
             server_poses_capacity = False
             service_deadline_likely_met = False
-            if sorted_priorities_list[0][0] == rl_selected_user:  ## amin ##
-                selected_EDF_service = True  ## the earliest deadline task is allocated
-                if rl_selected_server.has_capacity_to_host(service=rl_selected_service):  ## amin
-                    server_poses_capacity = True ## put some positive reward in reward-function
-                    rl_selected_service.provision(target_server=rl_selected_server)     ## amin
-                    print(f"can host and service {rl_selected_service} is the earliest service")       ## amin
-                    # print(f"cpu U of {rl_selected_server}: {rl_selected_server.total_cpu_utilization}")
-                    # print(
-                    #     f"memory U of {rl_selected_server}: {rl_selected_server.total_memory_utilization}")
-                    ################################################################
-                    ##############calculating the response time##################
-                    #### Calculate the one-way delay from the user to the candidate edge server for the service
-                    communication_paths = []
-                    topology = Topology.first()
-                    communication_chain = [rl_selected_user.base_station, rl_selected_server.base_station]
-                    for i in range(len(communication_chain) - 1):
 
-                        # Defining origin and target nodes
-                        origin = communication_chain[i]
-                        target = communication_chain[i + 1]
+            if rl_selected_server.has_capacity_to_host(service=rl_selected_service):  ## amin
+                server_poses_capacity = True ## put some positive reward in reward-function
+                rl_selected_service.provision(target_server=rl_selected_server)     ## amin
+                service_criticality_level = get_service_criticality_level(
+                    list(rl_selected_user.delay_slas.values())[0])
+                print(f"can host and service {rl_selected_service} is the earliest service, at {rl_selected_application},"
+                      f"at {rl_selected_user}, at {rl_selected_server}")       ## amin
+                ############## response time ##################
+                communication_paths = []
+                topology = Topology.first()
+                communication_chain = [rl_selected_user.base_station, rl_selected_server.base_station]
+                for i in range(len(communication_chain) - 1):
 
-                        # Finding and storing the best communication path between the origin and target nodes
-                        if origin == target:
-                            path = []
-                        else:
-                            path = nx.shortest_path(
-                                G=topology,
-                                source=origin.network_switch,
-                                target=target.network_switch,
-                                weight="delay",
-                                method="dijkstra",
-                            )
+                    # Defining origin and target nodes
+                    origin = communication_chain[i]
+                    target = communication_chain[i + 1]
 
-                        # Adding the best path found to the communication path
-                        communication_paths.append([network_switch.id for network_switch in path])
-                        ########
-                    delay = 0.0
-                    roundtrip_time = 0.0
-                    # Initializes the application's delay with the time it takes to communicate its client and his base station
-                    delay = rl_selected_user.base_station.wireless_delay
-                    for path in communication_paths:
-                        delay += topology.calculate_path_delay(path=[NetworkSwitch.find_by_id(i) for i in path])
+                    # Finding and storing the best communication path between the origin and target nodes
+                    if origin == target:
+                        path = []
+                    else:
+                        path = nx.shortest_path(
+                            G=topology,
+                            source=origin.network_switch,
+                            target=target.network_switch,
+                            weight="delay",
+                            method="dijkstra",
+                        )
 
-                    roundtrip_time = (2 * delay)
-                    response_time_for_service = round(
-                        (roundtrip_time + rl_selected_server.execution_time_of_service[str(rl_selected_service.id)]), 2)
-                    print(f"response_time_for_service: {response_time_for_service}")
-                    #################################################
-                    if (response_time_for_service < list(rl_selected_user.delay_slas.values())[0]):
-                        service_deadline_likely_met = True
+                    # Adding the best path found to the communication path
+                    communication_paths.append([network_switch.id for network_switch in path])
+                    ########
+                delay = 0.0
+                roundtrip_time = 0.0
+                # Initializes the application's delay with the time it takes to communicate its client and his base station
+                delay = rl_selected_user.base_station.wireless_delay
+                for path in communication_paths:
+                    delay += topology.calculate_path_delay(path=[NetworkSwitch.find_by_id(i) for i in path])
+
+                roundtrip_time = (2 * delay)
+                response_time_for_service = round(
+                    (roundtrip_time + rl_selected_server.execution_time_of_service[str(rl_selected_service.id)]), 4)
+
+                print(f"response_time_for_service: {response_time_for_service}")
+                #################################################
+                if (response_time_for_service < list(rl_selected_user.delay_slas.values())[0]):
+                    service_deadline_likely_met = True
+                    observation = update_state(state.tolist(), rl_selected_service.id)
+                else:
+                    service_deadline_likely_met = False
+                    service_criticality_level = get_service_criticality_level(list(rl_selected_user.delay_slas.values())[0])
+                    observation = update_state(state.tolist(), rl_selected_service.id)
             else:
-                print(f"can host but service {rl_selected_service} is NOT the earliest service")  ## amin
+                server_poses_capacity = False
+                service_criticality_level = get_service_criticality_level(list(rl_selected_user.delay_slas.values())[0])
+                observation = update_state(state.tolist(), rl_selected_service.id)
 
-            ##################????????????!!!!!!!!!!!!!!!!!!????################
+                # print(f"can host but service {rl_selected_service} is NOT the earliest service")  ## amin
 
-            service_criticality_level = get_service_criticality_level(list(rl_selected_user.delay_slas.values())[0])
-            reward = compute_reward(selected_EDF_service, server_poses_capacity, service_deadline_likely_met, rl_selected_server.total_cpu_utilization,
+            ##################################
+            ## calculating the reward
+            reward = compute_reward(server_poses_capacity, service_deadline_likely_met, rl_selected_server.total_cpu_utilization,
                            rl_selected_server.total_memory_utilization, response_time_for_service, service_criticality_level)
-            print(f"reward: {reward}")
+
+            reward = torch.tensor([reward], device=device)
+
+            if all(item == 1 for item in observation):
+                terminated = True
+            else:
+                terminated = False
+
+            #
+            #
+            # done = terminated or truncated
+            # ##################################
+            # ## calculating observation === next_step
+
+
             sys.exit(0) ##################????????????!!!!!!!!!!!!!!!!!!????################
             ##################????????????!!!!!!!!!!!!!!!!!!????################
 
