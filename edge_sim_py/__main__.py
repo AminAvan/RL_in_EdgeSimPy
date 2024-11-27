@@ -970,7 +970,7 @@ def my_rl_in_edgesimpy(parameters):
             else:
                 terminated = False
 
-            if num_likely_missed_deadline > int(0.35 * len(Service.all())):
+            if num_likely_missed_deadline >= len(Service.all()):
                 truncated = True
             else:
                 truncated = False
@@ -1016,6 +1016,7 @@ def my_rl_in_edgesimpy(parameters):
                 # Count the total number of elements equal to 1
                 count_ones = torch.sum(next_state == 1).item()
                 # Print the result
+                print(f"num_likely_missed_deadline: {num_likely_missed_deadline}")
                 print(f"Total number services are allocated: {count_ones}")
                 print(f"========================================")
                 if (i_episode > 0) and (i_episode % 50 == 0):
