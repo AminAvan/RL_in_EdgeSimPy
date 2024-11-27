@@ -833,7 +833,7 @@ def my_rl_in_edgesimpy(parameters):
             # print(f"cpu U of {rl_selected_server}: {rl_selected_server.total_cpu_utilization}")
             # print(f"memory U of {rl_selected_server}: {rl_selected_server.total_memory_utilization}")
 
-            wrong_counter = 0
+            num_likely_missed_deadline = 0
             server_poses_capacity = False
             service_deadline_likely_met = False
 
@@ -887,10 +887,12 @@ def my_rl_in_edgesimpy(parameters):
                     observation = update_state(state.tolist(), rl_selected_service.id)
                 else:
                     service_deadline_likely_met = False
+                    num_likely_missed_deadline += 1
                     service_criticality_level = get_service_criticality_level(list(rl_selected_user.delay_slas.values())[0])
                     observation = update_state(state.tolist(), rl_selected_service.id)
             else:
                 server_poses_capacity = False
+                num_likely_missed_deadline += 1
                 service_criticality_level = get_service_criticality_level(list(rl_selected_user.delay_slas.values())[0])
                 observation = update_state(state.tolist(), rl_selected_service.id)
 
@@ -900,7 +902,7 @@ def my_rl_in_edgesimpy(parameters):
             ## calculating the reward
             reward = compute_reward(server_poses_capacity, service_deadline_likely_met, rl_selected_server.total_cpu_utilization,
                            rl_selected_server.total_memory_utilization, response_time_for_service, service_criticality_level)
-
+            print(f"reward: {reward}")
             reward = torch.tensor([reward], device=device)
 
             if all(item == 1 for item in observation):
@@ -908,24 +910,20 @@ def my_rl_in_edgesimpy(parameters):
             else:
                 terminated = False
 
-            #
-            #
-            # done = terminated or truncated
-            # ##################################
-            # ## calculating observation === next_step
+            if num_likely_missed_deadline > int(0.35 * len(Service.all())):
+                truncated = True
+            else:
+                truncated = False
 
-
-            sys.exit(0) ##################????????????!!!!!!!!!!!!!!!!!!????################
-            ##################????????????!!!!!!!!!!!!!!!!!!????################
-
-            observation, reward, terminated, truncated, _ = env.step(action.item())
-            reward = torch.tensor([reward], device=device)
             done = terminated or truncated
 
             if terminated:
                 next_state = None
             else:
                 next_state = torch.tensor(observation, dtype=torch.float32, device=device).unsqueeze(0)
+
+            sys.exit(0) ##################????????????!!!!!!!!!!!!!!!!!!????################
+
 
             # Store the transition in rl_memory
             rl_memory.push(state, action, next_state, reward)
