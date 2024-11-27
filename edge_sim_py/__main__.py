@@ -922,8 +922,8 @@ def my_rl_in_edgesimpy(parameters):
             else:
                 next_state = torch.tensor(observation, dtype=torch.float32, device=device).unsqueeze(0)
 
-            sys.exit(0) ##################????????????!!!!!!!!!!!!!!!!!!????################
-
+            # sys.exit(0) ############### UNTIL HERE WAS WORKED ##############
+            ## NEED to line by line go further to check if the codes are proper to work
 
             # Store the transition in rl_memory
             rl_memory.push(state, action, next_state, reward)
