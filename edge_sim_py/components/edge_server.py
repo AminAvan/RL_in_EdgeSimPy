@@ -121,6 +121,22 @@ class EdgeServer(ComponentManager, Agent):
         self.model = None
         self.unique_id = None
 
+    def reset_attributes(self):  ## added by amin
+        """Resets all attributes of the instance to their default values."""
+        self.total_cpu_utilization = 0.0
+        self.total_memory_utilization = 0.0
+        self.cpu_demand = 0
+        self.memory_demand = 0
+        self.disk_demand = 0
+        self.processing_power_demand = 0
+        self.available = True
+        self.ongoing_migrations = 0
+        self.execution_time_of_service = {}
+        self.waiting_queue = []
+        self.download_queue = []
+        self.is_negative_freq_capacity = 0
+        self.is_potential_host = 0
+
     def _to_dict(self) -> dict:
         """Method that overrides the way the object is formatted to JSON."
 

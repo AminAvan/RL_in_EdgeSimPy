@@ -836,6 +836,13 @@ def my_rl_in_edgesimpy(parameters):
         # simulator.initialize(input_file=dataset_path)
         # simulator.run_model()
 
+        # Use the reset method
+        for server in EdgeServer._instances:
+            server.reset_attributes()
+        # for server in EdgeServer.all():
+        #     print(f"initial values server: {server.total_cpu_utilization}")
+
+
         services_status_values = [  ## amin -- the '1' shows that the service is provisioned but the '0' means that it is not
             1 if service.server is not None or service.being_provisioned else 0
             for service in Service.all()
@@ -872,8 +879,9 @@ def my_rl_in_edgesimpy(parameters):
             server_poses_capacity = False
             service_deadline_likely_met = False
 
+            # for server in EdgeServer.all():
+            #     print(f"in loop - server: {server.total_cpu_utilization}")
             print(f"service {rl_selected_service}, {rl_selected_application}, {rl_selected_user}, {rl_selected_server}")       ## amin
-
             if not is_service_allocated_before(state.squeeze(0).tolist(), rl_selected_service.id):
                 avoid_redundant_service = True
                 if rl_selected_server.has_capacity_to_host(service=rl_selected_service):  ## amin
@@ -948,13 +956,13 @@ def my_rl_in_edgesimpy(parameters):
                 service_criticality_level = get_service_criticality_level(list(rl_selected_user.delay_slas.values())[0])
                 observation = update_state(state.squeeze(0).tolist(), rl_selected_service.id)
 
-            print(f"observation: {sum(1 for item in observation if item == 1)}")
+            # print(f"observation: {sum(1 for item in observation if item == 1)}")
             # print(f"next step: {sum(1 for item in sum(observation) if item == 1)}")
             ##################################
             ## calculating the reward
             reward = compute_reward(avoid_redundant_service, server_poses_capacity, service_deadline_likely_met, rl_selected_server.total_cpu_utilization,
                            rl_selected_server.total_memory_utilization, service_criticality_level, response_time_for_service)
-            print(f"reward: {reward}")
+            # print(f"reward: {reward}")
             reward = torch.tensor([reward], device=device)
 
             if all(item == 1 for item in observation):
@@ -1002,13 +1010,14 @@ def my_rl_in_edgesimpy(parameters):
             for key in policy_net_state_dict:
                 target_net_state_dict[key] = policy_net_state_dict[key] * TAU + target_net_state_dict[key] * (1 - TAU)
             target_net.load_state_dict(target_net_state_dict)
-            print()
+
             if done:
                 episode_durations.append(t + 1)
                 # Count the total number of elements equal to 1
                 count_ones = torch.sum(next_state == 1).item()
                 # Print the result
-                print(f"Total number of elements equal to 1: {count_ones}")
+                print(f"Total number services are allocated: {count_ones}")
+                print(f"========================================")
                 if (i_episode > 0) and (i_episode % 50 == 0):
                     plot_durations()
                 break
