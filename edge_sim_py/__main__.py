@@ -583,8 +583,6 @@ def my_rl_in_edgesimpy(parameters):
 
         # Validate indices
         if task_index > total_num_tasks:
-            print(f"task_index: {task_index}")
-            print(f"total_num_tasks: {total_num_tasks}")
             raise ValueError("Action index out of bounds for the given number of tasks and servers.")
 
         return task_index, server_index
@@ -827,6 +825,11 @@ def my_rl_in_edgesimpy(parameters):
 
     for i_episode in range(num_episodes):
         # Initialize the environment and get its state
+        # Initialize the simulator with the absolute path
+        simulator.initialize(input_file=dataset_path)
+        # Executing the simulation
+        simulator.run_model()
+
         services_status_values = [  ## amin -- the '1' shows that the service is provisioned but the '0' means that it is not
             1 if service.server is not None or service.being_provisioned else 0
             for service in Service.all()
@@ -837,6 +840,7 @@ def my_rl_in_edgesimpy(parameters):
         # print(f"state: {state}")
         # state, info = env.reset() ## was
         state = torch.tensor(state, dtype=torch.float32, device=device).unsqueeze(0)
+        num_likely_missed_deadline = 0
         for t in count():
             action = select_action(state) ## amin
             # print(f"action x: {action}") ## amin
@@ -858,11 +862,11 @@ def my_rl_in_edgesimpy(parameters):
             # print(f"cpu U of {rl_selected_server}: {rl_selected_server.total_cpu_utilization}")
             # print(f"memory U of {rl_selected_server}: {rl_selected_server.total_memory_utilization}")
 
-            num_likely_missed_deadline = 0
+
             server_poses_capacity = False
             service_deadline_likely_met = False
 
-            if not is_service_allocated_before:
+            if not is_service_allocated_before(state.squeeze(0).tolist(), rl_selected_service.id):
                 avoid_redundant_service = True
                 if rl_selected_server.has_capacity_to_host(service=rl_selected_service):  ## amin
                     server_poses_capacity = True ## put some positive reward in reward-function
@@ -971,7 +975,7 @@ def my_rl_in_edgesimpy(parameters):
 
             # Move to the next state
             state = next_state
-            print(f"state: {state}")
+
             # Perform one step of the optimization (on the policy network)
             optimize_model()
 
