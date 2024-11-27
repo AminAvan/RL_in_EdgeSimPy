@@ -640,7 +640,6 @@ def my_rl_in_edgesimpy(parameters):
         """
         # Create a copy of the original list
         updated_state = state[:]
-
         # Ensure id is within valid range
         if 1 <= id <= len(updated_state):
             updated_state[id - 1] = 1  # Convert 1-based index to 0-based index
@@ -803,11 +802,12 @@ def my_rl_in_edgesimpy(parameters):
 
     for i_episode in range(num_episodes):
         # Initialize the environment and get its state
-        services_status_values = [  ## amin
-            service.server if service.server is not None or service.being_provisioned else 0  ## amin
-            for service in Service.all()  ## amin
-        ]  ## amin
+        services_status_values = [  ## amin -- the '1' shows that the service is provisioned but the '0' means that it is not
+            1 if service.server is not None or service.being_provisioned else 0
+            for service in Service.all()
+        ]
         state = services_status_values  ## amin
+        print(f"state: {state}")
         # print(f"len(state): {len(state)}")
         # print(f"state: {state}")
         # state, info = env.reset() ## was
@@ -836,6 +836,7 @@ def my_rl_in_edgesimpy(parameters):
             num_likely_missed_deadline = 0
             server_poses_capacity = False
             service_deadline_likely_met = False
+
 
             if rl_selected_server.has_capacity_to_host(service=rl_selected_service):  ## amin
                 server_poses_capacity = True ## put some positive reward in reward-function
@@ -884,17 +885,17 @@ def my_rl_in_edgesimpy(parameters):
                 #################################################
                 if (response_time_for_service < list(rl_selected_user.delay_slas.values())[0]):
                     service_deadline_likely_met = True
-                    observation = update_state(state.tolist(), rl_selected_service.id)
+                    observation = update_state(state.squeeze(0).tolist(), rl_selected_service.id)
                 else:
                     service_deadline_likely_met = False
                     num_likely_missed_deadline += 1
                     service_criticality_level = get_service_criticality_level(list(rl_selected_user.delay_slas.values())[0])
-                    observation = update_state(state.tolist(), rl_selected_service.id)
+                    observation = update_state(state.squeeze(0).tolist(), rl_selected_service.id)
             else:
                 server_poses_capacity = False
                 num_likely_missed_deadline += 1
                 service_criticality_level = get_service_criticality_level(list(rl_selected_user.delay_slas.values())[0])
-                observation = update_state(state.tolist(), rl_selected_service.id)
+                observation = update_state(state.squeeze(0).tolist(), rl_selected_service.id)
 
                 # print(f"can host but service {rl_selected_service} is NOT the earliest service")  ## amin
 
@@ -922,8 +923,8 @@ def my_rl_in_edgesimpy(parameters):
             else:
                 next_state = torch.tensor(observation, dtype=torch.float32, device=device).unsqueeze(0)
 
-            # sys.exit(0) ############### UNTIL HERE WAS WORKED ##############
-            ## NEED to line by line go further to check if the codes are proper to work
+            ############### UNTIL HERE WAS WORKED ##############
+
 
             # Store the transition in rl_memory
             rl_memory.push(state, action, next_state, reward)
