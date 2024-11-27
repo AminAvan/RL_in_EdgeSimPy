@@ -881,7 +881,7 @@ def my_rl_in_edgesimpy(parameters):
 
             # for server in EdgeServer.all():
             #     print(f"in loop - server: {server.total_cpu_utilization}")
-            print(f"service {rl_selected_service}, {rl_selected_application}, {rl_selected_user}, {rl_selected_server}")       ## amin
+            # print(f"service {rl_selected_service}, {rl_selected_application}, {rl_selected_user}, {rl_selected_server}")       ## amin
             if not is_service_allocated_before(state.squeeze(0).tolist(), rl_selected_service.id):
                 avoid_redundant_service = True
                 if rl_selected_server.has_capacity_to_host(service=rl_selected_service):  ## amin
