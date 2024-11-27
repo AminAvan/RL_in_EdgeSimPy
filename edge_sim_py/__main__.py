@@ -825,9 +825,15 @@ def my_rl_in_edgesimpy(parameters):
 
     for i_episode in range(num_episodes):
         # Initialize the environment and get its state
-        # Initialize the simulator with the absolute path
+        simulator = Simulator(
+            dump_interval=5,
+            tick_duration=1,
+            tick_unit="seconds",
+            stopping_criterion=stopping_criterion,
+            resource_management_algorithm=wrapped_Service_Provisioning,
+            logs_directory=logs_directory,
+        )
         simulator.initialize(input_file=dataset_path)
-        # Executing the simulation
         simulator.run_model()
 
         services_status_values = [  ## amin -- the '1' shows that the service is provisioned but the '0' means that it is not
