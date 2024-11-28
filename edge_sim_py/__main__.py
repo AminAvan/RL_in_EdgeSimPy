@@ -752,8 +752,8 @@ def my_rl_in_edgesimpy(parameters):
 
         # Reward for meeting service deadlines
         if service_deadline_met:
-            reward += 10 * (deadline_critical_level ** 2)
-            reward += 5 / response_time_factor  # Higher reward for low response times
+            reward += 15 * (deadline_critical_level ** 2)
+            reward += 10 / response_time_factor  # Higher reward for low response times
 
         ######################
         ## Negative Rewards ##
@@ -1032,7 +1032,7 @@ def my_rl_in_edgesimpy(parameters):
 
             if done:
                 episode_durations.append(t + 1)
-                print(f"episode_durations: {episode_durations}")
+                print(f"episode_duration: {episode_durations[-1]}")
                 if next_state is not None:
                     count_ones = torch.sum(next_state == 1).item()
                 else:
