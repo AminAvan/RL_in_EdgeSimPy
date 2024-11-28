@@ -17,6 +17,7 @@ import subprocess
 
 ### rl down ###
 import gymnasium as gym
+from builtins import map
 import math
 import random
 import matplotlib
@@ -609,22 +610,48 @@ def my_rl_in_edgesimpy(parameters):
 
     steps_done = 0
 
+    # def select_action(state):
+    #     nonlocal steps_done
+    #     print(f"state in state: {state}")
+    #     sample = random.random()
+    #     eps_threshold = EPS_END + (EPS_START - EPS_END) * \
+    #                     math.exp(-1. * steps_done / EPS_DECAY)
+    #     steps_done += 1
+    #     if sample > eps_threshold:
+    #         with torch.no_grad():
+    #             # t.max(1) will return the largest column value of each row.
+    #             # second column on max result is index of where max element was
+    #             # found, so we pick action with the larger expected reward.
+    #             return policy_net(state).max(1).indices.view(1, 1)
+    #     else:
+    #         return torch.tensor([[env.action_space.sample()]], device=device, dtype=torch.long)
+
     def select_action(state):
         nonlocal steps_done
         sample = random.random()
         eps_threshold = EPS_END + (EPS_START - EPS_END) * \
                         math.exp(-1. * steps_done / EPS_DECAY)
         steps_done += 1
+
+        # Find indices of unassigned tasks (state == 0)
+        unassigned_task_indices = (state == 0).nonzero(as_tuple=True)[1].tolist()  # Get unassigned indices
+
+        if not unassigned_task_indices:
+            raise ValueError("No unassigned tasks available for selection.")
+
         if sample > eps_threshold:
             with torch.no_grad():
-                # t.max(1) will return the largest column value of each row.
-                # second column on max result is index of where max element was
-                # found, so we pick action with the larger expected reward.
+                # Exploitation: Choose the best action based on policy_net
+                # Restricting to unassigned tasks is not necessary for exploitation
                 return policy_net(state).max(1).indices.view(1, 1)
         else:
-            return torch.tensor([[env.action_space.sample()]], device=device, dtype=torch.long)
+            # Exploration: Randomly select from unassigned tasks
+            random_action_idx = random.choice(unassigned_task_indices)
+            return torch.tensor([[random_action_idx]], device=device, dtype=torch.long)
+
 
     episode_durations = []
+    episode_allocated_service = []
 
     def is_service_allocated_before(state, id):
         """
@@ -716,7 +743,7 @@ def my_rl_in_edgesimpy(parameters):
         ######################
         if not_redundant:
             # Reward for selecting the service with the earliest deadline
-            reward += 1 * (deadline_critical_level ** 2)
+            reward += 2
 
         # Reward for efficient resource utilization (CPU and memory within capacity)
         if enough_capacity:
@@ -725,6 +752,7 @@ def my_rl_in_edgesimpy(parameters):
 
         # Reward for meeting service deadlines
         if service_deadline_met:
+            reward += 10 * (deadline_critical_level ** 2)
             reward += 5 / response_time_factor  # Higher reward for low response times
 
         ######################
@@ -751,17 +779,22 @@ def my_rl_in_edgesimpy(parameters):
     def plot_durations(show_result=False):
         plt.figure(1)
         durations_t = torch.tensor(episode_durations, dtype=torch.float)
+        allocated_t = torch.tensor(episode_allocated_service, dtype=torch.float)
         if show_result:
             plt.title('Result')
         else:
             plt.clf()
             plt.title('Training...')
         plt.xlabel('Episode')
-        plt.ylabel('Duration')
-        plt.plot(durations_t.numpy())
+        # plt.ylabel('Duration')
+        plt.ylabel('Allocated Services')
+        # plt.plot(durations_t.numpy())
+        plt.plot(allocated_t.numpy())
         # Take 100 episode averages and plot them too
-        if len(durations_t) >= 100:
-            means = durations_t.unfold(0, 100, 1).mean(1).view(-1)
+        # if len(durations_t) >= 100:
+        if len(allocated_t) >= 100:
+            # means = durations_t.unfold(0, 100, 1).mean(1).view(-1)
+            means = allocated_t.unfold(0, 100, 1).mean(1).view(-1)
             means = torch.cat((torch.zeros(99), means))
             plt.plot(means.numpy())
 
@@ -784,8 +817,7 @@ def my_rl_in_edgesimpy(parameters):
 
         # Compute a mask of non-final states and concatenate the batch elements
         # (a final state would've been the one after which simulation ended)
-        # non_final_mask = torch.tensor(tuple(map(lambda s: s is not None,batch.next_state)), device=device, dtype=torch.bool) ## was
-        non_final_mask = torch.tensor([s is not None for s in batch.next_state], device=device, dtype=torch.bool) ## amin
+        non_final_mask = torch.tensor(tuple(map(lambda s: s is not None, batch.next_state)), device=device, dtype=torch.bool)
         non_final_next_states = torch.cat([s for s in batch.next_state if s is not None])
         state_batch = torch.cat(batch.state)
         action_batch = torch.cat(batch.action)
@@ -824,31 +856,18 @@ def my_rl_in_edgesimpy(parameters):
         num_episodes = 500
 
     for i_episode in range(num_episodes):
-        # Initialize the environment and get its state
-        # simulator = Simulator(
-        #     dump_interval=5,
-        #     tick_duration=1,
-        #     tick_unit="seconds",
-        #     stopping_criterion=stopping_criterion,
-        #     resource_management_algorithm=wrapped_Service_Provisioning,
-        #     logs_directory=logs_directory,
-        # )
-        # simulator.initialize(input_file=dataset_path)
-        # simulator.run_model()
-
-        # Use the reset method
+        # Initialize the environment and get its state # Use the reset method
         for server in EdgeServer._instances:
             server.reset_attributes()
         # for server in EdgeServer.all():
         #     print(f"initial values server: {server.total_cpu_utilization}")
-
 
         services_status_values = [  ## amin -- the '1' shows that the service is provisioned but the '0' means that it is not
             1 if service.server is not None or service.being_provisioned else 0
             for service in Service.all()
         ]
         state = services_status_values  ## amin
-        print(f"state: {state}")
+        # print(f"state: {state}")
         # print(f"len(state): {len(state)}")
         # print(f"state: {state}")
         # state, info = env.reset() ## was
@@ -874,7 +893,6 @@ def my_rl_in_edgesimpy(parameters):
             # print(f"sorted_priorities_list[0][0]: {sorted_priorities_list[0][0]}")  ## amin
             # print(f"cpu U of {rl_selected_server}: {rl_selected_server.total_cpu_utilization}")
             # print(f"memory U of {rl_selected_server}: {rl_selected_server.total_memory_utilization}")
-
 
             server_poses_capacity = False
             service_deadline_likely_met = False
@@ -970,7 +988,7 @@ def my_rl_in_edgesimpy(parameters):
             else:
                 terminated = False
 
-            if num_likely_missed_deadline >= len(Service.all()):
+            if num_likely_missed_deadline >= (len(Service.all()) * len(EdgeServer.all())):
                 truncated = True
             else:
                 truncated = False
@@ -1011,12 +1029,19 @@ def my_rl_in_edgesimpy(parameters):
                 target_net_state_dict[key] = policy_net_state_dict[key] * TAU + target_net_state_dict[key] * (1 - TAU)
             target_net.load_state_dict(target_net_state_dict)
 
+
             if done:
                 episode_durations.append(t + 1)
+                print(f"episode_durations: {episode_durations}")
+                if next_state is not None:
+                    count_ones = torch.sum(next_state == 1).item()
+                else:
+                    count_ones = len(Service.all())  # Handle the case where next_state is None
+
+                episode_allocated_service.append(count_ones)
                 # Count the total number of elements equal to 1
-                count_ones = torch.sum(next_state == 1).item()
                 # Print the result
-                print(f"num_likely_missed_deadline: {num_likely_missed_deadline}")
+                # print(f"num_likely_missed_deadline: {num_likely_missed_deadline}")
                 print(f"Total number services are allocated: {count_ones}")
                 print(f"========================================")
                 if (i_episode > 0) and (i_episode % 50 == 0):
