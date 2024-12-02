@@ -1171,7 +1171,7 @@ def My_Proposed_Pruned_Method_For_RL_train(parameters):
 
 # In 'def Testing_My_Proposed_Pruned_Method_For_RL(parameters)' I test the RL-agent that was trained by 'My_Proposed_Pruned_Method_For_RL_train'.
 def Testing_My_Proposed_Pruned_Method_For_RL(parameters):
-    if (EdgeServer.is_provisioned <= len(Service.all())):
+    if (EdgeServer.is_potential_host <= len(Service.all())):
         # Load the Q_values from the .npy file
         Q_values_loaded = np.load(r'C:\Users\100807003\PycharmProjects\EdgeSimPy\edge_sim_py\Q_values.npy')
         max_steps = len(Q_values_loaded)
@@ -1248,7 +1248,7 @@ def Testing_My_Proposed_Pruned_Method_For_RL(parameters):
                             user_service_exe_time = (selected_service.processing_power_demand / selected_server.processing_power)
                             selected_server.execution_time_of_service[str(selected_service.id)] = user_service_exe_time
                             selected_service.provision(target_server=selected_server)
-                            EdgeServer.is_provisioned = EdgeServer.is_provisioned + 1
+                            EdgeServer.is_potential_host = EdgeServer.is_potential_host + 1
                             # print(f"SERVICE: {selected_service} of {selected_user} on {selected_server}")
                         # else:
                         #     print("No matching service found.")
@@ -1336,12 +1336,16 @@ algorithm_functions = {
     "BestFit": Best_Fit_Service_Provisioning,
     "EDF": EDF_algorithm,
     "rl": rl,
-    "my_rl_in_edgesimpy": my_rl_in_edgesimpy
+    "my_rl_in_edgesimpy": my_rl_in_edgesimpy,
+    "my_pruned_rl": My_Proposed_Pruned_Method_For_RL_train,
+    "test_my_pruned_rl": Testing_My_Proposed_Pruned_Method_For_RL
 }
 # Define the name of the scheduling algorithm, that could be "lapse", "MASS", "BestFit", "EDF"
 # scheduling_algorithm = "rl"
 # scheduling_algorithm = "EDF"
-scheduling_algorithm = "my_rl_in_edgesimpy"
+# scheduling_algorithm = "my_rl_in_edgesimpy"
+scheduling_algorithm = "my_pruned_rl"
+# scheduling_algorithm = "test_my_pruned_rl"
 
 # @measure_memory
 def wrapped_Service_Provisioning(parameters, algorithm_name=scheduling_algorithm):
