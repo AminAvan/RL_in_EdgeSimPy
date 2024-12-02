@@ -988,7 +988,8 @@ def my_rl_in_edgesimpy(parameters):
             else:
                 terminated = False
 
-            if num_likely_missed_deadline >= (len(Service.all()) * len(EdgeServer.all())):
+            # if num_likely_missed_deadline >= (len(Service.all()) * len(EdgeServer.all())):
+            if num_likely_missed_deadline >= (len(Service.all())):
                 truncated = True
             else:
                 truncated = False
@@ -1343,8 +1344,8 @@ algorithm_functions = {
 # Define the name of the scheduling algorithm, that could be "lapse", "MASS", "BestFit", "EDF"
 # scheduling_algorithm = "rl"
 # scheduling_algorithm = "EDF"
-# scheduling_algorithm = "my_rl_in_edgesimpy"
-scheduling_algorithm = "my_pruned_rl"
+scheduling_algorithm = "my_rl_in_edgesimpy"
+# scheduling_algorithm = "my_pruned_rl"
 # scheduling_algorithm = "test_my_pruned_rl"
 
 # @measure_memory
