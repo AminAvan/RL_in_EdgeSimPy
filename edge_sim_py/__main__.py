@@ -556,7 +556,8 @@ def my_rl_in_edgesimpy(parameters):
     # sorted_priorities_list = sorted(priorities_list, key=lambda x: (x[1]), reverse=True)    ## amin
 
     BATCH_SIZE = 128
-    GAMMA = 0.99
+    # GAMMA = 0.99 ## was
+    GAMMA = 0.9
     EPS_START = 0.9
     EPS_END = 0.05
     EPS_DECAY = 1000
@@ -695,6 +696,7 @@ def my_rl_in_edgesimpy(parameters):
         else:
             print("Error: id is out of range")
 
+        # print(f"updated_state: {updated_state}")
         return updated_state
 
     def get_service_criticality_level(input_value):
@@ -763,16 +765,19 @@ def my_rl_in_edgesimpy(parameters):
         ######################
         # Redundant decision
         if (not_redundant == -1):
+            # print(f"not_redundant == -1")
             # Reward for selecting the service with the earliest deadline
             reward -= 10 * (deadline_critical_level ** 2)
 
         # Penalty for exceeding server capacity
         if (enough_capacity == -1):
+            # print(f"enough_capacity == -1")
             reward -= 5 * max(0, cpu_utilization_factor - 1)  # Penalize overload
             reward -= 5 * max(0, memory_utilization_factor - 1)  # Penalize overload
 
         # Severe penalty for missing deadlines
         if (service_deadline_met == -1):
+            # print(f"service_deadline_met == -1")
             # Exponential penalty based on severity of the deadline miss
             penalty = 9 * (deadline_critical_level ** 2)
             reward -= penalty
@@ -888,7 +893,7 @@ def my_rl_in_edgesimpy(parameters):
             action = select_action(state) ## amin
             # print(f"action x: {action}") ## amin
             # print(f"action.item(): {action.item()}") ## amin
-
+            # print(f"state: {state}")
             rl_task, rl_server = map_action_to_task_server(action.item()) ## amin
             # print(f"Action {action.item()} corresponds to Task {rl_task} and Server {rl_server}.") ## amin
 
@@ -1007,13 +1012,14 @@ def my_rl_in_edgesimpy(parameters):
             else:
                 terminated = False
 
-            # if num_likely_missed_deadline >= (len(Service.all()) * len(EdgeServer.all())):
-            if num_likely_missed_deadline >= (len(Service.all())):
+            if num_likely_missed_deadline >= (len(Service.all()) * len(EdgeServer.all())):
+            # if num_likely_missed_deadline >= (len(Service.all())):
                 truncated = True
             else:
                 truncated = False
 
             if terminated or truncated:
+            # if terminated:
                 done = True
             else:
                 done = False
@@ -1063,6 +1069,7 @@ def my_rl_in_edgesimpy(parameters):
                 # Count the total number of elements equal to 1
                 # Print the result
                 # print(f"num_likely_missed_deadline: {num_likely_missed_deadline}")
+
                 print(f"Total number services are allocated: {count_ones}")
                 print(f"========================================")
                 if (i_episode > 0) and (i_episode % 50 == 0):
