@@ -743,7 +743,7 @@ def my_rl_in_edgesimpy(parameters):
         ######################
         if not_redundant:
             # Reward for selecting the service with the earliest deadline
-            reward += 10
+            reward += 50
 
         # Reward for efficient resource utilization (CPU and memory within capacity)
         if enough_capacity:
@@ -761,17 +761,17 @@ def my_rl_in_edgesimpy(parameters):
         # Redundant decision
         if not not_redundant:
             # Reward for selecting the service with the earliest deadline
-            reward -= 1 * (deadline_critical_level ** 2)
+            reward -= 10 * (deadline_critical_level ** 2)
 
         # Penalty for exceeding server capacity
         if not enough_capacity:
-            reward -= 1 * max(0, cpu_utilization_factor - 1)  # Penalize overload
-            reward -= 1 * max(0, memory_utilization_factor - 1)  # Penalize overload
+            reward -= 5 * max(0, cpu_utilization_factor - 1)  # Penalize overload
+            reward -= 5 * max(0, memory_utilization_factor - 1)  # Penalize overload
 
         # Severe penalty for missing deadlines
         if not service_deadline_met:
             # Exponential penalty based on severity of the deadline miss
-            penalty = 10 * (deadline_critical_level ** 2)
+            penalty = 9 * (deadline_critical_level ** 2)
             reward -= penalty
 
         return reward
@@ -866,8 +866,8 @@ def my_rl_in_edgesimpy(parameters):
         # Initialize the environment and get its state # Use the reset method
         for server in EdgeServer._instances:
             server.reset_attributes()
-        for server in EdgeServer.all():
-            print(f"initial values server: {server.total_cpu_utilization}")
+        # for server in EdgeServer.all():
+        #     print(f"initial values server: {server.total_cpu_utilization}")
 
 
         services_status_values = [  ## amin -- the '1' shows that the service is provisioned but the '0' means that it is not
@@ -875,8 +875,8 @@ def my_rl_in_edgesimpy(parameters):
             for service in Service.all()
         ]
         state = services_status_values  ## amin
-        print(f"state: {state}")
-        print(f"len(state): {len(state)}")
+        # print(f"state: {state}")
+        # print(f"len(state): {len(state)}")
         # print(f"state: {state}")
         # state, info = env.reset() ## was
         state = torch.tensor(state, dtype=torch.float32, device=device).unsqueeze(0)
@@ -908,10 +908,10 @@ def my_rl_in_edgesimpy(parameters):
             # for server in EdgeServer.all():
             #     print(f"in loop - server: {server.total_cpu_utilization}")
             # print(f"service {rl_selected_service}, {rl_selected_application}, {rl_selected_user}, {rl_selected_server}")       ## amin
-            print(f"service {rl_selected_service}")
+            # print(f"service {rl_selected_service}")
             if not is_service_allocated_before(state.squeeze(0).tolist(), rl_selected_service.id):
                 avoid_redundant_service = True
-                print(f"avoid_redundant_service = True")
+                # print(f"avoid_redundant_service = True")
                 if rl_selected_server.has_capacity_to_host(service=rl_selected_service):  ## amin
                     server_poses_capacity = True ## put some positive reward in reward-function
                     # rl_selected_service.provision(target_server=rl_selected_server)     ## amin
@@ -977,7 +977,7 @@ def my_rl_in_edgesimpy(parameters):
                 # print(f"can host but service {rl_selected_service} is NOT the earliest service")  ## amin
             else:
                 avoid_redundant_service = False
-                print(f"avoid_redundant_service = False")
+                # print(f"avoid_redundant_service = False")
                 server_poses_capacity = False
                 service_deadline_likely_met = False
                 response_time_for_service = -1
@@ -1043,7 +1043,7 @@ def my_rl_in_edgesimpy(parameters):
                 target_net_state_dict[key] = policy_net_state_dict[key] * TAU + target_net_state_dict[key] * (1 - TAU)
             target_net.load_state_dict(target_net_state_dict)
 
-
+            print("")
             if done:
                 episode_durations.append(t + 1)
                 print(f"episode_duration: {episode_durations[-1]}")
