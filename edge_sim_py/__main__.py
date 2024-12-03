@@ -990,6 +990,7 @@ def my_rl_in_edgesimpy(parameters):
             # print(f"reward: {reward}")
             reward = torch.tensor([reward], device=device)
             # print(f"reward: {reward}")
+            log_state_transition(i_episode, t, state, action.item(), next_state, reward.item())
 
             if all(item == 1 for item in observation):
                 terminated = True
