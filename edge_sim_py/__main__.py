@@ -1043,7 +1043,6 @@ def my_rl_in_edgesimpy(parameters):
                 target_net_state_dict[key] = policy_net_state_dict[key] * TAU + target_net_state_dict[key] * (1 - TAU)
             target_net.load_state_dict(target_net_state_dict)
 
-            print("")
             if done:
                 episode_durations.append(t + 1)
                 print(f"episode_duration: {episode_durations[-1]}")
