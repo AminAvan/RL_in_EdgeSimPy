@@ -587,7 +587,7 @@ def my_rl_in_edgesimpy(parameters):
             raise ValueError("Action index out of bounds for the given number of tasks and servers.")
 
         return task_index, server_index
-    
+
     # Get number of actions from gym action space
     # n_actions = env.action_space.n ## was
     n_actions = (len(Service.all())*len(EdgeServer.all()))  ## amin
@@ -806,6 +806,13 @@ def my_rl_in_edgesimpy(parameters):
             else:
                 display.display(plt.gcf())
 
+    def log_state_transition(episode, step, state, action, next_state, reward):
+        print(f"Episode: {episode}, Step: {step}")
+        print(f"State: {state}")
+        print(f"Action: {action}")
+        print(f"Next State: {next_state}")
+        print(f"Reward: {reward}")
+
     def optimize_model():
         if len(rl_memory) < BATCH_SIZE:
             return
@@ -982,6 +989,7 @@ def my_rl_in_edgesimpy(parameters):
                            rl_selected_server.total_memory_utilization, service_criticality_level, response_time_for_service)
             # print(f"reward: {reward}")
             reward = torch.tensor([reward], device=device)
+            # print(f"reward: {reward}")
 
             if all(item == 1 for item in observation):
                 terminated = True
