@@ -635,19 +635,16 @@ def my_rl_in_edgesimpy(parameters):
         steps_done += 1
 
         # Find indices of unassigned tasks (state == 0)
-        unassigned_task_indices = (state == 0).nonzero(as_tuple=True)[1].tolist()
+        unassigned_task_indices = (state == 0).nonzero(as_tuple=True)[1].tolist()  # Get unassigned indices
 
         if not unassigned_task_indices:
-            print("Warning: No unassigned tasks available. Returning default action.")
-            return torch.tensor([[0]], device=device, dtype=torch.long)  # Default fallback action
+            raise ValueError("No unassigned tasks available for selection.")
 
         if sample > eps_threshold:
             with torch.no_grad():
-                action_values = policy_net(state)
-                # Select the best action among unassigned tasks
-                unassigned_action_values = action_values[:, unassigned_task_indices]
-                best_action_idx = unassigned_task_indices[unassigned_action_values.argmax().item()]
-                return torch.tensor([[best_action_idx]], device=device, dtype=torch.long)
+                # Exploitation: Choose the best action based on policy_net
+                # Restricting to unassigned tasks is not necessary for exploitation
+                return policy_net(state).max(1).indices.view(1, 1)
         else:
             # Exploration: Randomly select from unassigned tasks
             random_action_idx = random.choice(unassigned_task_indices)
