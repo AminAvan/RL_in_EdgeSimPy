@@ -634,16 +634,19 @@ def my_rl_in_edgesimpy(parameters):
         steps_done += 1
 
         # Find indices of unassigned tasks (state == 0)
-        unassigned_task_indices = (state == 0).nonzero(as_tuple=True)[1].tolist()  # Get unassigned indices
+        unassigned_task_indices = (state == 0).nonzero(as_tuple=True)[1].tolist()
 
         if not unassigned_task_indices:
-            raise ValueError("No unassigned tasks available for selection.")
+            print("Warning: No unassigned tasks available. Returning default action.")
+            return torch.tensor([[0]], device=device, dtype=torch.long)  # Default fallback action
 
         if sample > eps_threshold:
             with torch.no_grad():
-                # Exploitation: Choose the best action based on policy_net
-                # Restricting to unassigned tasks is not necessary for exploitation
-                return policy_net(state).max(1).indices.view(1, 1)
+                action_values = policy_net(state)
+                # Select the best action among unassigned tasks
+                unassigned_action_values = action_values[:, unassigned_task_indices]
+                best_action_idx = unassigned_task_indices[unassigned_action_values.argmax().item()]
+                return torch.tensor([[best_action_idx]], device=device, dtype=torch.long)
         else:
             # Exploration: Randomly select from unassigned tasks
             random_action_idx = random.choice(unassigned_task_indices)
@@ -741,17 +744,17 @@ def my_rl_in_edgesimpy(parameters):
         ######################
         ## Positive Rewards ##
         ######################
-        if not_redundant:
+        if (not_redundant == 1):
             # Reward for selecting the service with the earliest deadline
             reward += 50
 
         # Reward for efficient resource utilization (CPU and memory within capacity)
-        if enough_capacity:
+        if (enough_capacity == 1):
             reward += max(0, 1 - abs(cpu_utilization_factor - 1))  # Reward closer to 1
             reward += max(0, 1 - abs(memory_utilization_factor - 1))  # Reward closer to 1
 
         # Reward for meeting service deadlines
-        if service_deadline_met:
+        if (service_deadline_met == 1):
             reward += 15 * (deadline_critical_level ** 2)
             reward += 10 / response_time_factor  # Higher reward for low response times
 
@@ -759,17 +762,17 @@ def my_rl_in_edgesimpy(parameters):
         ## Negative Rewards ##
         ######################
         # Redundant decision
-        if not not_redundant:
+        if (not_redundant == -1):
             # Reward for selecting the service with the earliest deadline
             reward -= 10 * (deadline_critical_level ** 2)
 
         # Penalty for exceeding server capacity
-        if not enough_capacity:
+        if (enough_capacity == -1):
             reward -= 5 * max(0, cpu_utilization_factor - 1)  # Penalize overload
             reward -= 5 * max(0, memory_utilization_factor - 1)  # Penalize overload
 
         # Severe penalty for missing deadlines
-        if not service_deadline_met:
+        if (service_deadline_met == -1):
             # Exponential penalty based on severity of the deadline miss
             penalty = 9 * (deadline_critical_level ** 2)
             reward -= penalty
@@ -905,15 +908,19 @@ def my_rl_in_edgesimpy(parameters):
             server_poses_capacity = False
             service_deadline_likely_met = False
 
+            avoid_redundant_service = 0
+            server_poses_capacity = 0
+            service_deadline_likely_met = 0
+
             # for server in EdgeServer.all():
             #     print(f"in loop - server: {server.total_cpu_utilization}")
             # print(f"service {rl_selected_service}, {rl_selected_application}, {rl_selected_user}, {rl_selected_server}")       ## amin
             # print(f"service {rl_selected_service}")
             if not is_service_allocated_before(state.squeeze(0).tolist(), rl_selected_service.id):
-                avoid_redundant_service = True
+                avoid_redundant_service = 1
                 # print(f"avoid_redundant_service = True")
                 if rl_selected_server.has_capacity_to_host(service=rl_selected_service):  ## amin
-                    server_poses_capacity = True ## put some positive reward in reward-function
+                    server_poses_capacity = 1 ## put some positive reward in reward-function
                     # rl_selected_service.provision(target_server=rl_selected_server)     ## amin
                     service_criticality_level = get_service_criticality_level(
                         list(rl_selected_user.delay_slas.values())[0])
@@ -958,17 +965,17 @@ def my_rl_in_edgesimpy(parameters):
                     # print(f"response_time_for_service: {response_time_for_service}")
                     #################################################
                     if (response_time_for_service < list(rl_selected_user.delay_slas.values())[0]):
-                        service_deadline_likely_met = True
+                        service_deadline_likely_met = 1
                         observation = update_state(state.squeeze(0).tolist(), rl_selected_service.id)
                     else:
-                        service_deadline_likely_met = False
+                        service_deadline_likely_met = -1
                         response_time_for_service = -1
                         num_likely_missed_deadline += 1
                         service_criticality_level = get_service_criticality_level(list(rl_selected_user.delay_slas.values())[0])
                         observation = update_state(state.squeeze(0).tolist(), rl_selected_service.id)
                 else:
-                    server_poses_capacity = False
-                    service_deadline_likely_met = False
+                    server_poses_capacity = -1
+                    # service_deadline_likely_met = False
                     response_time_for_service = -1
                     num_likely_missed_deadline += 1
                     service_criticality_level = get_service_criticality_level(list(rl_selected_user.delay_slas.values())[0])
@@ -976,10 +983,10 @@ def my_rl_in_edgesimpy(parameters):
 
                 # print(f"can host but service {rl_selected_service} is NOT the earliest service")  ## amin
             else:
-                avoid_redundant_service = False
+                avoid_redundant_service = -1
                 # print(f"avoid_redundant_service = False")
-                server_poses_capacity = False
-                service_deadline_likely_met = False
+                # server_poses_capacity = False
+                # service_deadline_likely_met = False
                 response_time_for_service = -1
                 num_likely_missed_deadline += 1
                 service_criticality_level = get_service_criticality_level(list(rl_selected_user.delay_slas.values())[0])
@@ -1017,6 +1024,16 @@ def my_rl_in_edgesimpy(parameters):
                 next_state = torch.tensor(observation, dtype=torch.float32, device=device).unsqueeze(0)
 
             # log_state_transition(i_episode, t, state, action.item(), next_state, reward.item())
+
+            improvement_threshold = 0.01  # Minimum improvement to continue training
+            recent_window = 100  # Number of recent episodes to evaluate
+            if i_episode > recent_window:
+                recent_rewards = reward_log[-recent_window:]
+                avg_recent_reward = sum(recent_rewards) / recent_window
+                avg_previous_reward = sum(reward_log[-2 * recent_window:-recent_window]) / recent_window
+                if abs(avg_recent_reward - avg_previous_reward) < improvement_threshold:
+                    print(f"Stopping early at episode {i_episode}: Reward improvement < {improvement_threshold}")
+                    break
             ############### UNTIL HERE WAS WORKED ##############
 
             # print(f"type(state): {type(state)}")
