@@ -1025,15 +1025,6 @@ def my_rl_in_edgesimpy(parameters):
 
             # log_state_transition(i_episode, t, state, action.item(), next_state, reward.item())
 
-            improvement_threshold = 0.01  # Minimum improvement to continue training
-            recent_window = 100  # Number of recent episodes to evaluate
-            if i_episode > recent_window:
-                recent_rewards = reward_log[-recent_window:]
-                avg_recent_reward = sum(recent_rewards) / recent_window
-                avg_previous_reward = sum(reward_log[-2 * recent_window:-recent_window]) / recent_window
-                if abs(avg_recent_reward - avg_previous_reward) < improvement_threshold:
-                    print(f"Stopping early at episode {i_episode}: Reward improvement < {improvement_threshold}")
-                    break
             ############### UNTIL HERE WAS WORKED ##############
 
             # print(f"type(state): {type(state)}")
