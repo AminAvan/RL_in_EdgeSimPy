@@ -31,7 +31,7 @@ import torch.nn.functional as F
 
 import sys
 
-import my_rl
+# import my_rl
 ####################################################
 
 class ResourceTracker:
@@ -469,27 +469,27 @@ def EDF_algorithm(parameters):
                         # After start migrating the service we can move on to the next service
                         break
 
-rl_start = True
-# rl_initialize = False
-def rl(parameters):
-
-    global rl_start, rl_initialize
-    if (rl_start == True):
-        my_rl.initialize()
-        # rl_initialize = True
-        # my_rl.initialize(rl_initialize)
-        rl_start = False
-
-    # # Override 'has_capacity_to_host' for all instances of the EdgeServer class
-    EdgeServer.has_capacity_to_host = has_capacity_to_host_proposed
-    my_rl.rl_training()
-
-    if edge_server.has_capacity_to_host(service=service):
-        # Start provisioning the service in the edge server
-        service.provision(target_server=edge_server)
-
-        # After start migrating the service we can move on to the next service
-    # # if edge_server.has_capacity_to_host(service=service):
+# rl_start = True
+# # rl_initialize = False
+# def rl(parameters):
+#
+#     global rl_start, rl_initialize
+#     if (rl_start == True):
+#         my_rl.initialize()
+#         # rl_initialize = True
+#         # my_rl.initialize(rl_initialize)
+#         rl_start = False
+#
+#     # # Override 'has_capacity_to_host' for all instances of the EdgeServer class
+#     EdgeServer.has_capacity_to_host = has_capacity_to_host_proposed
+#     my_rl.rl_training()
+#
+#     if edge_server.has_capacity_to_host(service=service):
+#         # Start provisioning the service in the edge server
+#         service.provision(target_server=edge_server)
+#
+#         # After start migrating the service we can move on to the next service
+#     # # if edge_server.has_capacity_to_host(service=service):
 
 
 
@@ -1009,14 +1009,14 @@ def my_rl_in_edgesimpy(parameters):
             else:
                 terminated = False
 
-            if num_likely_missed_deadline >= (len(Service.all()) * 2):
-            # if num_likely_missed_deadline >= (len(Service.all())):
-                truncated = True
-            else:
-                truncated = False
+            # if num_likely_missed_deadline >= (len(Service.all()) * len(EdgeServer.all())):
+            # # if num_likely_missed_deadline >= (len(Service.all())):
+            #     truncated = True
+            # else:
+            #     truncated = False
 
-            if terminated or truncated:
-            # if terminated:
+            # if terminated or truncated:
+            if terminated:
                 done = True
             else:
                 done = False
@@ -1054,6 +1054,7 @@ def my_rl_in_edgesimpy(parameters):
             for key in policy_net_state_dict:
                 target_net_state_dict[key] = policy_net_state_dict[key] * TAU + target_net_state_dict[key] * (1 - TAU)
             target_net.load_state_dict(target_net_state_dict)
+
 
             if done:
                 episode_durations.append(t + 1)
@@ -1361,7 +1362,6 @@ algorithm_functions = {
     "MASS": MASS,
     "BestFit": Best_Fit_Service_Provisioning,
     "EDF": EDF_algorithm,
-    "rl": rl,
     "my_rl_in_edgesimpy": my_rl_in_edgesimpy,
     "my_pruned_rl": My_Proposed_Pruned_Method_For_RL_train,
     "test_my_pruned_rl": Testing_My_Proposed_Pruned_Method_For_RL
