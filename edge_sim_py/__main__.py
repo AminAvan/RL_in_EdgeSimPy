@@ -607,7 +607,7 @@ def my_rl_in_edgesimpy(parameters):
     target_net.load_state_dict(policy_net.state_dict())
 
     optimizer = optim.AdamW(policy_net.parameters(), lr=LR, amsgrad=True)
-    rl_memory = ReplayMemory(10000)
+    rl_memory = ReplayMemory(100000)
 
     steps_done = 0
 
