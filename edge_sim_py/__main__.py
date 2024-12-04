@@ -497,7 +497,7 @@ def my_rl_in_edgesimpy(parameters):
     # Override 'has_capacity_to_host' for all instances of the EdgeServer class
     EdgeServer.has_capacity_to_host = has_capacity_to_host_proposed
 
-    env = gym.make("CartPole-v1")
+    # env = gym.make("CartPole-v1")
 
     # set up matplotlib
     is_ipython = 'inline' in matplotlib.get_backend()
@@ -1039,6 +1039,7 @@ def my_rl_in_edgesimpy(parameters):
 
             # Store the transition in rl_memory
             rl_memory.push(state, action, next_state, reward)
+
 
             # Move to the next state
             state = next_state
