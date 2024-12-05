@@ -555,9 +555,11 @@ def my_rl_in_edgesimpy(parameters):
     # # Sort the priorities_list based on deadline    ## amin
     # sorted_priorities_list = sorted(priorities_list, key=lambda x: (x[1]), reverse=True)    ## amin
 
-    BATCH_SIZE = 128
+    # BATCH_SIZE = 128  ## was
+    BATCH_SIZE = 512
     GAMMA = 0.99
-    EPS_START = 0.9
+    # EPS_START = 0.9 ## was
+    EPS_START = 0.5
     EPS_END = 0.05
     EPS_DECAY = 1000
     TAU = 0.005
@@ -866,6 +868,8 @@ def my_rl_in_edgesimpy(parameters):
     else:
         num_episodes = 500
 
+    num_step_in_last_time_completion = 0
+
     for i_episode in range(num_episodes):
         # Initialize the environment and get its state # Use the reset method
         for server in EdgeServer._instances:
@@ -885,6 +889,7 @@ def my_rl_in_edgesimpy(parameters):
         # state, info = env.reset() ## was
         state = torch.tensor(state, dtype=torch.float32, device=device).unsqueeze(0)
         num_likely_missed_deadline = 0
+
         for t in count():
             action = select_action(state) ## amin
             # print(f"action x: {action}") ## amin
@@ -1008,20 +1013,34 @@ def my_rl_in_edgesimpy(parameters):
             else:
                 terminated = False
 
+            # print(f"observation: {observation}")
+
+            # Check if observation is not None or empty
+            if observation is not None and len(observation) > 0:
+                # Count how many ones are in the list
+                count_ones = observation.count(1.0)  # List method for counting
+            else:
+                # Handle the case where observation is None or empty
+                count_ones = 0  # Or any other default behavior you want to implement
+
             # if num_likely_missed_deadline >= (len(Service.all()) * len(EdgeServer.all())):
             # # if num_likely_missed_deadline >= (len(Service.all())):
+            # print(f"count_one:{count_ones}")
+            # print(f"(0.85*(len(Service.all()))):{(0.85*(len(Service.all())))}")
+            # if (t>0) and (num_step_in_last_time_completion != 0) and (t>(num_step_in_last_time_completion/2)) and (count_ones<(0.9*(len(Service.all())))):
             #     truncated = True
             # else:
             #     truncated = False
 
-            if terminated or (t>(len(Service.all()) * len(EdgeServer.all()))):
-            # if terminated:
+            # if terminated or truncated:
+            if terminated:
                 done = True
             else:
                 done = False
 
             if terminated:
                 next_state = None
+                num_step_in_last_time_completion = t
             else:
                 next_state = torch.tensor(observation, dtype=torch.float32, device=device).unsqueeze(0)
 
