@@ -535,9 +535,9 @@ def my_rl_in_edgesimpy(parameters):
 
         def __init__(self, n_observations, n_actions):
             super(DQN, self).__init__()
-            self.layer1 = nn.Linear(n_observations, 128)
-            self.layer2 = nn.Linear(128, 128)
-            self.layer3 = nn.Linear(128, n_actions)
+            self.layer1 = nn.Linear(n_observations, 512)
+            self.layer2 = nn.Linear(512, 512)
+            self.layer3 = nn.Linear(512, n_actions)
 
         # Called with either one element to determine next action, or a batch
         # during optimization. Returns tensor([[left0exp,right0exp]...]).
@@ -558,11 +558,11 @@ def my_rl_in_edgesimpy(parameters):
     # BATCH_SIZE = 128  ## was
     BATCH_SIZE = 1024
     GAMMA = 0.99
-    EPS_START = 0.9
-    EPS_END = 0.05
-    EPS_DECAY = 1000
-    TAU = 0.005
-    LR = 1e-4
+    EPS_START = 1.0
+    EPS_END = 0.1
+    EPS_DECAY = 5000
+    TAU = 0.01
+    LR = 5e-4
 
     def map_action_to_task_server(action):
         """
@@ -607,7 +607,7 @@ def my_rl_in_edgesimpy(parameters):
     target_net.load_state_dict(policy_net.state_dict())
 
     optimizer = optim.AdamW(policy_net.parameters(), lr=LR, amsgrad=True)
-    rl_memory = ReplayMemory(100000)
+    rl_memory = ReplayMemory(500000)
 
     steps_done = 0
 
@@ -868,8 +868,9 @@ def my_rl_in_edgesimpy(parameters):
         num_episodes = 500
 
     num_step_in_last_time_completion = 0
-
+    last_num_of_allocated_services = 0
     for i_episode in range(num_episodes):
+
         # Initialize the environment and get its state # Use the reset method
         for server in EdgeServer._instances:
             server.reset_attributes()
@@ -1087,6 +1088,7 @@ def my_rl_in_edgesimpy(parameters):
                 # print(f"num_likely_missed_deadline: {num_likely_missed_deadline}")
 
                 print(f"Total number services are allocated: {count_ones}")
+                last_num_of_allocated_services = count_ones
                 print(f"========================================")
                 if (i_episode > 0) and (i_episode % 50 == 0):
                     plot_durations()
