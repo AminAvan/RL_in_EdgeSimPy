@@ -556,10 +556,9 @@ def my_rl_in_edgesimpy(parameters):
     # sorted_priorities_list = sorted(priorities_list, key=lambda x: (x[1]), reverse=True)    ## amin
 
     # BATCH_SIZE = 128  ## was
-    BATCH_SIZE = 512
+    BATCH_SIZE = 1024
     GAMMA = 0.99
-    # EPS_START = 0.9 ## was
-    EPS_START = 0.5
+    EPS_START = 0.9
     EPS_END = 0.05
     EPS_DECAY = 1000
     TAU = 0.005
@@ -1023,17 +1022,17 @@ def my_rl_in_edgesimpy(parameters):
                 # Handle the case where observation is None or empty
                 count_ones = 0  # Or any other default behavior you want to implement
 
-            # if num_likely_missed_deadline >= (len(Service.all()) * len(EdgeServer.all())):
+            if num_likely_missed_deadline >= (len(Service.all()) * len(EdgeServer.all())):
             # # if num_likely_missed_deadline >= (len(Service.all())):
             # print(f"count_one:{count_ones}")
             # print(f"(0.85*(len(Service.all()))):{(0.85*(len(Service.all())))}")
             # if (t>0) and (num_step_in_last_time_completion != 0) and (t>(num_step_in_last_time_completion/2)) and (count_ones<(0.9*(len(Service.all())))):
-            #     truncated = True
-            # else:
-            #     truncated = False
+                truncated = True
+            else:
+                truncated = False
 
-            # if terminated or truncated:
-            if terminated:
+            if terminated or truncated:
+            # if terminated:
                 done = True
             else:
                 done = False
