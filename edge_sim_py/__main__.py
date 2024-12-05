@@ -556,8 +556,7 @@ def my_rl_in_edgesimpy(parameters):
     # sorted_priorities_list = sorted(priorities_list, key=lambda x: (x[1]), reverse=True)    ## amin
 
     BATCH_SIZE = 128
-    # GAMMA = 0.99 ## was
-    GAMMA = 0.9
+    GAMMA = 0.99
     EPS_START = 0.9
     EPS_END = 0.05
     EPS_DECAY = 1000
