@@ -555,6 +555,7 @@ def my_rl_in_edgesimpy(parameters):
     # # Sort the priorities_list based on deadline    ## amin
     # sorted_priorities_list = sorted(priorities_list, key=lambda x: (x[1]), reverse=True)    ## amin
 
+
     # BATCH_SIZE = 128  ## was
     BATCH_SIZE = 1024
     GAMMA = 0.99
