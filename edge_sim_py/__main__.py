@@ -785,32 +785,32 @@ def my_rl_in_edgesimpy(parameters):
         return reward
 
     def plot_durations(show_result=False):
-        plt.figure(1)
+        plt.figure(1)  # Reference the same figure for consistency
+        plt.clf()  # Clear the figure to avoid overlapping
         durations_t = torch.tensor(episode_durations, dtype=torch.float)
         allocated_t = torch.tensor(episode_allocated_service, dtype=torch.float)
+
         if show_result:
             plt.title('Result')
         else:
-            plt.clf()
             plt.title('Training...')
+
         plt.xlabel('Episode')
-        # plt.ylabel('Duration')
         plt.ylabel('Allocated Services')
-        # plt.plot(durations_t.numpy())
         plt.plot(allocated_t.numpy())
-        # Take 100 episode averages and plot them too
-        # if len(durations_t) >= 100:
+
+        # Take 100-episode averages and plot them
         if len(allocated_t) >= 100:
-            # means = durations_t.unfold(0, 100, 1).mean(1).view(-1)
             means = allocated_t.unfold(0, 100, 1).mean(1).view(-1)
             means = torch.cat((torch.zeros(99), means))
             plt.plot(means.numpy())
 
-        plt.pause(0.001)  # pause a bit so that plots are updated
+        plt.pause(0.001)  # Pause to update the plot
+
         if is_ipython:
             if not show_result:
-                display.display(plt.gcf())
                 display.clear_output(wait=True)
+                display.display(plt.gcf())
             else:
                 display.display(plt.gcf())
 
@@ -1026,8 +1026,8 @@ def my_rl_in_edgesimpy(parameters):
                 # Handle the case where observation is None or empty
                 count_ones = 0  # Or any other default behavior you want to implement
 
-            if num_likely_missed_deadline >= (len(Service.all()) * len(EdgeServer.all())):
-            # # if num_likely_missed_deadline >= (len(Service.all())):
+            # if num_likely_missed_deadline >= (2*(len(Service.all()) * len(EdgeServer.all()))):
+            if num_likely_missed_deadline >= (len(Service.all())):
             # print(f"count_one:{count_ones}")
             # print(f"(0.85*(len(Service.all()))):{(0.85*(len(Service.all())))}")
             # if (t>0) and (num_step_in_last_time_completion != 0) and (t>(num_step_in_last_time_completion/2)) and (count_ones<(0.9*(len(Service.all())))):
