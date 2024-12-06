@@ -501,8 +501,6 @@ def my_rl_in_edgesimpy(parameters):
 
     def select_action(state):
         nonlocal steps_done
-        print("select_action function called")
-        print(f"state in def select_action(state):{state}")
         sample = random.random()
         eps_threshold = EPS_END + (EPS_START - EPS_END) * \
                         math.exp(-1. * steps_done / EPS_DECAY)
@@ -510,7 +508,6 @@ def my_rl_in_edgesimpy(parameters):
 
         # Find indices of unassigned tasks (state == 0)
         unassigned_task_indices = (state == 0).nonzero(as_tuple=True)[1].tolist()  # Get unassigned indices
-        print(f"unassigned_task_indices:{unassigned_task_indices}")
 
         if not unassigned_task_indices:
             raise ValueError("No unassigned tasks available for selection.")
@@ -609,15 +606,15 @@ def my_rl_in_edgesimpy(parameters):
 
 
         total_num_tasks = len(Service.all())
-        print(f"total_num_tasks:{total_num_tasks}")
+        # print(f"total_num_tasks:{total_num_tasks}")
         total_num_servers = len(EdgeServer.all())
-        print(f"total_num_servers:{total_num_servers}")
+        # print(f"total_num_servers:{total_num_servers}")
 
         # Determine the task and server indices
         task_index = (action // total_num_servers) + 1 ## the task(service) 0 represents the first service which its ID is '1'
-        print(f"task_index:{task_index}")
+        # print(f"task_index:{task_index}")
         server_index = (action % total_num_servers) + 1 ## the server 0 represents the first server which its ID is '1'
-        print(f"server_index:{server_index}")
+        # print(f"server_index:{server_index}")
 
         # Validate indices
         if task_index > total_num_tasks:
@@ -628,7 +625,7 @@ def my_rl_in_edgesimpy(parameters):
     # Get number of actions from gym action space
     # n_actions = env.action_space.n ## was
     n_actions = (len(Service.all())*len(EdgeServer.all()))  ## amin
-    print(f"n_actions:{n_actions}")
+    # print(f"n_actions:{n_actions}")
 
 
     # Get the number of state observations
@@ -644,8 +641,8 @@ def my_rl_in_edgesimpy(parameters):
         for server in EdgeServer.all()
     ]
     state = services_status_values  ## amin
-    print(f"state: {state}")
-    print(f"len(state): {len(state)}")
+    # print(f"state: {state}")
+    # print(f"len(state): {len(state)}")
 
     # state, info = env.reset() ## was
     n_observations = len(state)
@@ -898,9 +895,9 @@ def my_rl_in_edgesimpy(parameters):
 
         for t in count():
             action = select_action(state) ## amin
-            print(f"action from selected_action:{action}") ## amin
-            print(f"action.item(): {action.item()}") ## amin
-            print(f"state in for_t_count: {state}") ## amin
+            # print(f"action from selected_action:{action}") ## amin
+            # print(f"action.item(): {action.item()}") ## amin
+            # print(f"state in for_t_count: {state}") ## amin
             rl_task, rl_server = map_action_to_task_server(action.item()) ## amin
             # print(f"Action {action.item()} corresponds to Task {rl_task} and Server {rl_server}.") ## amin
 
@@ -926,8 +923,8 @@ def my_rl_in_edgesimpy(parameters):
 
             # for server in EdgeServer.all():
             #     print(f"in loop - server: {server.total_cpu_utilization}")
-            print(f"service {rl_selected_service}, {rl_selected_application}, {rl_selected_user}, {rl_selected_server}")  ## amin
-            print(f"=-=-=-=-=-=-=-=-=\n")
+            # print(f"service {rl_selected_service}, {rl_selected_application}, {rl_selected_user}, {rl_selected_server}")  ## amin
+            # print(f"=-=-=-=-=-=-=-=-=\n")
             # print(f"service {rl_selected_service}")
             if not is_service_allocated_before(state.squeeze(0).tolist(), rl_selected_service.id):
                 avoid_redundant_service = 1
