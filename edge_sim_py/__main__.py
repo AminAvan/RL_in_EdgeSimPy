@@ -578,32 +578,47 @@ def my_rl_in_edgesimpy(parameters):
             (int, int): A tuple of (task_index, server_index).
         """
         total_num_tasks = len(Service.all())
+        print(f"total_num_tasks:{total_num_tasks}")
         total_num_servers = len(EdgeServer.all())
+        print(f"total_num_servers:{total_num_servers}")
 
         # Determine the task and server indices
         task_index = (action // total_num_servers) + 1 ## the task(service) 0 represents the first service which its ID is '1'
+        print(f"task_index:{task_index}")
         server_index = (action % total_num_servers) + 1 ## the server 0 represents the first server which its ID is '1'
-        sys.exit(0)
+        print(f"server_index:{server_index}")
+
         # Validate indices
         if task_index > total_num_tasks:
             raise ValueError("Action index out of bounds for the given number of tasks and servers.")
-
+        print("=======")
         return task_index, server_index
 
     # Get number of actions from gym action space
     # n_actions = env.action_space.n ## was
     n_actions = (len(Service.all())*len(EdgeServer.all()))  ## amin
+    print(f"n_actions:{n_actions}")
 
 
     # Get the number of state observations
-    services_status_values = [  ## amin
-        service.server if service.server is not None or service.being_provisioned else 0
+    # services_status_values = [
+    #     ## amin -- the '1' shows that the service is provisioned but the '0' means that it is not
+    #     1 if service.server is not None or service.being_provisioned else 0
+    #     for service in Service.all()
+    # ]
+
+    services_status_values = [
+        1 if service.server == server or service.being_provisioned else 0
         for service in Service.all()
+        for server in EdgeServer.all()
     ]
     state = services_status_values  ## amin
-    # state, info = env.reset() ## was
-    n_observations = len(state)  ## was
+    print(f"state: {state}")
+    print(f"len(state): {len(state)}")
 
+    # state, info = env.reset() ## was
+    n_observations = len(state)
+    sys.exit(0)
 
     policy_net = DQN(n_observations, n_actions).to(device)
     target_net = DQN(n_observations, n_actions).to(device)
