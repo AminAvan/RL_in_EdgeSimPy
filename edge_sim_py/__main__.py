@@ -600,7 +600,9 @@ def my_rl_in_edgesimpy(parameters):
     ]
     state = services_status_values  ## amin
     # state, info = env.reset() ## was
-    n_observations = len(state)
+    # n_observations = len(state)  ## was
+    n_observations = len(state)*4
+    print(f"Number of observations: {n_observations}")
 
     policy_net = DQN(n_observations, n_actions).to(device)
     target_net = DQN(n_observations, n_actions).to(device)
