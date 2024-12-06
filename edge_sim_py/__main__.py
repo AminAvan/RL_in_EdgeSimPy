@@ -785,34 +785,37 @@ def my_rl_in_edgesimpy(parameters):
         return reward
 
     def plot_durations(show_result=False):
-        plt.figure(1)  # Reference the same figure for consistency
-        plt.clf()  # Clear the figure to avoid overlapping
-        durations_t = torch.tensor(episode_durations, dtype=torch.float)
+        # Get the current figure or create a new one
+        plt.gcf().clear()  # Clear the current figure to prevent overlaps
+
+        # Convert data to tensors for plotting
+        # durations_t = torch.tensor(episode_durations, dtype=torch.float)
         allocated_t = torch.tensor(episode_allocated_service, dtype=torch.float)
 
-        if show_result:
-            plt.title('Result')
-        else:
-            plt.title('Training...')
-
+        # Set plot title and labels
+        plt.title('Result' if show_result else 'Training...')
         plt.xlabel('Episode')
         plt.ylabel('Allocated Services')
-        plt.plot(allocated_t.numpy())
 
-        # Take 100-episode averages and plot them
+        # Plot the allocated services
+        plt.plot(allocated_t.numpy(), label='Allocated Services')
+
+        # Plot the moving average if there are enough episodes
         if len(allocated_t) >= 100:
             means = allocated_t.unfold(0, 100, 1).mean(1).view(-1)
             means = torch.cat((torch.zeros(99), means))
-            plt.plot(means.numpy())
+            plt.plot(means.numpy(), label='100-Episode Average')
 
-        plt.pause(0.001)  # Pause to update the plot
+        # Add legend for clarity
+        plt.legend()
 
+        # Pause to update the plot
+        plt.pause(0.001)
+
+        # Use IPython display if applicable
         if is_ipython:
-            if not show_result:
-                display.clear_output(wait=True)
-                display.display(plt.gcf())
-            else:
-                display.display(plt.gcf())
+            display.clear_output(wait=True)
+            display.display(plt.gcf())
 
     def log_state_transition(episode, step, state, action, next_state, reward):
         print(f"Episode: {episode}, Step: {step}")
