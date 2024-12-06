@@ -497,6 +497,34 @@ def my_rl_in_edgesimpy(parameters):
     # Override 'has_capacity_to_host' for all instances of the EdgeServer class
     EdgeServer.has_capacity_to_host = has_capacity_to_host_proposed
 
+    steps_done = 0
+
+    def select_action(state):
+        nonlocal steps_done
+        print("select_action function called")
+        print(f"state in def select_action(state):{state}")
+        sample = random.random()
+        eps_threshold = EPS_END + (EPS_START - EPS_END) * \
+                        math.exp(-1. * steps_done / EPS_DECAY)
+        steps_done += 1
+
+        # Find indices of unassigned tasks (state == 0)
+        unassigned_task_indices = (state == 0).nonzero(as_tuple=True)[1].tolist()  # Get unassigned indices
+        print(f"unassigned_task_indices:{unassigned_task_indices}")
+
+        if not unassigned_task_indices:
+            raise ValueError("No unassigned tasks available for selection.")
+
+        if sample > eps_threshold:
+            with torch.no_grad():
+                # Exploitation: Choose the best action based on policy_net
+                # Restricting to unassigned tasks is not necessary for exploitation
+                return policy_net(state).max(1).indices.view(1, 1)
+        else:
+            # Exploration: Randomly select from unassigned tasks
+            random_action_idx = random.choice(unassigned_task_indices)
+            return torch.tensor([[random_action_idx]], device=device, dtype=torch.long)
+
     # env = gym.make("CartPole-v1")
 
     # set up matplotlib
@@ -577,6 +605,9 @@ def my_rl_in_edgesimpy(parameters):
         Returns:
             (int, int): A tuple of (task_index, server_index).
         """
+
+
+
         total_num_tasks = len(Service.all())
         print(f"total_num_tasks:{total_num_tasks}")
         total_num_servers = len(EdgeServer.all())
@@ -591,7 +622,7 @@ def my_rl_in_edgesimpy(parameters):
         # Validate indices
         if task_index > total_num_tasks:
             raise ValueError("Action index out of bounds for the given number of tasks and servers.")
-        print("=======")
+
         return task_index, server_index
 
     # Get number of actions from gym action space
@@ -626,46 +657,7 @@ def my_rl_in_edgesimpy(parameters):
     optimizer = optim.AdamW(policy_net.parameters(), lr=LR, amsgrad=True)
     rl_memory = ReplayMemory(500000)
 
-    steps_done = 0
 
-    # def select_action(state):
-    #     nonlocal steps_done
-    #     print(f"state in state: {state}")
-    #     sample = random.random()
-    #     eps_threshold = EPS_END + (EPS_START - EPS_END) * \
-    #                     math.exp(-1. * steps_done / EPS_DECAY)
-    #     steps_done += 1
-    #     if sample > eps_threshold:
-    #         with torch.no_grad():
-    #             # t.max(1) will return the largest column value of each row.
-    #             # second column on max result is index of where max element was
-    #             # found, so we pick action with the larger expected reward.
-    #             return policy_net(state).max(1).indices.view(1, 1)
-    #     else:
-    #         return torch.tensor([[env.action_space.sample()]], device=device, dtype=torch.long)
-
-    def select_action(state):
-        nonlocal steps_done
-        sample = random.random()
-        eps_threshold = EPS_END + (EPS_START - EPS_END) * \
-                        math.exp(-1. * steps_done / EPS_DECAY)
-        steps_done += 1
-
-        # Find indices of unassigned tasks (state == 0)
-        unassigned_task_indices = (state == 0).nonzero(as_tuple=True)[1].tolist()  # Get unassigned indices
-
-        if not unassigned_task_indices:
-            raise ValueError("No unassigned tasks available for selection.")
-
-        if sample > eps_threshold:
-            with torch.no_grad():
-                # Exploitation: Choose the best action based on policy_net
-                # Restricting to unassigned tasks is not necessary for exploitation
-                return policy_net(state).max(1).indices.view(1, 1)
-        else:
-            # Exploration: Randomly select from unassigned tasks
-            random_action_idx = random.choice(unassigned_task_indices)
-            return torch.tensor([[random_action_idx]], device=device, dtype=torch.long)
 
 
     episode_durations = []
@@ -831,12 +823,6 @@ def my_rl_in_edgesimpy(parameters):
             display.clear_output(wait=True)
             display.display(plt.gcf())
 
-    def log_state_transition(episode, step, state, action, next_state, reward):
-        print(f"Episode: {episode}, Step: {step}")
-        print(f"State: {state}")
-        print(f"Action: {action}")
-        print(f"Next State: {next_state}")
-        print(f"Reward: {reward}")
 
     def optimize_model():
         if len(rl_memory) < BATCH_SIZE:
@@ -897,10 +883,10 @@ def my_rl_in_edgesimpy(parameters):
         # for server in EdgeServer.all():
         #     print(f"initial values server: {server.total_cpu_utilization}")
 
-
-        services_status_values = [  ## amin -- the '1' shows that the service is provisioned but the '0' means that it is not
-            1 if service.server is not None or service.being_provisioned else 0
+        services_status_values = [
+            1 if service.server == server or service.being_provisioned else 0
             for service in Service.all()
+            for server in EdgeServer.all()
         ]
         state = services_status_values  ## amin
         # print(f"state: {state}")
@@ -940,7 +926,8 @@ def my_rl_in_edgesimpy(parameters):
 
             # for server in EdgeServer.all():
             #     print(f"in loop - server: {server.total_cpu_utilization}")
-            print(f"service {rl_selected_service}, {rl_selected_application}, {rl_selected_user}, {rl_selected_server}")       ## amin
+            print(f"service {rl_selected_service}, {rl_selected_application}, {rl_selected_user}, {rl_selected_server}")  ## amin
+            print(f"=-=-=-=-=-=-=-=-=\n")
             # print(f"service {rl_selected_service}")
             if not is_service_allocated_before(state.squeeze(0).tolist(), rl_selected_service.id):
                 avoid_redundant_service = 1
