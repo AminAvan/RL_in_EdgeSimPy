@@ -618,7 +618,6 @@ def my_rl_in_edgesimpy(parameters):
 
     # state, info = env.reset() ## was
     n_observations = len(state)
-    sys.exit(0)
 
     policy_net = DQN(n_observations, n_actions).to(device)
     target_net = DQN(n_observations, n_actions).to(device)
@@ -913,9 +912,9 @@ def my_rl_in_edgesimpy(parameters):
 
         for t in count():
             action = select_action(state) ## amin
-            # print(f"action x: {action}") ## amin
-            # print(f"action.item(): {action.item()}") ## amin
-            # print(f"state: {state}")
+            print(f"action from selected_action:{action}") ## amin
+            print(f"action.item(): {action.item()}") ## amin
+            print(f"state in for_t_count: {state}") ## amin
             rl_task, rl_server = map_action_to_task_server(action.item()) ## amin
             # print(f"Action {action.item()} corresponds to Task {rl_task} and Server {rl_server}.") ## amin
 
@@ -941,7 +940,7 @@ def my_rl_in_edgesimpy(parameters):
 
             # for server in EdgeServer.all():
             #     print(f"in loop - server: {server.total_cpu_utilization}")
-            # print(f"service {rl_selected_service}, {rl_selected_application}, {rl_selected_user}, {rl_selected_server}")       ## amin
+            print(f"service {rl_selected_service}, {rl_selected_application}, {rl_selected_user}, {rl_selected_server}")       ## amin
             # print(f"service {rl_selected_service}")
             if not is_service_allocated_before(state.squeeze(0).tolist(), rl_selected_service.id):
                 avoid_redundant_service = 1
