@@ -583,7 +583,7 @@ def my_rl_in_edgesimpy(parameters):
         # Determine the task and server indices
         task_index = (action // total_num_servers) + 1 ## the task(service) 0 represents the first service which its ID is '1'
         server_index = (action % total_num_servers) + 1 ## the server 0 represents the first server which its ID is '1'
-
+        sys.exit(0)
         # Validate indices
         if task_index > total_num_tasks:
             raise ValueError("Action index out of bounds for the given number of tasks and servers.")
