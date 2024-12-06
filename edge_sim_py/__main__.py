@@ -594,6 +594,7 @@ def my_rl_in_edgesimpy(parameters):
     # n_actions = env.action_space.n ## was
     n_actions = (len(Service.all())*len(EdgeServer.all()))  ## amin
 
+
     # Get the number of state observations
     services_status_values = [  ## amin
         service.server if service.server is not None or service.being_provisioned else 0
@@ -601,9 +602,8 @@ def my_rl_in_edgesimpy(parameters):
     ]
     state = services_status_values  ## amin
     # state, info = env.reset() ## was
-    # n_observations = len(state)  ## was
-    n_observations = len(state)*4
-    print(f"Number of observations: {n_observations}")
+    n_observations = len(state)  ## was
+
 
     policy_net = DQN(n_observations, n_actions).to(device)
     target_net = DQN(n_observations, n_actions).to(device)
