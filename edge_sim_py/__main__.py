@@ -1047,11 +1047,11 @@ def my_rl_in_edgesimpy(parameters):
                 # Handle the case where observation is None or empty
                 count_ones = 0  # Or any other default behavior you want to implement
 
-            if num_likely_missed_deadline >= (len(Service.all()) * len(EdgeServer.all())):
-            # if num_likely_missed_deadline >= (len(Service.all())):
-            # print(f"count_one:{count_ones}")
-            # print(f"(0.85*(len(Service.all()))):{(0.85*(len(Service.all())))}")
-            # if (t>0) and (num_step_in_last_time_completion != 0) and (t>(num_step_in_last_time_completion/2)) and (count_ones<(0.9*(len(Service.all())))):
+            if num_likely_missed_deadline >= (len(Service.all()) * len(EdgeServer.all())) and (count_ones < (0.8 * (len(Service.all())))):
+                truncated = True
+            elif num_likely_missed_deadline >= (2 * (len(Service.all()) * len(EdgeServer.all()))) and (count_ones < (0.9 * (len(Service.all())))):
+                truncated = True
+            elif num_likely_missed_deadline >= (3 * (len(Service.all()) * len(EdgeServer.all()))) and (count_ones < (0.95 * (len(Service.all())))):
                 truncated = True
             else:
                 truncated = False
