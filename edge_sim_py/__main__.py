@@ -771,7 +771,7 @@ def my_rl_in_edgesimpy(parameters):
         ######################
         if (not_redundant == 1):
             # Reward for selecting the service with the earliest deadline
-            reward += 50
+            reward += 90
 
         # Reward for efficient resource utilization (CPU and memory within capacity)
         if (enough_capacity == 1):
