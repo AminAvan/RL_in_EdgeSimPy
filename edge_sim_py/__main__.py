@@ -1032,7 +1032,7 @@ def my_rl_in_edgesimpy(parameters):
             reward = torch.tensor([reward], device=device)
             # print(f"reward: {reward}")
 
-            if all(item == 1 for item in observation):
+            if observation.count(1) == len(Service.all()):
                 terminated = True
             else:
                 terminated = False
@@ -1061,7 +1061,6 @@ def my_rl_in_edgesimpy(parameters):
                 truncated = False
 
             if terminated or truncated:
-            # if terminated:
                 done = True
             else:
                 done = False
