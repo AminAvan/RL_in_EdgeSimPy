@@ -556,38 +556,40 @@ def my_rl_in_edgesimpy(parameters):
         def __len__(self):
             return len(self.rl_memory)
 
-    class DQN(nn.Module): ## was
-
-        def __init__(self, n_observations, n_actions):
-            super(DQN, self).__init__()
-            self.layer1 = nn.Linear(n_observations, 512)
-            self.layer2 = nn.Linear(512, 512)
-            self.layer3 = nn.Linear(512, n_actions)
-
-        # Called with either one element to determine next action, or a batch
-        # during optimization. Returns tensor([[left0exp,right0exp]...]).
-        def forward(self, x):
-            x = F.relu(self.layer1(x))
-            x = F.relu(self.layer2(x))
-            return self.layer3(x)
-
-    # class DQN(nn.Module):
+    # class DQN(nn.Module): ## was
+    #
     #     def __init__(self, n_observations, n_actions):
     #         super(DQN, self).__init__()
     #         self.layer1 = nn.Linear(n_observations, 512)
-    #         self.norm1 = nn.BatchNorm1d(512)  # Add normalization after layer1
     #         self.layer2 = nn.Linear(512, 512)
-    #         self.norm2 = nn.BatchNorm1d(512)  # Add normalization after layer2
     #         self.layer3 = nn.Linear(512, n_actions)
     #
+    #     # Called with either one element to determine next action, or a batch
+    #     # during optimization. Returns tensor([[left0exp,right0exp]...]).
     #     def forward(self, x):
-    #         # Ensure input is 2D for BatchNorm compatibility
-    #         if x.dim() == 1:
-    #             x = x.unsqueeze(0)  # Add batch dimension if not present
-    #
-    #         x = F.relu(self.norm1(self.layer1(x)))  # Apply normalization after activation
-    #         x = F.relu(self.norm2(self.layer2(x)))  # Apply normalization after activation
-    #         return self.layer3(x)  # No activation in the output layer
+    #         x = F.relu(self.layer1(x))
+    #         x = F.relu(self.layer2(x))
+    #         return self.layer3(x)
+
+    class DQN(nn.Module):
+        def __init__(self, n_observations, n_actions):
+            super(DQN, self).__init__()
+            self.layer1 = nn.Sequential(
+                nn.Linear(n_observations, 512),
+                nn.LayerNorm(512),  # Use LayerNorm instead of BatchNorm
+                nn.ReLU()
+            )
+            self.layer2 = nn.Sequential(
+                nn.Linear(512, 512),
+                nn.LayerNorm(512),  # Use LayerNorm instead of BatchNorm
+                nn.ReLU()
+            )
+            self.layer3 = nn.Linear(512, n_actions)
+
+        def forward(self, x):
+            x = self.layer1(x)
+            x = self.layer2(x)
+            return self.layer3(x)
 
     # priorities_list = [] ## amin
     # for usr in User.all():  ## amin
