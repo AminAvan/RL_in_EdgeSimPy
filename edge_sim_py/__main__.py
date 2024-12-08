@@ -775,8 +775,8 @@ def my_rl_in_edgesimpy(parameters):
 
         # Reward for efficient resource utilization (CPU and memory within capacity)
         if (enough_capacity == 1):
-            reward += max(0, 1 - abs(cpu_utilization_factor - 1))  # Reward closer to 1
-            reward += max(0, 1 - abs(memory_utilization_factor - 1))  # Reward closer to 1
+            reward += 10 + max(0, 1 - abs(cpu_utilization_factor - 1))  # Reward closer to 1
+            reward += 10 + max(0, 1 - abs(memory_utilization_factor - 1))  # Reward closer to 1
 
         # Reward for meeting service deadlines
         if (service_deadline_met == 1):
@@ -1047,23 +1047,23 @@ def my_rl_in_edgesimpy(parameters):
                 # Handle the case where observation is None or empty
                 count_ones = 0  # Or any other default behavior you want to implement
 
-            # if num_likely_missed_deadline >= (len(Service.all()) * len(EdgeServer.all())) and (count_ones < (0.8 * (len(Service.all())))):
-            #     truncated = True
-            # elif num_likely_missed_deadline >= (2 * (len(Service.all()) * len(EdgeServer.all()))) and (count_ones < (0.9 * (len(Service.all())))):
-            #     truncated = True
-            # elif num_likely_missed_deadline >= (3 * (len(Service.all()) * len(EdgeServer.all()))) and (count_ones < (0.95 * (len(Service.all())))):
-            #     truncated = True
-            # elif num_likely_missed_deadline >= (4 * (len(Service.all()) * len(EdgeServer.all()))) and (count_ones < (0.97 * (len(Service.all())))):
-            #     truncated = True
-            # elif num_likely_missed_deadline >= (5 * (len(Service.all()) * len(EdgeServer.all()))) and (count_ones < (0.99 * (len(Service.all())))):
-            #     truncated = True
-            # else:
-            #     truncated = False
-
-            if t >= len(Service.all()):
+            if num_likely_missed_deadline >= (len(Service.all()) * len(EdgeServer.all())) and (count_ones < (0.8 * (len(Service.all())))):
+                truncated = True
+            elif num_likely_missed_deadline >= (2 * (len(Service.all()) * len(EdgeServer.all()))) and (count_ones < (0.9 * (len(Service.all())))):
+                truncated = True
+            elif num_likely_missed_deadline >= (3 * (len(Service.all()) * len(EdgeServer.all()))) and (count_ones < (0.95 * (len(Service.all())))):
+                truncated = True
+            elif num_likely_missed_deadline >= (4 * (len(Service.all()) * len(EdgeServer.all()))) and (count_ones < (0.97 * (len(Service.all())))):
+                truncated = True
+            elif num_likely_missed_deadline >= (5 * (len(Service.all()) * len(EdgeServer.all()))) and (count_ones < (0.99 * (len(Service.all())))):
                 truncated = True
             else:
                 truncated = False
+
+            # if t >= len(Service.all()):
+            #     truncated = True
+            # else:
+            #     truncated = False
 
             if terminated or truncated:
                 done = True
