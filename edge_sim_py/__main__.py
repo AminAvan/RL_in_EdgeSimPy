@@ -1090,7 +1090,7 @@ def my_rl_in_edgesimpy(parameters):
             elif num_likely_missed_deadline >= (11 * (len(Service.all()) * len(EdgeServer.all()))) and (count_ones < (0.99 * (len(Service.all())))):
                 truncated = True
             elif num_likely_missed_deadline >= (12 * (len(Service.all()) * len(EdgeServer.all()))):
-                truncated = False
+                truncated = True
             else:
                 truncated = False
 
