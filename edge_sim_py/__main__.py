@@ -835,9 +835,9 @@ def my_rl_in_edgesimpy(parameters):
             penalty = 10 * (deadline_critical_level ** 2)
             reward -= penalty
 
-        if (reward < 0):
-            compensation = (number_of_alloc_services / len(Service.all())) * (abs(reward))
-            reward += compensation
+        # if (reward < 0):
+        #     compensation = (number_of_alloc_services / len(Service.all())) * (abs(reward))
+        #     reward += compensation
 
         return reward
 
