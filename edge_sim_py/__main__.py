@@ -1077,15 +1077,15 @@ def my_rl_in_edgesimpy(parameters):
             else:
                 terminated = False
 
-            if num_likely_missed_deadline >= (len(Service.all()) * len(EdgeServer.all())) and (count_ones < (0.8 * (len(Service.all())))):
+            if num_likely_missed_deadline >= (2*(len(Service.all()) * len(EdgeServer.all())) and (count_ones < (0.8 * (len(Service.all()))))):
                 truncated = True
-            elif num_likely_missed_deadline >= (2 * (len(Service.all()) * len(EdgeServer.all()))) and (count_ones < (0.9 * (len(Service.all())))):
+            elif num_likely_missed_deadline >= (3 * (len(Service.all()) * len(EdgeServer.all()))) and (count_ones < (0.9 * (len(Service.all())))):
                 truncated = True
-            elif num_likely_missed_deadline >= (3 * (len(Service.all()) * len(EdgeServer.all()))) and (count_ones < (0.95 * (len(Service.all())))):
+            elif num_likely_missed_deadline >= (4 * (len(Service.all()) * len(EdgeServer.all()))) and (count_ones < (0.95 * (len(Service.all())))):
                 truncated = True
-            elif num_likely_missed_deadline >= (4 * (len(Service.all()) * len(EdgeServer.all()))) and (count_ones < (0.97 * (len(Service.all())))):
+            elif num_likely_missed_deadline >= (5 * (len(Service.all()) * len(EdgeServer.all()))) and (count_ones < (0.97 * (len(Service.all())))):
                 truncated = True
-            elif num_likely_missed_deadline >= (5 * (len(Service.all()) * len(EdgeServer.all()))) and (count_ones < (0.99 * (len(Service.all())))):
+            elif num_likely_missed_deadline >= (6 * (len(Service.all()) * len(EdgeServer.all()))) and (count_ones < (0.99 * (len(Service.all())))):
                 truncated = True
             else:
                 truncated = False
