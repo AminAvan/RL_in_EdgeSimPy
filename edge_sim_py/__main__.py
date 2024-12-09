@@ -796,11 +796,10 @@ def my_rl_in_edgesimpy(parameters):
         ## Positive Rewards ##
         ######################
 
-        reward += (number_of_alloc_services/len(Service.all())) * 100
-
         if (not_redundant == 1):
             # Reward for selecting the service with the earliest deadline
             reward += 90
+            reward += (number_of_alloc_services / len(Service.all())) * 1000
 
         # Reward for efficient resource utilization (CPU and memory within capacity)
         if (enough_capacity == 1):
