@@ -571,6 +571,26 @@ def my_rl_in_edgesimpy(parameters):
     #         x = F.relu(self.layer2(x))
     #         return self.layer3(x)
 
+    # class DQN(nn.Module):
+    #     def __init__(self, n_observations, n_actions):
+    #         super(DQN, self).__init__()
+    #         self.layer1 = nn.Sequential(
+    #             nn.Linear(n_observations, 512),
+    #             nn.LayerNorm(512),  # Use LayerNorm instead of BatchNorm
+    #             nn.ReLU()
+    #         )
+    #         self.layer2 = nn.Sequential(
+    #             nn.Linear(512, 512),
+    #             nn.LayerNorm(512),  # Use LayerNorm instead of BatchNorm
+    #             nn.ReLU()
+    #         )
+    #         self.layer3 = nn.Linear(512, n_actions)
+    #
+    #     def forward(self, x):
+    #         x = self.layer1(x)
+    #         x = self.layer2(x)
+    #         return self.layer3(x)
+
     class DQN(nn.Module):
         def __init__(self, n_observations, n_actions):
             super(DQN, self).__init__()
@@ -584,12 +604,18 @@ def my_rl_in_edgesimpy(parameters):
                 nn.LayerNorm(512),  # Use LayerNorm instead of BatchNorm
                 nn.ReLU()
             )
-            self.layer3 = nn.Linear(512, n_actions)
+            self.layer3 = nn.Sequential(
+                nn.Linear(512, 512),  # New additional layer
+                nn.LayerNorm(512),
+                nn.ReLU()
+            )
+            self.output_layer = nn.Linear(512, n_actions)  # Output layer
 
         def forward(self, x):
             x = self.layer1(x)
             x = self.layer2(x)
-            return self.layer3(x)
+            x = self.layer3(x)  # Pass through the new additional layer
+            return self.output_layer(x)
 
     # priorities_list = [] ## amin
     # for usr in User.all():  ## amin
