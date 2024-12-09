@@ -632,7 +632,7 @@ def my_rl_in_edgesimpy(parameters):
     GAMMA = 0.99
     EPS_START = 1.0
     EPS_END = 0.1
-    EPS_DECAY = 5000
+    EPS_DECAY = (len(Service.all())*len(EdgeServer.all()))
     TAU = 0.01
     LR = 5e-4
 
@@ -1079,15 +1079,15 @@ def my_rl_in_edgesimpy(parameters):
             else:
                 terminated = False
 
-            # if t >= (len(Service.all()) * len(EdgeServer.all())):
-            #     truncated = True
-            # else:
-            #     truncated = False
-
-            if num_likely_missed_deadline >= len(Service.all()):
+            if t >= (2*(len(Service.all())*len(EdgeServer.all()))):
                 truncated = True
             else:
                 truncated = False
+
+            # if num_likely_missed_deadline >= len(Service.all()):
+            #     truncated = True
+            # else:
+            #     truncated = False
 
             if terminated or truncated:
                 done = True
