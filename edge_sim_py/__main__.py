@@ -1069,7 +1069,7 @@ def my_rl_in_edgesimpy(parameters):
 
             reward = compute_reward(avoid_redundant_service, server_poses_capacity, service_deadline_likely_met, rl_selected_server.total_cpu_utilization,
                            rl_selected_server.total_memory_utilization, service_criticality_level, response_time_for_service, count_ones)
-            print(f"reward: {reward}")
+            # print(f"reward: {reward}")
             reward = torch.tensor([reward], device=device)
 
             if observation.count(1) == len(Service.all()):
