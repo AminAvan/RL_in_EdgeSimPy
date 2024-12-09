@@ -1099,11 +1099,6 @@ def my_rl_in_edgesimpy(parameters):
             else:
                 truncated = False
 
-            # if t >= len(Service.all()):
-            #     truncated = True
-            # else:
-            #     truncated = False
-
             if terminated or truncated:
                 done = True
             else:
