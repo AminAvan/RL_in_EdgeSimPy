@@ -632,8 +632,8 @@ def my_rl_in_edgesimpy(parameters):
     GAMMA = 0.99
     EPS_START = 1.0
     EPS_END = 0.05
-    # EPS_DECAY = (len(Service.all())*len(EdgeServer.all())) was 160
-    EPS_DECAY = (len(Service.all())*len(Service.all()))
+    EPS_DECAY = (len(Service.all())*len(EdgeServer.all())) ###was 160
+    # EPS_DECAY = (len(Service.all())*len(Service.all()))
     TAU = 0.005
     LR = 5e-4
 
