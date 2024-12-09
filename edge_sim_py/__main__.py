@@ -632,7 +632,8 @@ def my_rl_in_edgesimpy(parameters):
     GAMMA = 0.99
     EPS_START = 1.0
     EPS_END = 0.1
-    EPS_DECAY = (len(Service.all())*len(EdgeServer.all()))
+    # EPS_DECAY = (len(Service.all())*len(EdgeServer.all())) was 160
+    EPS_DECAY = (len(Service.all())*len(Service.all()))
     TAU = 0.01
     LR = 5e-4
 
@@ -1079,15 +1080,39 @@ def my_rl_in_edgesimpy(parameters):
             else:
                 terminated = False
 
-            if t >= (2*(len(Service.all())*len(EdgeServer.all()))):
+            # 160 in avg
+            # if t >= (2*(len(Service.all())*len(EdgeServer.all()))):
+            #     truncated = True
+            # else:
+            #     truncated = False
+
+            if t > len(Service.all()):
                 truncated = True
             else:
                 truncated = False
 
-            # if num_likely_missed_deadline >= len(Service.all()):
-            #     truncated = True
-            # else:
-            #     truncated = False
+            """
+            Key Considerations for Real-Time Applications
+            1. Deadline for Task Completion
+                Each task must be scheduled within a strict timeframe.
+                Since there are 262 tasks to schedule, set STEPS_PER_EPISODE to match the number of tasks.
+                    STEPS_PER_EPISODE = 262  # One step per task, no retries allowed
+
+            2. Exploration vs. Exploitation
+                For real-time applications, the agent must shift quickly from exploration to exploitation
+                to ensure tasks are scheduled efficiently.
+                Decay epsilon (exploration rate) over approximately 3 episodes:
+                    EPS_DECAY = STEPS_PER_EPISODE * 3  # Decay exploration over 3 episodes
+
+            3. Minimize Retries
+                Retries should be avoided as they delay task completion.
+                The agent must be designed to focus on allocating each task once during each episode.
+                    This is naturally enforced by setting STEPS_PER_EPISODE = 262.
+            """
+
+            # EPS_DECAY = 4*262  # Quick transition from exploration to exploitation
+            # EPS_DECAY = 262*262  # Quick transition from exploration to exploitation
+            # STEPS_PER_EPISODE = 262  # Equal to the number of tasks (minimal retries)
 
             if terminated or truncated:
                 done = True
