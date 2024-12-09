@@ -799,19 +799,19 @@ def my_rl_in_edgesimpy(parameters):
         if (not_redundant == 1):
             # Reward for selecting the service with the earliest deadline
             reward += 90
-            reward += (number_of_alloc_services / len(Service.all())) * 10
+            reward += (number_of_alloc_services / len(Service.all())) * 100
 
         # Reward for efficient resource utilization (CPU and memory within capacity)
         if (enough_capacity == 1):
             reward += 10 + max(0, 1 - abs(cpu_utilization_factor - 1))  # Reward closer to 1
             reward += 10 + max(0, 1 - abs(memory_utilization_factor - 1))  # Reward closer to 1
-            reward += (number_of_alloc_services / len(Service.all())) * 100
+            reward += (number_of_alloc_services / len(Service.all())) * 1000
 
         # Reward for meeting service deadlines
         if (service_deadline_met == 1):
             reward += 15 * (deadline_critical_level ** 2)
             reward += 10 / response_time_factor  # Higher reward for low response times
-            reward += (number_of_alloc_services / len(Service.all())) * 1000
+            reward += (number_of_alloc_services / len(Service.all())) * 10000
 
         ######################
         ## Negative Rewards ##
