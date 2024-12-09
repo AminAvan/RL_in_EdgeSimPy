@@ -632,8 +632,8 @@ def my_rl_in_edgesimpy(parameters):
     GAMMA = 0.99
     EPS_START = 1.0
     EPS_END = 0.05
-    EPS_DECAY = (len(Service.all())*len(EdgeServer.all())) ###was 160
-    # EPS_DECAY = (len(Service.all())*len(Service.all()))
+    # EPS_DECAY = (len(Service.all())*len(EdgeServer.all())) ###was 160
+    EPS_DECAY = ((len(Service.all())*len(EdgeServer.all()))*len(Service.all()))
     TAU = 0.005
     LR = 5e-4
 
@@ -1086,7 +1086,7 @@ def my_rl_in_edgesimpy(parameters):
             # else:
             #     truncated = False
 
-            if t > len(Service.all()):
+            if num_likely_missed_deadline > (len(Service.all())*len(EdgeServer.all())):
                 truncated = True
             else:
                 truncated = False
@@ -1158,12 +1158,19 @@ def my_rl_in_edgesimpy(parameters):
             if done:
                 episode_durations.append(t + 1)
                 print(f"episode_duration: {episode_durations[-1]}")
+                if episode_durations:
+                    average_duration = sum(episode_durations) / len(episode_durations)
+                    print(f"Average duration is: {average_duration}")
+
                 if next_state is not None:
                     count_ones = torch.sum(next_state == 1).item()
                 else:
                     count_ones = len(Service.all())  # Handle the case where next_state is None
-
                 episode_allocated_service.append(count_ones)
+                if episode_allocated_service:
+                    average_episode_allocated_service = sum(episode_allocated_service) / len(episode_allocated_service)
+                    print(f"Average of allocated services is {round(average_episode_allocated_service,1) } in {len(episode_allocated_service)} episodes")
+                    print(f"Average hit-ratio of RL-algorithm {round((average_episode_allocated_service/len(Service.all())),2)*100}% in {len(episode_allocated_service)} episodes")
                 # Count the total number of elements equal to 1
                 # Print the result
                 # print(f"num_likely_missed_deadline: {num_likely_missed_deadline}")
