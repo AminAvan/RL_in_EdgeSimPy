@@ -830,8 +830,12 @@ def my_rl_in_edgesimpy(parameters):
         if (service_deadline_met == -1):
             # print(f"service_deadline_met == -1")
             # Exponential penalty based on severity of the deadline miss
-            penalty = 9 * (deadline_critical_level ** 2)
+            penalty = 10 * (deadline_critical_level ** 2)
             reward -= penalty
+
+        if (reward < 0):
+            compensation = (number_of_alloc_services / len(Service.all())) * (abs(reward))
+            reward += compensation
 
         return reward
 
@@ -1065,9 +1069,8 @@ def my_rl_in_edgesimpy(parameters):
 
             reward = compute_reward(avoid_redundant_service, server_poses_capacity, service_deadline_likely_met, rl_selected_server.total_cpu_utilization,
                            rl_selected_server.total_memory_utilization, service_criticality_level, response_time_for_service, count_ones)
-            # print(f"reward: {reward}")
+            print(f"reward: {reward}")
             reward = torch.tensor([reward], device=device)
-            # print(f"reward: {reward}")
 
             if observation.count(1) == len(Service.all()):
                 terminated = True
