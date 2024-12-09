@@ -775,7 +775,7 @@ def my_rl_in_edgesimpy(parameters):
         return 0
 
     def compute_reward(not_redundant, enough_capacity, service_deadline_met, cpu_utilization_factor,
-                       memory_utilization_factor, deadline_critical_level, response_time_factor):
+                       memory_utilization_factor, deadline_critical_level, response_time_factor, number_of_alloc_services):
         """
         Compute the reward for the RL agent in a real-time task scheduling scenario.
 
@@ -795,6 +795,9 @@ def my_rl_in_edgesimpy(parameters):
         ######################
         ## Positive Rewards ##
         ######################
+
+        reward += (number_of_alloc_services/len(Service.all())) * 100
+
         if (not_redundant == 1):
             # Reward for selecting the service with the earliest deadline
             reward += 90
@@ -1052,18 +1055,6 @@ def my_rl_in_edgesimpy(parameters):
             # print(f"next step: {sum(1 for item in sum(observation) if item == 1)}")
             ##################################
             ## calculating the reward
-            reward = compute_reward(avoid_redundant_service, server_poses_capacity, service_deadline_likely_met, rl_selected_server.total_cpu_utilization,
-                           rl_selected_server.total_memory_utilization, service_criticality_level, response_time_for_service)
-            # print(f"reward: {reward}")
-            reward = torch.tensor([reward], device=device)
-            # print(f"reward: {reward}")
-
-            if observation.count(1) == len(Service.all()):
-                terminated = True
-            else:
-                terminated = False
-
-            # print(f"observation: {observation}")
 
             # Check if observation is not None or empty
             if observation is not None and len(observation) > 0:
@@ -1072,6 +1063,17 @@ def my_rl_in_edgesimpy(parameters):
             else:
                 # Handle the case where observation is None or empty
                 count_ones = 0  # Or any other default behavior you want to implement
+
+            reward = compute_reward(avoid_redundant_service, server_poses_capacity, service_deadline_likely_met, rl_selected_server.total_cpu_utilization,
+                           rl_selected_server.total_memory_utilization, service_criticality_level, response_time_for_service, count_ones)
+            # print(f"reward: {reward}")
+            reward = torch.tensor([reward], device=device)
+            # print(f"reward: {reward}")
+
+            if observation.count(1) == len(Service.all()):
+                terminated = True
+            else:
+                terminated = False
 
             if num_likely_missed_deadline >= (len(Service.all()) * len(EdgeServer.all())) and (count_ones < (0.8 * (len(Service.all())))):
                 truncated = True
