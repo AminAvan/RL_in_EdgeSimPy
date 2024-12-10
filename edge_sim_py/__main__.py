@@ -633,11 +633,12 @@ def my_rl_in_edgesimpy(parameters):
     EPS_START = 1.0
     EPS_END = 0.05
     # EPS_DECAY = (len(Service.all())*len(EdgeServer.all())) ###was 160
-    EPS_DECAY = (((len(Service.all())*2)*600)/10) ## 600 is number of episodes that we are having
+    EPS_DECAY = ((len(Service.all())*600)/10) ## 600 is number of episodes that we are having
     TAU = 0.005
     LR = 5e-4
 
     def map_action_to_task_server(action):
+        # print(f"action:{action}")
         """
         Maps an action index to a task and server.
 
@@ -658,15 +659,16 @@ def my_rl_in_edgesimpy(parameters):
         # print(f"total_num_servers:{total_num_servers}")
 
         # Determine the task and server indices
-        task_index = (action // total_num_servers) + 1 ## the task(service) 0 represents the first service which its ID is '1'
+        task_index = ((action - 1) // total_num_servers + 1) ## the task(service) 0 represents the first service which its ID is '1'
         # print(f"task_index:{task_index}")
-        server_index = (action % total_num_servers) + 1 ## the server 0 represents the first server which its ID is '1'
+        server_index = ((action - 1) % total_num_servers + 1) ## (action % total_num_servers) + 1 ## the server 0 represents the first server which its ID is '1'
         # print(f"server_index:{server_index}")
 
         # Validate indices
         if task_index > total_num_tasks:
             raise ValueError("Action index out of bounds for the given number of tasks and servers.")
 
+        # print(f"task_index {task_index}, server_index {server_index}")
         return task_index, server_index
 
     # Get number of actions from gym action space
@@ -954,9 +956,11 @@ def my_rl_in_edgesimpy(parameters):
 
         for t in count():
             action = select_action(state) ## amin
-            # print(f"action from selected_action:{action}") ## amin
+            # print(f"state:{state}")
+            # print(f"action:{action}")
             # print(f"action.item(): {action.item()}") ## amin
             # print(f"state in for_t_count: {state}") ## amin
+            # print(f"action.item()::{action.item()}")
             rl_task, rl_server = map_action_to_task_server(action.item()) ## amin
             # print(f"Action {action.item()} corresponds to Task {rl_task} and Server {rl_server}.") ## amin
 
