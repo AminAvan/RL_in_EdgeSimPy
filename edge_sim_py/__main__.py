@@ -702,8 +702,6 @@ def my_rl_in_edgesimpy(parameters):
     rl_memory = ReplayMemory(500000)
 
 
-
-
     episode_durations = []
     episode_allocated_service = []
 
@@ -818,10 +816,10 @@ def my_rl_in_edgesimpy(parameters):
         ## Negative Rewards ##
         ######################
         # Redundant decision
-        # if (not_redundant == -1):
-        #     # print(f"not_redundant == -1")
-        #     # Reward for selecting the service with the earliest deadline
-        #     reward -= 6 * (deadline_critical_level ** 2)
+        if (not_redundant == -1):
+            # print(f"not_redundant == -1")
+            # Reward for selecting the service with the earliest deadline
+            reward -= 5 * (deadline_critical_level ** 2)
 
         # Penalty for exceeding server capacity
         if (enough_capacity == -1):
@@ -833,7 +831,7 @@ def my_rl_in_edgesimpy(parameters):
         if (service_deadline_met == -1):
             # print(f"service_deadline_met == -1")
             # Exponential penalty based on severity of the deadline miss
-            penalty = 7 * (deadline_critical_level ** 2)
+            penalty = 6 * (deadline_critical_level ** 2)
             reward -= penalty
 
         # if (reward < 0):
