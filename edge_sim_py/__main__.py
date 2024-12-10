@@ -633,7 +633,7 @@ def my_rl_in_edgesimpy(parameters):
     EPS_START = 1.0
     EPS_END = 0.05
     # EPS_DECAY = (len(Service.all())*len(EdgeServer.all())) ###was 160
-    EPS_DECAY = ((len(Service.all())*len(EdgeServer.all()))*len(Service.all()))
+    EPS_DECAY = (((len(Service.all())*2)*600)/10) ## 600 is number of episodes that we are having
     TAU = 0.005
     LR = 5e-4
 
