@@ -774,7 +774,7 @@ def my_rl_in_edgesimpy(parameters):
         return 0
 
     def compute_reward(not_redundant, enough_capacity, service_deadline_met, cpu_utilization_factor,
-                       memory_utilization_factor, deadline_critical_level, response_time_factor, number_of_alloc_services):
+                       memory_utilization_factor, deadline_critical_level, response_time_factor, number_of_alloc_services, missed_tasks):
         """
         Compute the reward for the RL agent in a real-time task scheduling scenario.
 
@@ -823,6 +823,9 @@ def my_rl_in_edgesimpy(parameters):
             # print(f"not_redundant == -1")
             # Reward for selecting the service with the earliest deadline
             reward -= 5 * (deadline_critical_level ** 2)
+
+        if (missed_tasks == len(Service.all())):
+            reward -= len(Service.all()) * 100
 
         # Penalty for exceeding server capacity
         if (enough_capacity == -1):
@@ -1072,7 +1075,7 @@ def my_rl_in_edgesimpy(parameters):
                 count_ones = 0  # Or any other default behavior you want to implement
 
             reward = compute_reward(avoid_redundant_service, server_poses_capacity, service_deadline_likely_met, rl_selected_server.total_cpu_utilization,
-                           rl_selected_server.total_memory_utilization, service_criticality_level, response_time_for_service, count_ones)
+                           rl_selected_server.total_memory_utilization, service_criticality_level, response_time_for_service, count_ones, num_likely_missed_deadline)
             # print(f"reward: {reward}")
             reward = torch.tensor([reward], device=device)
 
@@ -1087,7 +1090,7 @@ def my_rl_in_edgesimpy(parameters):
             # else:
             #     truncated = False
 
-            if num_likely_missed_deadline > (2*(len(Service.all())*len(EdgeServer.all()))):
+            if num_likely_missed_deadline > (5*(len(Service.all())*len(EdgeServer.all()))):
                 truncated = True
             else:
                 truncated = False
