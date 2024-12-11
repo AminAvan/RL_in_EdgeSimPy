@@ -1156,7 +1156,7 @@ def my_rl_in_edgesimpy(parameters):
             # STEPS_PER_EPISODE = 262  # Equal to the number of tasks (minimal retries)
 
             # if terminated or truncated:
-            if terminated:
+            if terminated and truncated:
                 done = True
             else:
                 done = False
