@@ -1122,15 +1122,29 @@ def my_rl_in_edgesimpy(parameters):
                 terminated = False
 
 
-            if num_likely_missed_deadline > (len(Service.all())*len(EdgeServer.all())):
+            # if num_likely_missed_deadline > (len(Service.all())*len(EdgeServer.all())):
+            #     truncated = True
+            # else:
+            #     truncated = False
+
+            if num_likely_missed_deadline > len(Service.all()):
                 truncated = True
             else:
                 truncated = False
 
-            # if num_likely_missed_deadline > len(Service.all()):
-            #     truncated = True
-            # else:
-            #     truncated = False
+            # if terminated or truncated:
+            if terminated and truncated:
+                done = True
+            else:
+                done = False
+
+            if terminated:
+                next_state = None
+                num_step_in_last_time_completion = t
+            else:
+                next_state = torch.tensor(observation, dtype=torch.float32, device=device).unsqueeze(0)
+
+            # log_state_transition(i_episode, t, state, action.item(), next_state, reward.item())
 
             """
             Key Considerations for Real-Time Applications
@@ -1154,20 +1168,6 @@ def my_rl_in_edgesimpy(parameters):
             # EPS_DECAY = 4*262  # Quick transition from exploration to exploitation
             # EPS_DECAY = 262*262  # Quick transition from exploration to exploitation
             # STEPS_PER_EPISODE = 262  # Equal to the number of tasks (minimal retries)
-
-            # if terminated or truncated:
-            if terminated and truncated:
-                done = True
-            else:
-                done = False
-
-            if terminated:
-                next_state = None
-                num_step_in_last_time_completion = t
-            else:
-                next_state = torch.tensor(observation, dtype=torch.float32, device=device).unsqueeze(0)
-
-            # log_state_transition(i_episode, t, state, action.item(), next_state, reward.item())
 
             ############### UNTIL HERE WAS WORKED ##############
 
