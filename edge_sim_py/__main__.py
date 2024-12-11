@@ -508,7 +508,7 @@ def my_rl_in_edgesimpy(parameters):
 
         # Find indices of unassigned tasks (state == 0)
         unassigned_task_indices = (state == 0).nonzero(as_tuple=True)[1].tolist()  # Get unassigned indices
-        print(f"unassigned_task_indices:{unassigned_task_indices}")
+        # print(f"unassigned_task_indices:{unassigned_task_indices}")
         if not unassigned_task_indices:
             raise ValueError("No unassigned tasks available for selection.")
 
@@ -516,11 +516,12 @@ def my_rl_in_edgesimpy(parameters):
             with torch.no_grad():
                 # Exploitation: Choose the best action based on policy_net
                 # Restricting to unassigned tasks is not necessary for exploitation
+                # print(f"policy_net(state).max(1).indices.view(1, 1):{policy_net(state).max(1).indices.view(1, 1)}")
                 return policy_net(state).max(1).indices.view(1, 1)
         else:
             # Exploration: Randomly select from unassigned tasks
             random_action_idx = random.choice(unassigned_task_indices)
-            print(f"random_action_idx:{random_action_idx}")
+            # print(f"random_action_idx:{random_action_idx}")
             return torch.tensor([[random_action_idx]], device=device, dtype=torch.long)
 
     # env = gym.make("CartPole-v1")
@@ -639,7 +640,7 @@ def my_rl_in_edgesimpy(parameters):
     LR = 5e-4
 
     def map_action_to_task_server(action):
-        print(f"action was {action}")
+        # print(f"action was {action}")
 
         """
         Maps an action index to a task and server.
@@ -654,7 +655,7 @@ def my_rl_in_edgesimpy(parameters):
         """
 
         translated_action = action + 1
-        print(f"translated_action:{translated_action}")
+        # print(f"translated_action:{translated_action}")
 
         total_num_tasks = len(Service.all())
         # print(f"total_num_tasks:{total_num_tasks}")
@@ -671,7 +672,7 @@ def my_rl_in_edgesimpy(parameters):
         if task_index > total_num_tasks:
             raise ValueError("Action index out of bounds for the given number of tasks and servers.")
 
-        print(f"task_index {task_index}, server_index {server_index}")
+        # print(f"task_index {task_index}, server_index {server_index}")
         return task_index, server_index
 
     # Get number of actions from gym action space
@@ -727,17 +728,17 @@ def my_rl_in_edgesimpy(parameters):
 
         candidate_indices = list(range(start_item, end_item + 1))
 
-        print(f"candidate_indices:{candidate_indices}")
+        # print(f"candidate_indices:{candidate_indices}")
 
         candidate_indices_values = [state[i - 1] for i in candidate_indices]
-        print("Values at specified indices:", candidate_indices_values)
+        # print("Values at specified indices:", candidate_indices_values)
 
         # Check if any value in 'values' is 1
         if 1 in candidate_indices_values:
-            print("At least one value is 1.")
+            # print("At least one value is 1.")
             return True
         elif 1 not in candidate_indices_values:
-            print("No '1' found.")
+            # print("No '1' found.")
             return False
         else:
             print("Error: id is out of range")
@@ -751,6 +752,8 @@ def my_rl_in_edgesimpy(parameters):
         #     print("Error: id is out of range")
 
     def update_state(state, id):
+        # print(f"update_state->state:{state}")
+        # print(f"update_state->id:{id}")
         """
         Creates a new list by updating the n-th item to '1' based on the input id
         without modifying the original list.
@@ -764,11 +767,16 @@ def my_rl_in_edgesimpy(parameters):
         """
         # Create a copy of the original list
         updated_state = state[:]
-        # Ensure id is within valid range
-        if 1 <= id <= len(updated_state):
-            updated_state[id - 1] = 1  # Convert 1-based index to 0-based index
-        else:
-            print("Error: id is out of range")
+        # Convert 1-based index to 0-based index
+        updated_state[id] = 1
+
+        # # Create a copy of the original list
+        # updated_state = state[:]
+        # # Ensure id is within valid range
+        # if 1 <= id <= len(updated_state):
+        #     updated_state[id - 1] = 1  # Convert 1-based index to 0-based index
+        # else:
+        #     print("Error: id is out of range")
 
         # print(f"updated_state: {updated_state}")
         return updated_state
@@ -1061,20 +1069,21 @@ def my_rl_in_edgesimpy(parameters):
                     #################################################
                     if (response_time_for_service < list(rl_selected_user.delay_slas.values())[0]):
                         service_deadline_likely_met = 1
-                        observation = update_state(state.squeeze(0).tolist(), rl_selected_service.id)
+                        # observation = update_state(state.squeeze(0).tolist(), rl_selected_service.id) ## was
+                        observation = update_state(state.squeeze(0).tolist(), action.item())
                     else:
                         service_deadline_likely_met = -1
                         response_time_for_service = -1
                         num_likely_missed_deadline += 1
                         service_criticality_level = get_service_criticality_level(list(rl_selected_user.delay_slas.values())[0])
-                        observation = update_state(state.squeeze(0).tolist(), rl_selected_service.id)
+                        observation = update_state(state.squeeze(0).tolist(), action.item())
                 else:
                     server_poses_capacity = -1
                     # service_deadline_likely_met = False
                     response_time_for_service = -1
                     num_likely_missed_deadline += 1
                     service_criticality_level = get_service_criticality_level(list(rl_selected_user.delay_slas.values())[0])
-                    observation = update_state(state.squeeze(0).tolist(), rl_selected_service.id)
+                    observation = update_state(state.squeeze(0).tolist(), action.item())
 
                 # print(f"can host but service {rl_selected_service} is NOT the earliest service")  ## amin
             else:
@@ -1085,7 +1094,7 @@ def my_rl_in_edgesimpy(parameters):
                 response_time_for_service = -1
                 num_likely_missed_deadline += 1
                 service_criticality_level = get_service_criticality_level(list(rl_selected_user.delay_slas.values())[0])
-                observation = update_state(state.squeeze(0).tolist(), rl_selected_service.id)
+                observation = update_state(state.squeeze(0).tolist(), action.item())
 
             # print(f"observation: {sum(1 for item in observation if item == 1)}")
             # print(f"next step: {sum(1 for item in sum(observation) if item == 1)}")
@@ -1104,7 +1113,7 @@ def my_rl_in_edgesimpy(parameters):
                            rl_selected_server.total_memory_utilization, service_criticality_level, response_time_for_service, count_ones, num_likely_missed_deadline)
             # print(f"reward: {reward}")
             reward = torch.tensor([reward], device=device)
-            print()
+
             if observation.count(1) == len(Service.all()):
                 terminated = True
             else:
