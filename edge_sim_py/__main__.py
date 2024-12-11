@@ -830,54 +830,48 @@ def my_rl_in_edgesimpy(parameters):
         ## Positive Rewards ##
         ######################
 
+        # print(f"\tnum_crtc_alloc_services:{num_crtc_alloc_services}")
         if (num_crtc_alloc_services == len(Service.all())):
-            reward += len(Service.all()) * 1000
+            reward += len(Service.all()) * 10
+            # print(f"\tnum_crtc_alloc_services == len(Service.all()): {reward}")
 
         if (not_redundant == 1):
             # Reward for selecting the service with the earliest deadline
-            reward += 90
-            reward += (num_crtc_alloc_services / len(Service.all())) * 1000
+            reward += (num_crtc_alloc_services / len(Service.all())) * 100
+            # print(f"\tnot_redundant == 1: {reward}")
 
         # Reward for efficient resource utilization (CPU and memory within capacity)
         if (enough_capacity == 1):
-            reward += 10 + max(0, 1 - abs(cpu_utilization_factor - 1))  # Reward closer to 1
-            reward += 10 + max(0, 1 - abs(memory_utilization_factor - 1))  # Reward closer to 1
-            reward += (num_crtc_alloc_services / len(Service.all())) * 1000
+            reward += (num_crtc_alloc_services / len(Service.all())) * 100
+            # print(f"\tenough_capacity == 1: {reward}")
 
         # Reward for meeting service deadlines
         if (service_deadline_met == 1):
-            reward += 15 * (deadline_critical_level ** 2)
-            reward += 10 / response_time_factor  # Higher reward for low response times
-            reward += (num_crtc_alloc_services / len(Service.all())) * 1000
+            reward += (num_crtc_alloc_services / len(Service.all())) * 100
+            # print(f"\tservice_deadline_met == 1: {reward}")
 
         ######################
         ## Negative Rewards ##
         ######################
-        # Redundant decision
-        if (not_redundant == -1):
-            # print(f"not_redundant == -1")
-            # Reward for selecting the service with the earliest deadline
-            reward -= 5 * (deadline_critical_level ** 2)
 
         if (missed_tasks == len(Service.all())):
             reward -= len(Service.all()) * 100
 
+        # Redundant decision
+        if (not_redundant == -1):
+            # Reward for selecting the service with the earliest deadline
+            reward -= (missed_tasks / len(Service.all())) * 100
+            # print(f"\t(not_redundant == -1): {reward}")
+
         # Penalty for exceeding server capacity
         if (enough_capacity == -1):
-            # print(f"enough_capacity == -1")
-            reward -= 5 * max(0, cpu_utilization_factor - 1)  # Penalize overload
-            reward -= 5 * max(0, memory_utilization_factor - 1)  # Penalize overload
+            reward -= (missed_tasks / len(Service.all())) * 100
+            # print(f"\t(enough_capacity == -1): {reward}")
 
         # Severe penalty for missing deadlines
         if (service_deadline_met == -1):
-            # print(f"service_deadline_met == -1")
-            # Exponential penalty based on severity of the deadline miss
-            penalty = 6 * (deadline_critical_level ** 2)
-            reward -= penalty
-
-        # if (reward < 0):
-        #     compensation = (num_crtc_alloc_services / len(Service.all())) * (abs(reward))
-        #     reward += compensation
+            reward -= (missed_tasks / len(Service.all())) * 100
+            # print(f"\t(service_deadline_met == -1): {reward}")
 
         return reward
 
