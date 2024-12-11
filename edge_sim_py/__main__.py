@@ -508,7 +508,7 @@ def my_rl_in_edgesimpy(parameters):
 
         # Find indices of unassigned tasks (state == 0)
         unassigned_task_indices = (state == 0).nonzero(as_tuple=True)[1].tolist()  # Get unassigned indices
-
+        print(f"unassigned_task_indices:{unassigned_task_indices}")
         if not unassigned_task_indices:
             raise ValueError("No unassigned tasks available for selection.")
 
@@ -520,6 +520,7 @@ def my_rl_in_edgesimpy(parameters):
         else:
             # Exploration: Randomly select from unassigned tasks
             random_action_idx = random.choice(unassigned_task_indices)
+            print(f"random_action_idx:{random_action_idx}")
             return torch.tensor([[random_action_idx]], device=device, dtype=torch.long)
 
     # env = gym.make("CartPole-v1")
@@ -638,7 +639,8 @@ def my_rl_in_edgesimpy(parameters):
     LR = 5e-4
 
     def map_action_to_task_server(action):
-        # print(f"action:{action}")
+        print(f"action was {action}")
+
         """
         Maps an action index to a task and server.
 
@@ -651,7 +653,8 @@ def my_rl_in_edgesimpy(parameters):
             (int, int): A tuple of (task_index, server_index).
         """
 
-
+        translated_action = action + 1
+        print(f"translated_action:{translated_action}")
 
         total_num_tasks = len(Service.all())
         # print(f"total_num_tasks:{total_num_tasks}")
@@ -659,16 +662,16 @@ def my_rl_in_edgesimpy(parameters):
         # print(f"total_num_servers:{total_num_servers}")
 
         # Determine the task and server indices
-        task_index = ((action - 1) // total_num_servers + 1) ## the task(service) 0 represents the first service which its ID is '1'
+        task_index = ((translated_action - 1) // total_num_servers + 1) ## the task(service) 0 represents the first service which its ID is '1'
         # print(f"task_index:{task_index}")
-        server_index = ((action - 1) % total_num_servers + 1) ## (action % total_num_servers) + 1 ## the server 0 represents the first server which its ID is '1'
+        server_index = ((translated_action - 1) % total_num_servers + 1) ## (action % total_num_servers) + 1 ## the server 0 represents the first server which its ID is '1'
         # print(f"server_index:{server_index}")
 
         # Validate indices
         if task_index > total_num_tasks:
             raise ValueError("Action index out of bounds for the given number of tasks and servers.")
 
-        # print(f"task_index {task_index}, server_index {server_index}")
+        print(f"task_index {task_index}, server_index {server_index}")
         return task_index, server_index
 
     # Get number of actions from gym action space
@@ -718,13 +721,34 @@ def my_rl_in_edgesimpy(parameters):
         Returns:
             bool
         """
-        # Ensure id is within valid range
-        if (1 <= id <= len(state)) and (state[id - 1] == 1):
+
+        start_item = (id - 1) * (len(EdgeServer.all())) + 1
+        end_item = id * (len(EdgeServer.all()))
+
+        candidate_indices = list(range(start_item, end_item + 1))
+
+        print(f"candidate_indices:{candidate_indices}")
+
+        candidate_indices_values = [state[i - 1] for i in candidate_indices]
+        print("Values at specified indices:", candidate_indices_values)
+
+        # Check if any value in 'values' is 1
+        if 1 in candidate_indices_values:
+            print("At least one value is 1.")
             return True
-        elif (1 <= id <= len(state)) and (state[id - 1] == 0):
+        elif 1 not in candidate_indices_values:
+            print("No '1' found.")
             return False
         else:
             print("Error: id is out of range")
+
+        # # Ensure id is within valid range
+        # if (1 <= id <= len(state)) and (state[id - 1] == 1):
+        #     return True
+        # elif (1 <= id <= len(state)) and (state[id - 1] == 0):
+        #     return False
+        # else:
+        #     print("Error: id is out of range")
 
     def update_state(state, id):
         """
@@ -987,8 +1011,6 @@ def my_rl_in_edgesimpy(parameters):
             # for server in EdgeServer.all():
             #     print(f"in loop - server: {server.total_cpu_utilization}")
             # print(f"service {rl_selected_service}, {rl_selected_application}, {rl_selected_user}, {rl_selected_server}")  ## amin
-            # print(f"=-=-=-=-=-=-=-=-=\n")
-            # print(f"service {rl_selected_service}")
             if not is_service_allocated_before(state.squeeze(0).tolist(), rl_selected_service.id):
                 avoid_redundant_service = 1
                 # print(f"avoid_redundant_service = True")
@@ -1082,7 +1104,7 @@ def my_rl_in_edgesimpy(parameters):
                            rl_selected_server.total_memory_utilization, service_criticality_level, response_time_for_service, count_ones, num_likely_missed_deadline)
             # print(f"reward: {reward}")
             reward = torch.tensor([reward], device=device)
-
+            print()
             if observation.count(1) == len(Service.all()):
                 terminated = True
             else:
