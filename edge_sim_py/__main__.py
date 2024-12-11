@@ -955,7 +955,7 @@ def my_rl_in_edgesimpy(parameters):
         optimizer.step()
 
     if torch.cuda.is_available() or torch.backends.mps.is_available():
-        num_episodes = 600
+        num_episodes = 2000
     else:
         num_episodes = 500
 
