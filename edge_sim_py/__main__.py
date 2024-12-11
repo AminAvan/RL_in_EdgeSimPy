@@ -710,6 +710,7 @@ def my_rl_in_edgesimpy(parameters):
 
     episode_durations = []
     episode_allocated_service = []
+    episode_crtc_allc_services = []
 
     def is_service_allocated_before(state, id):
         """
@@ -808,7 +809,7 @@ def my_rl_in_edgesimpy(parameters):
         return 0
 
     def compute_reward(not_redundant, enough_capacity, service_deadline_met, cpu_utilization_factor,
-                       memory_utilization_factor, deadline_critical_level, response_time_factor, number_of_alloc_services, missed_tasks):
+                       memory_utilization_factor, deadline_critical_level, response_time_factor, num_crtc_alloc_services, missed_tasks):
         """
         Compute the reward for the RL agent in a real-time task scheduling scenario.
 
@@ -829,25 +830,25 @@ def my_rl_in_edgesimpy(parameters):
         ## Positive Rewards ##
         ######################
 
-        if (number_of_alloc_services == len(Service.all())):
+        if (num_crtc_alloc_services == len(Service.all())):
             reward += len(Service.all()) * 1000
 
         if (not_redundant == 1):
             # Reward for selecting the service with the earliest deadline
             reward += 90
-            reward += (number_of_alloc_services / len(Service.all())) * 1000
+            reward += (num_crtc_alloc_services / len(Service.all())) * 1000
 
         # Reward for efficient resource utilization (CPU and memory within capacity)
         if (enough_capacity == 1):
             reward += 10 + max(0, 1 - abs(cpu_utilization_factor - 1))  # Reward closer to 1
             reward += 10 + max(0, 1 - abs(memory_utilization_factor - 1))  # Reward closer to 1
-            reward += (number_of_alloc_services / len(Service.all())) * 1000
+            reward += (num_crtc_alloc_services / len(Service.all())) * 1000
 
         # Reward for meeting service deadlines
         if (service_deadline_met == 1):
             reward += 15 * (deadline_critical_level ** 2)
             reward += 10 / response_time_factor  # Higher reward for low response times
-            reward += (number_of_alloc_services / len(Service.all())) * 1000
+            reward += (num_crtc_alloc_services / len(Service.all())) * 1000
 
         ######################
         ## Negative Rewards ##
@@ -875,7 +876,7 @@ def my_rl_in_edgesimpy(parameters):
             reward -= penalty
 
         # if (reward < 0):
-        #     compensation = (number_of_alloc_services / len(Service.all())) * (abs(reward))
+        #     compensation = (num_crtc_alloc_services / len(Service.all())) * (abs(reward))
         #     reward += compensation
 
         return reward
@@ -886,7 +887,8 @@ def my_rl_in_edgesimpy(parameters):
 
         # Convert data to tensors for plotting
         # durations_t = torch.tensor(episode_durations, dtype=torch.float)
-        allocated_t = torch.tensor(episode_allocated_service, dtype=torch.float)
+        # allocated_t = torch.tensor(episode_allocated_service, dtype=torch.float)
+        allocated_t = torch.tensor(episode_crtc_allc_services, dtype=torch.float)
 
         # Set plot title and labels
         plt.title('Result' if show_result else 'Training...')
@@ -985,6 +987,7 @@ def my_rl_in_edgesimpy(parameters):
         # state, info = env.reset() ## was
         state = torch.tensor(state, dtype=torch.float32, device=device).unsqueeze(0)
         num_likely_missed_deadline = 0
+        num_likely_MEET_deadline = 0
 
         for t in count():
             action = select_action(state) ## amin
@@ -1009,8 +1012,6 @@ def my_rl_in_edgesimpy(parameters):
             # print(f"cpu U of {rl_selected_server}: {rl_selected_server.total_cpu_utilization}")
             # print(f"memory U of {rl_selected_server}: {rl_selected_server.total_memory_utilization}")
 
-            server_poses_capacity = False
-            service_deadline_likely_met = False
 
             avoid_redundant_service = 0
             server_poses_capacity = 0
@@ -1070,6 +1071,7 @@ def my_rl_in_edgesimpy(parameters):
                     if (response_time_for_service < list(rl_selected_user.delay_slas.values())[0]):
                         service_deadline_likely_met = 1
                         # observation = update_state(state.squeeze(0).tolist(), rl_selected_service.id) ## was
+                        num_likely_MEET_deadline += 1
                         observation = update_state(state.squeeze(0).tolist(), action.item())
                     else:
                         service_deadline_likely_met = -1
@@ -1110,7 +1112,7 @@ def my_rl_in_edgesimpy(parameters):
                 count_ones = 0  # Or any other default behavior you want to implement
 
             reward = compute_reward(avoid_redundant_service, server_poses_capacity, service_deadline_likely_met, rl_selected_server.total_cpu_utilization,
-                           rl_selected_server.total_memory_utilization, service_criticality_level, response_time_for_service, count_ones, num_likely_missed_deadline)
+                           rl_selected_server.total_memory_utilization, service_criticality_level, response_time_for_service, num_likely_MEET_deadline, num_likely_missed_deadline)
             # print(f"reward: {reward}")
             reward = torch.tensor([reward], device=device)
 
@@ -1125,10 +1127,10 @@ def my_rl_in_edgesimpy(parameters):
             # else:
             #     truncated = False
 
-            if num_likely_missed_deadline >= len(Service.all()):
-                truncated = True
-            else:
-                truncated = False
+            # if num_likely_missed_deadline > len(Service.all()):
+            #     truncated = True
+            # else:
+            #     truncated = False
 
             """
             Key Considerations for Real-Time Applications
@@ -1153,7 +1155,8 @@ def my_rl_in_edgesimpy(parameters):
             # EPS_DECAY = 262*262  # Quick transition from exploration to exploitation
             # STEPS_PER_EPISODE = 262  # Equal to the number of tasks (minimal retries)
 
-            if terminated or truncated:
+            # if terminated or truncated:
+            if terminated:
                 done = True
             else:
                 done = False
@@ -1206,15 +1209,23 @@ def my_rl_in_edgesimpy(parameters):
                 else:
                     count_ones = len(Service.all())  # Handle the case where next_state is None
                 episode_allocated_service.append(count_ones)
+                episode_crtc_allc_services.append(num_likely_MEET_deadline)
                 if episode_allocated_service:
                     average_episode_allocated_service = sum(episode_allocated_service) / len(episode_allocated_service)
                     print(f"Average of allocated services is {round(average_episode_allocated_service,1) } in {len(episode_allocated_service)} episodes")
-                    print(f"Average hit-ratio of RL-algorithm {round((average_episode_allocated_service/len(Service.all())),2)*100}% in {len(episode_allocated_service)} episodes")
+                    # print(f"Average allocation {round((average_episode_allocated_service/len(Service.all())),2)*100}% in {len(episode_allocated_service)} episodes")
+                if episode_crtc_allc_services:
+                    average_episode_crtc_allc_services = sum(episode_crtc_allc_services) / len(episode_crtc_allc_services)
+                    print(
+                        f"Average of CORRECT allocated services is {round(average_episode_crtc_allc_services, 1)} in {len(episode_crtc_allc_services)} episodes")
+                    print(
+                        f"Average CORRECT allocation {round((average_episode_crtc_allc_services / len(Service.all())), 2) * 100}% in {len(episode_crtc_allc_services)} episodes")
                 # Count the total number of elements equal to 1
                 # Print the result
                 # print(f"num_likely_missed_deadline: {num_likely_missed_deadline}")
 
                 print(f"Total number services are allocated: {count_ones}")
+                print(f"Total number services are CORRECTED allocated: {num_likely_MEET_deadline}")
                 last_num_of_allocated_services = count_ones
                 print(f"========================================")
                 if (i_episode > 0) and (i_episode % 50 == 0):
