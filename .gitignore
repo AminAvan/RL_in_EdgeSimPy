@@ -147,3 +147,4 @@ logs/
 .idea/
 Q_values.npy
 pruned_G.graphml
+/edge_sim_py/test.py
