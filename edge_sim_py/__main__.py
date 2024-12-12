@@ -1121,7 +1121,7 @@ def my_rl_in_edgesimpy(parameters):
             # else:
             #     truncated = False
 
-            if num_likely_missed_deadline > len(Service.all()):
+            if t > len(Service.all()):
                 truncated = True
             else:
                 truncated = False
@@ -1204,22 +1204,23 @@ def my_rl_in_edgesimpy(parameters):
                     count_ones = len(Service.all())  # Handle the case where next_state is None
                 episode_allocated_service.append(count_ones)
                 episode_crtc_allc_services.append(num_likely_MEET_deadline)
-                if episode_allocated_service:
-                    average_episode_allocated_service = sum(episode_allocated_service) / len(episode_allocated_service)
-                    print(f"Average of allocated services is {round(average_episode_allocated_service,1) } in {len(episode_allocated_service)} episodes")
+                # if episode_allocated_service:
+                #     average_episode_allocated_service = sum(episode_allocated_service) / len(episode_allocated_service)
+                #     print(f"Average of allocated services is {round(average_episode_allocated_service,1) } in {len(episode_allocated_service)} episodes")
                     # print(f"Average allocation {round((average_episode_allocated_service/len(Service.all())),2)*100}% in {len(episode_allocated_service)} episodes")
-                if episode_crtc_allc_services:
-                    average_episode_crtc_allc_services = sum(episode_crtc_allc_services) / len(episode_crtc_allc_services)
-                    print(
-                        f"Average of CORRECT allocated services is {round(average_episode_crtc_allc_services, 1)} in {len(episode_crtc_allc_services)} episodes")
-                    print(
-                        f"Average CORRECT allocation {round((average_episode_crtc_allc_services / len(Service.all())), 2) * 100}% in {len(episode_crtc_allc_services)} episodes")
+                # if episode_crtc_allc_services:
+                #     average_episode_crtc_allc_services = sum(episode_crtc_allc_services) / len(episode_crtc_allc_services)
+                #     print(
+                #         f"Average of CORRECT allocated services is {round(average_episode_crtc_allc_services, 1)} in {len(episode_crtc_allc_services)} episodes")
+                #     print(
+                #         f"Average CORRECT allocation {round((average_episode_crtc_allc_services / len(Service.all())), 2) * 100}% in {len(episode_crtc_allc_services)} episodes")
                 # Count the total number of elements equal to 1
                 # Print the result
                 # print(f"num_likely_missed_deadline: {num_likely_missed_deadline}")
 
                 print(f"Total number services are allocated: {count_ones}")
                 print(f"Total number services are CORRECTED allocated: {num_likely_MEET_deadline}")
+                print(f"num_likely_missed_deadline:{num_likely_missed_deadline}")
                 last_num_of_allocated_services = count_ones
                 print(f"========================================")
                 if (i_episode > 0) and (i_episode % 50 == 0):
