@@ -1221,12 +1221,12 @@ def my_rl_in_edgesimpy(parameters):
                 #     average_episode_allocated_service = sum(episode_allocated_service) / len(episode_allocated_service)
                 #     print(f"Average of allocated services is {round(average_episode_allocated_service,1) } in {len(episode_allocated_service)} episodes")
                     # print(f"Average allocation {round((average_episode_allocated_service/len(Service.all())),2)*100}% in {len(episode_allocated_service)} episodes")
-                # if episode_crtc_allc_services:
-                #     average_episode_crtc_allc_services = sum(episode_crtc_allc_services) / len(episode_crtc_allc_services)
-                #     print(
-                #         f"Average of CORRECT allocated services is {round(average_episode_crtc_allc_services, 1)} in {len(episode_crtc_allc_services)} episodes")
-                #     print(
-                #         f"Average CORRECT allocation {round((average_episode_crtc_allc_services / len(Service.all())), 2) * 100}% in {len(episode_crtc_allc_services)} episodes")
+                if episode_crtc_allc_services:
+                    average_episode_crtc_allc_services = sum(episode_crtc_allc_services) / len(episode_crtc_allc_services)
+                    print(
+                        f"Average of CORRECT allocated services is {round(average_episode_crtc_allc_services, 1)} in {len(episode_allocated_service)} episodes")
+                    print(
+                        f"Average CORRECT allocation {round((average_episode_crtc_allc_services / len(Service.all())), 2) * 100}% in {len(episode_allocated_service)} episodes")
                 # Count the total number of elements equal to 1
                 # Print the result
                 # print(f"num_likely_missed_deadline: {num_likely_missed_deadline}")
