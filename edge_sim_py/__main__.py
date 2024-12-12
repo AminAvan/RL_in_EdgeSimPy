@@ -1125,16 +1125,16 @@ def my_rl_in_edgesimpy(parameters):
                 terminated = False
 
             ## 160 in avg
-            # if num_likely_missed_deadline > (len(EdgeServer.all())):
-            #     truncated = True
-            # else:
-            #     truncated = False
-
-            # if t > (len(Service.all())*len(EdgeServer.all())):
-            if observation.count(1) == len(Service.all()):
+            if num_likely_missed_deadline >= (len(Service.all())):
                 truncated = True
             else:
                 truncated = False
+
+            # # if t > (len(Service.all())*len(EdgeServer.all())):
+            # if observation.count(1) == len(Service.all()):
+            #     truncated = True
+            # else:
+            #     truncated = False
 
             """
             Key Considerations for Real-Time Applications
