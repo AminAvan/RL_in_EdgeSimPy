@@ -838,17 +838,17 @@ def my_rl_in_edgesimpy(parameters):
 
         if (not_redundant == 1):
             # Reward for selecting the service with the earliest deadline
-            reward += num_crtc_alloc_services
+            reward += 1
             # print(f"\tnot_redundant == 1: {reward}")
 
         # Reward for efficient resource utilization (CPU and memory within capacity)
         if (enough_capacity == 1):
-            reward += num_crtc_alloc_services
+            reward += 2
             # print(f"\tenough_capacity == 1: {reward}")
 
         # Reward for meeting service deadlines
         if (service_deadline_met == 1):
-            reward += num_crtc_alloc_services
+            reward += 20
             # print(f"\tservice_deadline_met == 1: {reward}")
 
         ######################
@@ -862,30 +862,30 @@ def my_rl_in_edgesimpy(parameters):
         # Redundant decision
         if (not_redundant == -1):
             # Reward for selecting the service with the earliest deadline
-            penalty -= num_crtc_alloc_services
+            penalty -= 1
             # print(f"\t(not_redundant == -1): {reward}")
 
         # Penalty for exceeding server capacity
         if (enough_capacity == -1):
-            penalty -= num_crtc_alloc_services
+            penalty -= 2
             # print(f"\t(enough_capacity == -1): {reward}")
 
         # Severe penalty for missing deadlines
         if (service_deadline_met == -1):
-            penalty -= num_crtc_alloc_services
+            penalty -= 20
             # print(f"\t(service_deadline_met == -1): {reward}")
 
         if (penalty < 0):
             reward = penalty
 
-        if (missed_tasks >= len(Service.all())):
-            # print(f"(missed_tasks >= len(Service.all()))")
-            if (penalty < 0):
-                penalty += (-1 * (len(Service.all()))*len(EdgeServer.all()))*10
-                reward = penalty
-            else:
-                penalty = (-1 * (len(Service.all()))*len(EdgeServer.all()))*10
-                reward = penalty
+        # if (missed_tasks >= len(Service.all())):
+        #     # print(f"(missed_tasks >= len(Service.all()))")
+        #     if (penalty < 0):
+        #         penalty += (-1 * (len(Service.all()))*len(EdgeServer.all()))*10
+        #         reward = penalty
+        #     else:
+        #         penalty = (-1 * (len(Service.all()))*len(EdgeServer.all()))*10
+        #         reward = penalty
 
         # print(f"reward:{reward}")
         return reward
@@ -1001,7 +1001,70 @@ def my_rl_in_edgesimpy(parameters):
         total_rewards = 0
 
         for t in count():
-            action = select_action(state) ## amin
+            # if (t % 100 == 0):
+            #     print(f"t={t}")
+
+            if not (state == 0).nonzero(as_tuple=True)[1].tolist():
+                done = True
+                print(f"truncated = True")
+                # Store the transition in rl_memory
+                rl_memory.push(state, action, next_state, reward)
+
+                # Move to the next state
+                state = next_state
+
+                # Perform one step of the optimization (on the policy network)
+                optimize_model()
+
+                # Soft update of the target network's weights
+                # θ′ ← τ θ + (1 −τ )θ′
+                target_net_state_dict = target_net.state_dict()
+                policy_net_state_dict = policy_net.state_dict()
+                for key in policy_net_state_dict:
+                    target_net_state_dict[key] = policy_net_state_dict[key] * TAU + target_net_state_dict[key] * (
+                                1 - TAU)
+                target_net.load_state_dict(target_net_state_dict)
+
+                # print()
+                if done:
+                    episode_durations.append(t + 1)
+                    print(f"episode_duration: {episode_durations[-1]}, and total rewards: {total_rewards}")
+                    if episode_durations:
+                        average_duration = sum(episode_durations) / len(episode_durations)
+                        print(f"Average duration is: {average_duration}")
+
+                    if next_state is not None:
+                        count_ones = torch.sum(next_state == 1).item()
+                    else:
+                        count_ones = len(Service.all())  # Handle the case where next_state is None
+                    episode_allocated_service.append(count_ones)
+                    episode_crtc_allc_services.append(num_likely_MEET_deadline)
+                    # if episode_allocated_service:
+                    #     average_episode_allocated_service = sum(episode_allocated_service) / len(episode_allocated_service)
+                    #     print(f"Average of allocated services is {round(average_episode_allocated_service,1) } in {len(episode_allocated_service)} episodes")
+                    # print(f"Average allocation {round((average_episode_allocated_service/len(Service.all())),2)*100}% in {len(episode_allocated_service)} episodes")
+                    if episode_crtc_allc_services:
+                        average_episode_crtc_allc_services = sum(episode_crtc_allc_services) / len(
+                            episode_crtc_allc_services)
+                        print(
+                            f"Average of CORRECT allocated services is {round(average_episode_crtc_allc_services, 1)} in {len(episode_allocated_service)} episodes")
+                        print(
+                            f"Average CORRECT allocation {round((average_episode_crtc_allc_services / len(Service.all())), 2) * 100}% in {len(episode_allocated_service)} episodes")
+                    # Count the total number of elements equal to 1
+                    # Print the result
+                    # print(f"num_likely_missed_deadline: {num_likely_missed_deadline}")
+
+                    print(f"Total number services are allocated: {count_ones}")
+                    print(f"Total number services are CORRECTED allocated: {num_likely_MEET_deadline}")
+                    print(f"num_likely_missed_deadline:{num_likely_missed_deadline}")
+                    # print(f"reward_is_zero:{reward_is_zero}")
+                    last_num_of_allocated_services = count_ones
+                    print(f"========================================")
+                    if (i_episode > 0) and (i_episode % 50 == 0):
+                        plot_durations()
+                    break
+            else:
+                action = select_action(state)
             # print(f"state:{state}")
             # print(f"action:{action}")
             # print(f"action.item(): {action.item()}") ## amin
@@ -1094,7 +1157,7 @@ def my_rl_in_edgesimpy(parameters):
                     server_poses_capacity = -1
                     # service_deadline_likely_met = False
                     response_time_for_service = -1
-                    num_likely_missed_deadline += 1
+                    # num_likely_missed_deadline += 1
                     service_criticality_level = get_service_criticality_level(list(rl_selected_user.delay_slas.values())[0])
                     observation = update_state(state.squeeze(0).tolist(), action.item())
 
@@ -1105,7 +1168,7 @@ def my_rl_in_edgesimpy(parameters):
                 # server_poses_capacity = False
                 # service_deadline_likely_met = False
                 response_time_for_service = -1
-                num_likely_missed_deadline += 1
+                # num_likely_missed_deadline += 1
                 service_criticality_level = get_service_criticality_level(list(rl_selected_user.delay_slas.values())[0])
                 observation = update_state(state.squeeze(0).tolist(), action.item())
 
@@ -1136,16 +1199,16 @@ def my_rl_in_edgesimpy(parameters):
                 terminated = False
 
             # ## 160 in avg
-            # if num_likely_missed_deadline == (len(Service.all())):
-            #     truncated = True
-            # else:
-            #     truncated = False
-
-            # if t > (len(Service.all())*len(EdgeServer.all())):
-            if t > len(Service.all()):
+            if num_likely_missed_deadline == (len(Service.all())):
                 truncated = True
             else:
                 truncated = False
+
+            # if t > (len(Service.all())*len(EdgeServer.all())):
+            # if t > len(Service.all()):
+            #     truncated = True
+            # else:
+            #     truncated = False
 
             """
             Key Considerations for Real-Time Applications
