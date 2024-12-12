@@ -825,6 +825,7 @@ def my_rl_in_edgesimpy(parameters):
             float: The computed reward.
         """
         reward = 0
+        penalty = 0
 
         ######################
         ## Positive Rewards ##
@@ -854,26 +855,29 @@ def my_rl_in_edgesimpy(parameters):
         ## Negative Rewards ##
         ######################
 
-        if (missed_tasks == len(Service.all())):
-            reward -= len(Service.all()) * 10
-            # print(f"(missed_tasks == len(Service.all())):{reward}")
+        # if (missed_tasks == len(Service.all())):
+        #     reward -= len(Service.all()) * 10
+        #     # print(f"(missed_tasks == len(Service.all())):{reward}")
 
         # Redundant decision
         if (not_redundant == -1):
             # Reward for selecting the service with the earliest deadline
-            reward -= num_crtc_alloc_services
+            penalty -= num_crtc_alloc_services
             # print(f"\t(not_redundant == -1): {reward}")
 
         # Penalty for exceeding server capacity
         if (enough_capacity == -1):
-            reward -= num_crtc_alloc_services
+            penalty -= num_crtc_alloc_services
             # print(f"\t(enough_capacity == -1): {reward}")
 
         # Severe penalty for missing deadlines
         if (service_deadline_met == -1):
-            reward -= num_crtc_alloc_services
+            penalty -= num_crtc_alloc_services
             # print(f"\t(service_deadline_met == -1): {reward}")
 
+        if (penalty < 0):
+            reward = penalty
+        # print(f"reward:{reward}")
         return reward
 
     def plot_durations(show_result=False):
