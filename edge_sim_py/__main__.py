@@ -837,17 +837,17 @@ def my_rl_in_edgesimpy(parameters):
 
         if (not_redundant == 1):
             # Reward for selecting the service with the earliest deadline
-            reward += (num_crtc_alloc_services / len(Service.all())) * 100
+            reward += num_crtc_alloc_services
             # print(f"\tnot_redundant == 1: {reward}")
 
         # Reward for efficient resource utilization (CPU and memory within capacity)
         if (enough_capacity == 1):
-            reward += (num_crtc_alloc_services / len(Service.all())) * 100
+            reward += num_crtc_alloc_services
             # print(f"\tenough_capacity == 1: {reward}")
 
         # Reward for meeting service deadlines
         if (service_deadline_met == 1):
-            reward += (num_crtc_alloc_services / len(Service.all())) * 100
+            reward += num_crtc_alloc_services
             # print(f"\tservice_deadline_met == 1: {reward}")
 
         ######################
@@ -855,22 +855,23 @@ def my_rl_in_edgesimpy(parameters):
         ######################
 
         if (missed_tasks == len(Service.all())):
-            reward -= len(Service.all()) * 100
+            reward -= len(Service.all()) * 10
+            # print(f"(missed_tasks == len(Service.all())):{reward}")
 
         # Redundant decision
         if (not_redundant == -1):
             # Reward for selecting the service with the earliest deadline
-            reward -= (missed_tasks / len(Service.all())) * 100
+            reward -= num_crtc_alloc_services
             # print(f"\t(not_redundant == -1): {reward}")
 
         # Penalty for exceeding server capacity
         if (enough_capacity == -1):
-            reward -= (missed_tasks / len(Service.all())) * 100
+            reward -= num_crtc_alloc_services
             # print(f"\t(enough_capacity == -1): {reward}")
 
         # Severe penalty for missing deadlines
         if (service_deadline_met == -1):
-            reward -= (missed_tasks / len(Service.all())) * 100
+            reward -= num_crtc_alloc_services
             # print(f"\t(service_deadline_met == -1): {reward}")
 
         return reward
@@ -955,7 +956,7 @@ def my_rl_in_edgesimpy(parameters):
         optimizer.step()
 
     if torch.cuda.is_available() or torch.backends.mps.is_available():
-        num_episodes = 2000
+        num_episodes = 2500
     else:
         num_episodes = 500
 
