@@ -1119,7 +1119,7 @@ def my_rl_in_edgesimpy(parameters):
 
             reward = torch.tensor([reward], device=device)
 
-            if observation.count(1) == len(Service.all()):
+            if num_likely_missed_deadline == len(Service.all()):
                 terminated = True
             else:
                 terminated = False
@@ -1131,9 +1131,10 @@ def my_rl_in_edgesimpy(parameters):
             #     truncated = False
 
             # if t > (len(Service.all())*len(EdgeServer.all())):
-            #     truncated = True
-            # else:
-            #     truncated = False
+            if observation.count(1) == len(Service.all()):
+                truncated = True
+            else:
+                truncated = False
 
             """
             Key Considerations for Real-Time Applications
@@ -1158,8 +1159,8 @@ def my_rl_in_edgesimpy(parameters):
             # EPS_DECAY = 262*262  # Quick transition from exploration to exploitation
             # STEPS_PER_EPISODE = 262  # Equal to the number of tasks (minimal retries)
 
-            # if terminated or truncated:
-            if terminated:
+            if terminated or truncated:
+            # if terminated:
                 done = True
             else:
                 done = False
