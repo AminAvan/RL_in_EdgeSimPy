@@ -859,30 +859,35 @@ def my_rl_in_edgesimpy(parameters):
         #     reward -= len(Service.all()) * 10
         #     # print(f"(missed_tasks == len(Service.all())):{reward}")
 
-        # # Redundant decision
-        # if (not_redundant == -1):
-        #     # Reward for selecting the service with the earliest deadline
-        #     penalty -= num_crtc_alloc_services
-        #     # print(f"\t(not_redundant == -1): {reward}")
-        #
-        # # Penalty for exceeding server capacity
-        # if (enough_capacity == -1):
-        #     penalty -= num_crtc_alloc_services
-        #     # print(f"\t(enough_capacity == -1): {reward}")
-        #
-        # # Severe penalty for missing deadlines
-        # if (service_deadline_met == -1):
-        #     penalty -= num_crtc_alloc_services
-        #     # print(f"\t(service_deadline_met == -1): {reward}")
+        # Redundant decision
+        if (not_redundant == -1):
+            # Reward for selecting the service with the earliest deadline
+            penalty -= num_crtc_alloc_services
+            # print(f"\t(not_redundant == -1): {reward}")
 
-        # if (penalty < 0):
-        #     reward = penalty
-        # print(f"reward:{reward}")
+        # Penalty for exceeding server capacity
+        if (enough_capacity == -1):
+            penalty -= num_crtc_alloc_services
+            # print(f"\t(enough_capacity == -1): {reward}")
 
-        if (missed_tasks >= len(Service.all())):
-            penalty = (len(Service.all()))*len(EdgeServer.all())
+        # Severe penalty for missing deadlines
+        if (service_deadline_met == -1):
+            penalty -= num_crtc_alloc_services
+            # print(f"\t(service_deadline_met == -1): {reward}")
+
+        if (penalty < 0):
             reward = penalty
 
+        if (missed_tasks >= len(Service.all())):
+            # print(f"(missed_tasks >= len(Service.all()))")
+            if (penalty < 0):
+                penalty += (-1 * (len(Service.all()))*len(EdgeServer.all()))*10
+                reward = penalty
+            else:
+                penalty = (-1 * (len(Service.all()))*len(EdgeServer.all()))*10
+                reward = penalty
+
+        # print(f"reward:{reward}")
         return reward
 
     def plot_durations(show_result=False):
@@ -1120,6 +1125,7 @@ def my_rl_in_edgesimpy(parameters):
             reward = compute_reward(avoid_redundant_service, server_poses_capacity, service_deadline_likely_met, rl_selected_server.total_cpu_utilization,
                            rl_selected_server.total_memory_utilization, service_criticality_level, response_time_for_service, num_likely_MEET_deadline, num_likely_missed_deadline)
 
+            # print(f"reward:{reward}")
             total_rewards += reward
 
             reward = torch.tensor([reward], device=device)
@@ -1129,17 +1135,17 @@ def my_rl_in_edgesimpy(parameters):
             else:
                 terminated = False
 
-            ## 160 in avg
-            if num_likely_missed_deadline > (len(Service.all())):
-                truncated = True
-            else:
-                truncated = False
-
-            # # if t > (len(Service.all())*len(EdgeServer.all())):
-            # if observation.count(1) == len(Service.all()):
+            # ## 160 in avg
+            # if num_likely_missed_deadline == (len(Service.all())):
             #     truncated = True
             # else:
             #     truncated = False
+
+            # if t > (len(Service.all())*len(EdgeServer.all())):
+            if t > len(Service.all()):
+                truncated = True
+            else:
+                truncated = False
 
             """
             Key Considerations for Real-Time Applications
