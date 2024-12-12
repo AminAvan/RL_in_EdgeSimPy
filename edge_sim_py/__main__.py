@@ -1134,10 +1134,10 @@ def my_rl_in_edgesimpy(parameters):
             # else:
             #     truncated = False
 
-            if t > (len(Service.all())*len(EdgeServer.all())):
-                truncated = True
-            else:
-                truncated = False
+            # if t > (len(Service.all())*len(EdgeServer.all())):
+            #     truncated = True
+            # else:
+            #     truncated = False
 
             """
             Key Considerations for Real-Time Applications
@@ -1162,8 +1162,8 @@ def my_rl_in_edgesimpy(parameters):
             # EPS_DECAY = 262*262  # Quick transition from exploration to exploitation
             # STEPS_PER_EPISODE = 262  # Equal to the number of tasks (minimal retries)
 
-            if terminated or truncated:
-            # if terminated:
+            # if terminated or truncated:
+            if terminated:
                 done = True
             else:
                 done = False
