@@ -988,6 +988,7 @@ def my_rl_in_edgesimpy(parameters):
         num_likely_missed_deadline = 0
         num_likely_MEET_deadline = 0
         reward_is_zero = 0
+        total_rewards = 0
 
         for t in count():
             action = select_action(state) ## amin
@@ -1114,12 +1115,7 @@ def my_rl_in_edgesimpy(parameters):
             reward = compute_reward(avoid_redundant_service, server_poses_capacity, service_deadline_likely_met, rl_selected_server.total_cpu_utilization,
                            rl_selected_server.total_memory_utilization, service_criticality_level, response_time_for_service, num_likely_MEET_deadline, num_likely_missed_deadline)
 
-            if (reward==0):
-                reward_is_zero += 1
-                # print(f"observation: {observation}")
-                # print(f"is_service_allocated_before:{is_service_allocated_before(state.squeeze(0).tolist(), rl_selected_service.id)}")
-                # print(f"has_capacity_to_host:{rl_selected_server.has_capacity_to_host(service=rl_selected_service)}")
-                # print(f"deadline:{(response_time_for_service < list(rl_selected_user.delay_slas.values())[0])}")
+            total_rewards += reward
 
             reward = torch.tensor([reward], device=device)
 
@@ -1206,7 +1202,7 @@ def my_rl_in_edgesimpy(parameters):
             # print()
             if done:
                 episode_durations.append(t + 1)
-                print(f"episode_duration: {episode_durations[-1]}")
+                print(f"episode_duration: {episode_durations[-1]}, and total rewards: {total_rewards}")
                 if episode_durations:
                     average_duration = sum(episode_durations) / len(episode_durations)
                     print(f"Average duration is: {average_duration}")
