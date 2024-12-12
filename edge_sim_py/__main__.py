@@ -1134,7 +1134,7 @@ def my_rl_in_edgesimpy(parameters):
             # else:
             #     truncated = False
 
-            if t > len(Service.all()):
+            if t > (len(Service.all())*len(EdgeServer.all())):
                 truncated = True
             else:
                 truncated = False
@@ -1234,7 +1234,7 @@ def my_rl_in_edgesimpy(parameters):
                 print(f"Total number services are allocated: {count_ones}")
                 print(f"Total number services are CORRECTED allocated: {num_likely_MEET_deadline}")
                 print(f"num_likely_missed_deadline:{num_likely_missed_deadline}")
-                print(f"reward_is_zero:{reward_is_zero}")
+                # print(f"reward_is_zero:{reward_is_zero}")
                 last_num_of_allocated_services = count_ones
                 print(f"========================================")
                 if (i_episode > 0) and (i_episode % 50 == 0):
