@@ -1119,7 +1119,7 @@ def my_rl_in_edgesimpy(parameters):
 
             reward = torch.tensor([reward], device=device)
 
-            if num_likely_missed_deadline == len(Service.all()):
+            if num_likely_MEET_deadline == len(Service.all()):
                 terminated = True
             else:
                 terminated = False
