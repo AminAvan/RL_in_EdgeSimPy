@@ -983,6 +983,7 @@ def my_rl_in_edgesimpy(parameters):
         state = torch.tensor(state, dtype=torch.float32, device=device).unsqueeze(0)
         num_likely_missed_deadline = 0
         num_likely_MEET_deadline = 0
+        reward_is_zero = 0
 
         for t in count():
             action = select_action(state) ## amin
@@ -1108,7 +1109,14 @@ def my_rl_in_edgesimpy(parameters):
 
             reward = compute_reward(avoid_redundant_service, server_poses_capacity, service_deadline_likely_met, rl_selected_server.total_cpu_utilization,
                            rl_selected_server.total_memory_utilization, service_criticality_level, response_time_for_service, num_likely_MEET_deadline, num_likely_missed_deadline)
-            # print(f"reward: {reward}")
+
+            if (reward==0):
+                reward_is_zero += 1
+                # print(f"observation: {observation}")
+                # print(f"is_service_allocated_before:{is_service_allocated_before(state.squeeze(0).tolist(), rl_selected_service.id)}")
+                # print(f"has_capacity_to_host:{rl_selected_server.has_capacity_to_host(service=rl_selected_service)}")
+                # print(f"deadline:{(response_time_for_service < list(rl_selected_user.delay_slas.values())[0])}")
+
             reward = torch.tensor([reward], device=device)
 
             if observation.count(1) == len(Service.all()):
@@ -1222,6 +1230,7 @@ def my_rl_in_edgesimpy(parameters):
                 print(f"Total number services are allocated: {count_ones}")
                 print(f"Total number services are CORRECTED allocated: {num_likely_MEET_deadline}")
                 print(f"num_likely_missed_deadline:{num_likely_missed_deadline}")
+                print(f"reward_is_zero:{reward_is_zero}")
                 last_num_of_allocated_services = count_ones
                 print(f"========================================")
                 if (i_episode > 0) and (i_episode % 50 == 0):
