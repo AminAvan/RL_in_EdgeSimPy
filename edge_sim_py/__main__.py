@@ -855,8 +855,8 @@ def my_rl_in_edgesimpy(parameters):
         ## Negative Rewards ##
         ######################
 
-        if (missed_tasks == len(Service.all())):
-            penalty -= len(Service.all()) * 100
+        if ((missed_tasks+num_crtc_alloc_services) == len(Service.all())):
+            penalty -= missed_tasks * 1000
             reward = penalty
             # print(f"(missed_tasks == len(Service.all())):{reward}")
 
@@ -1138,7 +1138,7 @@ def my_rl_in_edgesimpy(parameters):
 
             # ## 160 in avg
             # if (num_likely_missed_deadline+num_likely_MEET_deadline) == (len(Service.all())*len(EdgeServer.all())):
-            if (num_likely_missed_deadline >= len(Service.all())):
+            if ((num_likely_missed_deadline+num_likely_MEET_deadline) >= len(Service.all())):
                 truncated = True
             else:
                 truncated = False
