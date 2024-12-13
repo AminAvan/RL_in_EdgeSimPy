@@ -631,7 +631,7 @@ def my_rl_in_edgesimpy(parameters):
 
     # BATCH_SIZE = 128  ## was
     BATCH_SIZE = 1024
-    GAMMA = 0.99
+    GAMMA = 0.995
     EPS_START = 1.0
     EPS_END = 0.05
     # EPS_DECAY = (len(Service.all())*len(EdgeServer.all())) ###was 160
