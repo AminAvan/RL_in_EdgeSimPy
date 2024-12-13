@@ -855,28 +855,29 @@ def my_rl_in_edgesimpy(parameters):
         ## Negative Rewards ##
         ######################
 
-        # if (missed_tasks == len(Service.all())):
-        #     reward -= len(Service.all()) * 10
-        #     # print(f"(missed_tasks == len(Service.all())):{reward}")
-
-        # Redundant decision
-        if (not_redundant == -1):
-            # Reward for selecting the service with the earliest deadline
-            penalty -= missed_tasks
-            # print(f"\t(not_redundant == -1): {reward}")
-
-        # Penalty for exceeding server capacity
-        if (enough_capacity == -1):
-            penalty -= (missed_tasks*1.25)
-            # print(f"\t(enough_capacity == -1): {reward}")
-
-        # Severe penalty for missing deadlines
-        if (service_deadline_met == -1):
-            penalty -= (missed_tasks*2)
-            # print(f"\t(service_deadline_met == -1): {reward}")
-
-        if (penalty < 0):
+        if (missed_tasks == len(Service.all())):
+            penalty -= len(Service.all()) * 100
             reward = penalty
+            # print(f"(missed_tasks == len(Service.all())):{reward}")
+
+        # # Redundant decision
+        # if (not_redundant == -1):
+        #     # Reward for selecting the service with the earliest deadline
+        #     penalty -= missed_tasks
+        #     # print(f"\t(not_redundant == -1): {reward}")
+        #
+        # # Penalty for exceeding server capacity
+        # if (enough_capacity == -1):
+        #     penalty -= (missed_tasks*1.25)
+        #     # print(f"\t(enough_capacity == -1): {reward}")
+        #
+        # # Severe penalty for missing deadlines
+        # if (service_deadline_met == -1):
+        #     penalty -= (missed_tasks*2)
+        #     # print(f"\t(service_deadline_met == -1): {reward}")
+        #
+        # if (penalty < 0):
+        #     reward = penalty
 
         # if (missed_tasks >= len(Service.all())):
         #     # print(f"(missed_tasks >= len(Service.all()))")
@@ -1136,7 +1137,8 @@ def my_rl_in_edgesimpy(parameters):
                 terminated = False
 
             # ## 160 in avg
-            if (num_likely_missed_deadline+num_likely_MEET_deadline) == (len(Service.all())*len(EdgeServer.all())):
+            # if (num_likely_missed_deadline+num_likely_MEET_deadline) == (len(Service.all())*len(EdgeServer.all())):
+            if (num_likely_missed_deadline >= len(Service.all())):
                 truncated = True
             else:
                 truncated = False
