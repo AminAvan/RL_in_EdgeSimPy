@@ -838,17 +838,17 @@ def my_rl_in_edgesimpy(parameters):
 
         if (not_redundant == 1):
             # Reward for selecting the service with the earliest deadline
-            reward += 1
+            reward += num_crtc_alloc_services
             # print(f"\tnot_redundant == 1: {reward}")
 
         # Reward for efficient resource utilization (CPU and memory within capacity)
         if (enough_capacity == 1):
-            reward += 2
+            reward += (num_crtc_alloc_services*2)
             # print(f"\tenough_capacity == 1: {reward}")
 
         # Reward for meeting service deadlines
         if (service_deadline_met == 1):
-            reward += 20
+            reward += (num_crtc_alloc_services*4)
             # print(f"\tservice_deadline_met == 1: {reward}")
 
         ######################
@@ -862,17 +862,17 @@ def my_rl_in_edgesimpy(parameters):
         # Redundant decision
         if (not_redundant == -1):
             # Reward for selecting the service with the earliest deadline
-            penalty -= 1
+            penalty -= missed_tasks
             # print(f"\t(not_redundant == -1): {reward}")
 
         # Penalty for exceeding server capacity
         if (enough_capacity == -1):
-            penalty -= 2
+            penalty -= (missed_tasks*1.25)
             # print(f"\t(enough_capacity == -1): {reward}")
 
         # Severe penalty for missing deadlines
         if (service_deadline_met == -1):
-            penalty -= 20
+            penalty -= (missed_tasks*2)
             # print(f"\t(service_deadline_met == -1): {reward}")
 
         if (penalty < 0):
@@ -1136,7 +1136,7 @@ def my_rl_in_edgesimpy(parameters):
                 terminated = False
 
             # ## 160 in avg
-            if (num_likely_missed_deadline+num_likely_MEET_deadline) == (len(Service.all())):
+            if (num_likely_missed_deadline+num_likely_MEET_deadline) == (len(Service.all())*len(EdgeServer.all())):
                 truncated = True
             else:
                 truncated = False
