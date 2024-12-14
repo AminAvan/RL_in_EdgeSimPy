@@ -517,6 +517,11 @@ def my_rl_in_edgesimpy(parameters):
         ]
         print(f"unassigned_services_indices:{unassigned_services_indices}")
         print(f"len(unassigned_services_indices):{len(unassigned_services_indices)}")
+        servers_range_indices = [
+            0
+            for service in Service.all()
+            for server in EdgeServer.all()
+        ]
 
         if not unassigned_services_indices:
             raise ValueError("No unassigned tasks available for selection.")
@@ -526,11 +531,12 @@ def my_rl_in_edgesimpy(parameters):
                 # Exploitation: Choose the best action based on policy_net
                 # Restricting to unassigned tasks is not necessary for exploitation
                 # print(f"policy_net(state).max(1).indices.view(1, 1):{policy_net(state).max(1).indices.view(1, 1)}")
+                print(f"select_action(state)->policy_net(state):{policy_net(state).max(1).indices.view(1, 1)}")
                 return policy_net(state).max(1).indices.view(1, 1)
         else:
             # Exploration: Randomly select from unassigned tasks
             random_action_idx = random.choice(unassigned_services_indices)
-            # print(f"random_action_idx:{random_action_idx}")
+            print(f"select_action(state)->random:{torch.tensor([[random_action_idx]], device=device, dtype=torch.long)}")
             return torch.tensor([[random_action_idx]], device=device, dtype=torch.long)
 
     # env = gym.make("CartPole-v1")
