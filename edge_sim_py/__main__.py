@@ -675,10 +675,15 @@ def my_rl_in_edgesimpy(parameters):
         # print(f"task_index {task_index}, server_index {server_index}")
         return task_index, server_index
 
+    """
+    Based on my understanding, it would be better to consider the state = [service, server], where the range of
+    task=[1,..,262] and server=[1,..,4].
+    """
+
     # Get number of actions from EdgeSimPy converted action-space
     # n_actions = env.action_space.n ## was
     n_actions = (len(Service.all())*len(EdgeServer.all()))  ## amin
-    print(f"n_actions:{n_actions}")
+    # print(f"n_actions:{n_actions}")
 
 
     # Get the number of state observations
@@ -688,14 +693,17 @@ def my_rl_in_edgesimpy(parameters):
     #     for service in Service.all()
     # ]
 
-    services_status_values = [
-        1 if service.server == server or service.being_provisioned else 0
-        for service in Service.all()
-        for server in EdgeServer.all()
-    ]
-    state = services_status_values  ## amin
-    # print(f"state: {state}")
-    # print(f"len(state): {len(state)}")
+    ### [was working fine
+    # services_status_values = [
+    #     1 if service.server == server or service.being_provisioned else 0
+    #     for service in Service.all()
+    #     for server in EdgeServer.all()
+    # ]
+    # state = services_status_values  ## amin
+    ### was working fine ]
+
+    ## initial state for the RL-agent
+    state = [0,0]
 
     # state, info = env.reset() ## was
     n_observations = len(state)
