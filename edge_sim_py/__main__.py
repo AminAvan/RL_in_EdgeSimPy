@@ -500,16 +500,25 @@ def my_rl_in_edgesimpy(parameters):
     steps_done = 0
 
     def select_action(state):
+        print(f"select_action(state):{state}")
         nonlocal steps_done
         sample = random.random()
         eps_threshold = EPS_END + (EPS_START - EPS_END) * \
                         math.exp(-1. * steps_done / EPS_DECAY)
         steps_done += 1
 
-        # Find indices of unassigned tasks (state == 0)
-        unassigned_task_indices = (state == 0).nonzero(as_tuple=True)[1].tolist()  # Get unassigned indices
-        # print(f"unassigned_task_indices:{unassigned_task_indices}")
-        if not unassigned_task_indices:
+        # ## [was working fine
+        # # Find indices of unassigned tasks (state == 0)
+        # unassigned_task_indices = (state == 0).nonzero(as_tuple=True)[1].tolist()  # Get unassigned indices
+        # ## was working fine]
+        unassigned_services_indices = [
+            1 if service.server == server or service.being_provisioned else 0
+            for service in Service.all()
+        ]
+        print(f"unassigned_services_indices:{unassigned_services_indices}")
+        print(f"len(unassigned_services_indices):{len(unassigned_services_indices)}")
+
+        if not unassigned_services_indices:
             raise ValueError("No unassigned tasks available for selection.")
 
         if sample > eps_threshold:
@@ -520,7 +529,7 @@ def my_rl_in_edgesimpy(parameters):
                 return policy_net(state).max(1).indices.view(1, 1)
         else:
             # Exploration: Randomly select from unassigned tasks
-            random_action_idx = random.choice(unassigned_task_indices)
+            random_action_idx = random.choice(unassigned_services_indices)
             # print(f"random_action_idx:{random_action_idx}")
             return torch.tensor([[random_action_idx]], device=device, dtype=torch.long)
 
@@ -718,7 +727,6 @@ def my_rl_in_edgesimpy(parameters):
     optimizer = optim.AdamW(policy_net.parameters(), lr=LR, amsgrad=True)
     rl_memory = ReplayMemory(500000)
 
-
     episode_durations = []
     episode_allocated_service = []
     episode_crtc_allc_services = []
@@ -755,13 +763,6 @@ def my_rl_in_edgesimpy(parameters):
         else:
             print("Error: id is out of range")
 
-        # # Ensure id is within valid range
-        # if (1 <= id <= len(state)) and (state[id - 1] == 1):
-        #     return True
-        # elif (1 <= id <= len(state)) and (state[id - 1] == 0):
-        #     return False
-        # else:
-        #     print("Error: id is out of range")
 
     def update_state(state, id):
         # print(f"update_state->state:{state}")
@@ -781,14 +782,6 @@ def my_rl_in_edgesimpy(parameters):
         updated_state = state[:]
         # Convert 1-based index to 0-based index
         updated_state[id] = 1
-
-        # # Create a copy of the original list
-        # updated_state = state[:]
-        # # Ensure id is within valid range
-        # if 1 <= id <= len(updated_state):
-        #     updated_state[id - 1] = 1  # Convert 1-based index to 0-based index
-        # else:
-        #     print("Error: id is out of range")
 
         # print(f"updated_state: {updated_state}")
         return updated_state
@@ -996,17 +989,23 @@ def my_rl_in_edgesimpy(parameters):
         # for server in EdgeServer.all():
         #     print(f"initial values server: {server.total_cpu_utilization}")
 
-        services_status_values = [
-            1 if service.server == server or service.being_provisioned else 0
-            for service in Service.all()
-            for server in EdgeServer.all()
-        ]
-        state = services_status_values  ## amin
+        ## [was working fine
+        # services_status_values = [
+        #     1 if service.server == server or service.being_provisioned else 0
+        #     for service in Service.all()
+        #     for server in EdgeServer.all()
+        # ]
+        # state = services_status_values  ## amin
+        ## was working fine ]
+
+        ## initial state for the RL-agent
+        state = [0, 0]
         # print(f"state: {state}")
         # print(f"len(state): {len(state)}")
         # print(f"state: {state}")
-        # state, info = env.reset() ## was
+        # state, info = env.reset() ## was was
         state = torch.tensor(state, dtype=torch.float32, device=device).unsqueeze(0)
+
         num_likely_missed_deadline = 0
         num_likely_MEET_deadline = 0
         reward_is_zero = 0
@@ -1014,8 +1013,6 @@ def my_rl_in_edgesimpy(parameters):
 
         for t in count():
             action = select_action(state)
-            # print(f"state:{state}")
-            # print(f"action:{action}")
             # print(f"action.item(): {action.item()}") ## amin
             # print(f"state in for_t_count: {state}") ## amin
             # print(f"action.item()::{action.item()}")
