@@ -217,8 +217,11 @@ def select_action(state):
             # t.max(1) will return the largest column value of each row.
             # second column on max result is index of where max element was
             # found, so we pick action with the larger expected reward.
+            # print(f"policy_net->state:{policy_net(state).max(1).indices.view(1, 1)}")
             return policy_net(state).max(1).indices.view(1, 1)
     else:
+        # print(f"random->state:"
+        #       f"{torch.tensor([[env.action_space.sample()]], device=device, dtype=torch.long)}")
         return torch.tensor([[env.action_space.sample()]], device=device, dtype=torch.long)
 
 
