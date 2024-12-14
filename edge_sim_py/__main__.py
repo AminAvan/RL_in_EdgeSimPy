@@ -739,7 +739,8 @@ def my_rl_in_edgesimpy(parameters):
     episode_allocated_service = []
     episode_crtc_allc_services = []
 
-    def is_service_allocated_before(state, id):
+    def is_service_allocated_before(wanted_to_go_state):
+        print(f"is_service_allocated_before->state:{wanted_to_go_state}")
         """
         Check the state to see if the selected_service is chosen before and is in its procedure of allocation or not
 
@@ -751,25 +752,38 @@ def my_rl_in_edgesimpy(parameters):
             bool
         """
 
-        start_item = (id - 1) * (len(EdgeServer.all())) + 1
-        end_item = id * (len(EdgeServer.all()))
+        unassigned_services_indices = [
+            1 if service.server == server or service.being_provisioned else 0
+            for service in Service.all()
+        ]
 
-        candidate_indices = list(range(start_item, end_item + 1))
-
-        # print(f"candidate_indices:{candidate_indices}")
-
-        candidate_indices_values = [state[i - 1] for i in candidate_indices]
-        # print("Values at specified indices:", candidate_indices_values)
-
-        # Check if any value in 'values' is 1
-        if 1 in candidate_indices_values:
-            # print("At least one value is 1.")
+        if (unassigned_services_indices[wanted_to_go_state[0]] == 1):
+            # print(f"unassigned_services_indices[wanted_to_go_state[0]]:{unassigned_services_indices[wanted_to_go_state[0]]}")
             return True
-        elif 1 not in candidate_indices_values:
-            # print("No '1' found.")
+        elif (unassigned_services_indices[wanted_to_go_state[0]] == 0):
+            # print(f"unassigned_services_indices[wanted_to_go_state[0]]:{unassigned_services_indices[wanted_to_go_state[0]]}")
             return False
         else:
             print("Error: id is out of range")
+
+        ### [was work fine
+        # start_item = (id - 1) * (len(EdgeServer.all())) + 1
+        # end_item = id * (len(EdgeServer.all()))
+        # candidate_indices = list(range(start_item, end_item + 1))
+        # # print(f"candidate_indices:{candidate_indices}")
+        # candidate_indices_values = [state[i - 1] for i in candidate_indices]
+        # # print("Values at specified indices:", candidate_indices_values)
+        ### was work fine]
+
+        # # Check if any value in 'values' is 1
+        # if 1 in candidate_indices_values:
+        #     # print("At least one value is 1.")
+        #     return True
+        # elif 1 not in candidate_indices_values:
+        #     # print("No '1' found.")
+        #     return False
+        # else:
+        #     print("Error: id is out of range")
 
 
     def update_state(state, id):
@@ -1021,10 +1035,7 @@ def my_rl_in_edgesimpy(parameters):
 
         for t in count():
             action = select_action(state)
-            # print(f"action.item(): {action.item()}") ## amin
-            # print(f"state in for_t_count: {state}") ## amin
-            # print(f"action.item()::{action.item()}")
-            # rl_task, rl_server = map_action_to_task_server(action.item()) ## amin
+            # rl_task, rl_server = map_action_to_task_server(action.item()) ## amin was work fine
             rl_task, rl_server = action[0][0].item(), action[0][1].item()
             print(f"Action {action} corresponds to Task {rl_task} and Server {rl_server}.") ## amin
 
@@ -1037,7 +1048,9 @@ def my_rl_in_edgesimpy(parameters):
             rl_selected_user = next((user for user in User._instances if rl_selected_application in user.applications), None)
             rl_selected_server = next((s for s in EdgeServer._instances if s.id == (rl_server)), None)  ## amin
 
-            # print(f"sorted_priorities_list[0][0]: {sorted_priorities_list[0][0]}")  ## amin
+            print(f"rl_selected_service:{rl_selected_service}\trl_selected_application:{rl_selected_application}\t"
+                  f"rl_selected_user:{rl_selected_user}\trl_selected_server:{rl_selected_server}")
+
             # print(f"cpu U of {rl_selected_server}: {rl_selected_server.total_cpu_utilization}")
             # print(f"memory U of {rl_selected_server}: {rl_selected_server.total_memory_utilization}")
 
@@ -1049,7 +1062,9 @@ def my_rl_in_edgesimpy(parameters):
             # for server in EdgeServer.all():
             #     print(f"in loop - server: {server.total_cpu_utilization}")
             # print(f"service {rl_selected_service}, {rl_selected_application}, {rl_selected_user}, {rl_selected_server}")  ## amin
-            if not is_service_allocated_before(state.squeeze(0).tolist(), rl_selected_service.id):
+            ### was working fine
+            # if not is_service_allocated_before(state.squeeze(0).tolist(), rl_selected_service.id):
+            if not is_service_allocated_before(action.squeeze(0).tolist()):
                 avoid_redundant_service = 1
                 # print(f"avoid_redundant_service = True")
                 if rl_selected_server.has_capacity_to_host(service=rl_selected_service):  ## amin
