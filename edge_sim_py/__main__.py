@@ -1023,7 +1023,8 @@ def my_rl_in_edgesimpy(parameters):
             # print(f"state in for_t_count: {state}") ## amin
             # print(f"action.item()::{action.item()}")
             rl_task, rl_server = map_action_to_task_server(action.item()) ## amin
-            # print(f"Action {action.item()} corresponds to Task {rl_task} and Server {rl_server}.") ## amin
+            rl_task, rl_server = action[0][0].item(), action[0][1].item()
+            print(f"Action {action.item()} corresponds to Task {rl_task} and Server {rl_server}.") ## amin
 
             rl_selected_service = next((s for s in Service._instances if s.id == (rl_task)), None) ## amin
             # rl_selected_application = next((s for s in Application._instances if s.id == (rl_task)), None)  ## amin
