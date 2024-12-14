@@ -654,41 +654,43 @@ def my_rl_in_edgesimpy(parameters):
     TAU = 0.005
     LR = 5e-4
 
-    def map_action_to_task_server(action):
-        # print(f"action was {action}")
-
-        """
-        Maps an action index to a task and server.
-
-        Args:
-            action (int): The action index.
-            total_num_tasks (int): Total number of tasks.
-            total_num_servers (int): Total number of servers.
-
-        Returns:
-            (int, int): A tuple of (task_index, server_index).
-        """
-
-        translated_action = action + 1
-        # print(f"translated_action:{translated_action}")
-
-        total_num_tasks = len(Service.all())
-        # print(f"total_num_tasks:{total_num_tasks}")
-        total_num_servers = len(EdgeServer.all())
-        # print(f"total_num_servers:{total_num_servers}")
-
-        # Determine the task and server indices
-        task_index = ((translated_action - 1) // total_num_servers + 1) ## the task(service) 0 represents the first service which its ID is '1'
-        # print(f"task_index:{task_index}")
-        server_index = ((translated_action - 1) % total_num_servers + 1) ## (action % total_num_servers) + 1 ## the server 0 represents the first server which its ID is '1'
-        # print(f"server_index:{server_index}")
-
-        # Validate indices
-        if task_index > total_num_tasks:
-            raise ValueError("Action index out of bounds for the given number of tasks and servers.")
-
-        # print(f"task_index {task_index}, server_index {server_index}")
-        return task_index, server_index
+    ## according to the update/modification that I did in 'def select_action(state)',
+    # it seems there is no need to use this function anymore
+    # def map_action_to_task_server(action):
+    #     # print(f"action was {action}")
+    #
+    #     """
+    #     Maps an action index to a task and server.
+    #
+    #     Args:
+    #         action (int): The action index.
+    #         total_num_tasks (int): Total number of tasks.
+    #         total_num_servers (int): Total number of servers.
+    #
+    #     Returns:
+    #         (int, int): A tuple of (task_index, server_index).
+    #     """
+    #
+    #     translated_action = action + 1
+    #     # print(f"translated_action:{translated_action}")
+    #
+    #     total_num_tasks = len(Service.all())
+    #     # print(f"total_num_tasks:{total_num_tasks}")
+    #     total_num_servers = len(EdgeServer.all())
+    #     # print(f"total_num_servers:{total_num_servers}")
+    #
+    #     # Determine the task and server indices
+    #     task_index = ((translated_action - 1) // total_num_servers + 1) ## the task(service) 0 represents the first service which its ID is '1'
+    #     # print(f"task_index:{task_index}")
+    #     server_index = ((translated_action - 1) % total_num_servers + 1) ## (action % total_num_servers) + 1 ## the server 0 represents the first server which its ID is '1'
+    #     # print(f"server_index:{server_index}")
+    #
+    #     # Validate indices
+    #     if task_index > total_num_tasks:
+    #         raise ValueError("Action index out of bounds for the given number of tasks and servers.")
+    #
+    #     # print(f"task_index {task_index}, server_index {server_index}")
+    #     return task_index, server_index
 
     """
     Based on my understanding, it would be better to consider the state = [service, server], where the range of
@@ -1022,9 +1024,9 @@ def my_rl_in_edgesimpy(parameters):
             # print(f"action.item(): {action.item()}") ## amin
             # print(f"state in for_t_count: {state}") ## amin
             # print(f"action.item()::{action.item()}")
-            rl_task, rl_server = map_action_to_task_server(action.item()) ## amin
+            # rl_task, rl_server = map_action_to_task_server(action.item()) ## amin
             rl_task, rl_server = action[0][0].item(), action[0][1].item()
-            print(f"Action {action.item()} corresponds to Task {rl_task} and Server {rl_server}.") ## amin
+            print(f"Action {action} corresponds to Task {rl_task} and Server {rl_server}.") ## amin
 
             rl_selected_service = next((s for s in Service._instances if s.id == (rl_task)), None) ## amin
             # rl_selected_application = next((s for s in Application._instances if s.id == (rl_task)), None)  ## amin
