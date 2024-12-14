@@ -705,8 +705,11 @@ def my_rl_in_edgesimpy(parameters):
     ## initial state for the RL-agent
     state = [0,0]
 
-    # state, info = env.reset() ## was
-    n_observations = len(state)
+    # state, info = env.reset() ## was was
+    # n_observations = len(state) ## was working fine
+
+    ## number of observation is equal to the number of action that can be taken!?
+    n_observations = (len(Service.all())*len(EdgeServer.all()))
 
     policy_net = DQN(n_observations, n_actions).to(device)
     target_net = DQN(n_observations, n_actions).to(device)
