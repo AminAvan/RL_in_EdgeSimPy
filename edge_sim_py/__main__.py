@@ -675,10 +675,10 @@ def my_rl_in_edgesimpy(parameters):
         # print(f"task_index {task_index}, server_index {server_index}")
         return task_index, server_index
 
-    # Get number of actions from gym action space
+    # Get number of actions from EdgeSimPy converted action-space
     # n_actions = env.action_space.n ## was
     n_actions = (len(Service.all())*len(EdgeServer.all()))  ## amin
-    # print(f"n_actions:{n_actions}")
+    print(f"n_actions:{n_actions}")
 
 
     # Get the number of state observations
