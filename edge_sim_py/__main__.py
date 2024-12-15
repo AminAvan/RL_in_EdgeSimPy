@@ -696,7 +696,7 @@ def my_rl_in_edgesimpy(parameters):
         # print(f"task_index {task_index}, server_index {server_index}")
 
         # return task_index, server_index ## was
-        return torch.tensor([[task_index, server_index]])
+        return torch.tensor([[task_index, server_index]], device=device)
 
     """
     Based on my understanding, it would be better to consider the state = [service, server], where the range of
