@@ -693,7 +693,7 @@ def my_rl_in_edgesimpy(parameters):
         if task_index > total_num_tasks:
             raise ValueError("Action index out of bounds for the given number of tasks and servers.")
 
-        print(f"task_index {task_index}, server_index {server_index}")
+        # print(f"task_index {task_index}, server_index {server_index}")
 
         # return task_index, server_index ## was
         return torch.tensor([[task_index, server_index]])
