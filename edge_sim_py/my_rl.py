@@ -191,9 +191,11 @@ LR = 1e-4
 
 # Get number of actions from gym action space
 n_actions = env.action_space.n
+print(f"n_actions:{n_actions}")
 # Get the number of state observations
 state, info = env.reset()
 n_observations = len(state)
+print(f"n_observations:{n_observations}")
 
 policy_net = DQN(n_observations, n_actions).to(device)
 target_net = DQN(n_observations, n_actions).to(device)
@@ -218,6 +220,7 @@ def select_action(state):
             # second column on max result is index of where max element was
             # found, so we pick action with the larger expected reward.
             # print(f"policy_net->state:{policy_net(state).max(1).indices.view(1, 1)}")
+            print(f"policy_net(state).max(1).indices.view(1, 1):{policy_net(state).max(1).indices.view(1, 1)}")
             return policy_net(state).max(1).indices.view(1, 1)
     else:
         # print(f"random->state:"
@@ -344,8 +347,12 @@ for i_episode in range(num_episodes):
     state, info = env.reset()
     state = torch.tensor(state, dtype=torch.float32, device=device).unsqueeze(0)
     for t in count():
+        print(f"state: {state}")
         action = select_action(state)
+        print(f"action: {action}")
         observation, reward, terminated, truncated, _ = env.step(action.item())
+        print(f"observation==next_state: {observation}")
+        print()
         reward = torch.tensor([reward], device=device)
         done = terminated or truncated
 

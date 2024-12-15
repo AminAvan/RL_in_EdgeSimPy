@@ -500,7 +500,7 @@ def my_rl_in_edgesimpy(parameters):
     steps_done = 0
 
     def select_action(state):
-        print(f"select_action(state):{state}")
+        # print(f"select_action(state):{state}")
         nonlocal steps_done
         sample = random.random()
         eps_threshold = EPS_END + (EPS_START - EPS_END) * \
@@ -520,6 +520,8 @@ def my_rl_in_edgesimpy(parameters):
         servers_range_indices = list(range(1, len(EdgeServer.all()) + 1))
         # print(f"servers_range_indices:{servers_range_indices}, and {servers_range_indices[0]}")
 
+        output = policy_net(state)
+
         if not unassigned_services_indices:
             raise ValueError("No unassigned tasks available for selection.")
 
@@ -528,8 +530,10 @@ def my_rl_in_edgesimpy(parameters):
                 # Exploitation: Choose the best action based on policy_net
                 # Restricting to unassigned tasks is not necessary for exploitation
                 # print(f"policy_net(state).max(1).indices.view(1, 1):{policy_net(state).max(1).indices.view(1, 1)}")
-                # print(f"select_action(state)->policy_net(state):{policy_net(state).max(1).indices.view(1, 1)}")
-                return policy_net(state).max(1).indices.view(1, 1)
+                # print(
+                #     f"policy_net(state).max(1).indices.view(1, 1).item():{policy_net(state).max(1).indices.view(1, 1).item()}")
+                # return policy_net(state).max(1).indices.view(1, 1) ## was
+                return map_action_to_task_server(policy_net(state).max(1).indices.view(1, 1).item())
         else:
             # Exploration: Randomly select from unassigned tasks
             # random_action_idx = random.choice(unassigned_services_indices)
@@ -656,41 +660,43 @@ def my_rl_in_edgesimpy(parameters):
 
     ## according to the update/modification that I did in 'def select_action(state)',
     # it seems there is no need to use this function anymore
-    # def map_action_to_task_server(action):
-    #     # print(f"action was {action}")
-    #
-    #     """
-    #     Maps an action index to a task and server.
-    #
-    #     Args:
-    #         action (int): The action index.
-    #         total_num_tasks (int): Total number of tasks.
-    #         total_num_servers (int): Total number of servers.
-    #
-    #     Returns:
-    #         (int, int): A tuple of (task_index, server_index).
-    #     """
-    #
-    #     translated_action = action + 1
-    #     # print(f"translated_action:{translated_action}")
-    #
-    #     total_num_tasks = len(Service.all())
-    #     # print(f"total_num_tasks:{total_num_tasks}")
-    #     total_num_servers = len(EdgeServer.all())
-    #     # print(f"total_num_servers:{total_num_servers}")
-    #
-    #     # Determine the task and server indices
-    #     task_index = ((translated_action - 1) // total_num_servers + 1) ## the task(service) 0 represents the first service which its ID is '1'
-    #     # print(f"task_index:{task_index}")
-    #     server_index = ((translated_action - 1) % total_num_servers + 1) ## (action % total_num_servers) + 1 ## the server 0 represents the first server which its ID is '1'
-    #     # print(f"server_index:{server_index}")
-    #
-    #     # Validate indices
-    #     if task_index > total_num_tasks:
-    #         raise ValueError("Action index out of bounds for the given number of tasks and servers.")
-    #
-    #     # print(f"task_index {task_index}, server_index {server_index}")
-    #     return task_index, server_index
+    def map_action_to_task_server(action):
+        # print(f"action was {action}")
+
+        """
+        Maps an action index to a task and server.
+
+        Args:
+            action (int): The action index.
+            total_num_tasks (int): Total number of tasks.
+            total_num_servers (int): Total number of servers.
+
+        Returns:
+            (int, int): A tuple of (task_index, server_index).
+        """
+
+        translated_action = action + 1
+        # print(f"translated_action:{translated_action}")
+
+        total_num_tasks = len(Service.all())
+        # print(f"total_num_tasks:{total_num_tasks}")
+        total_num_servers = len(EdgeServer.all())
+        # print(f"total_num_servers:{total_num_servers}")
+
+        # Determine the task and server indices
+        task_index = ((translated_action - 1) // total_num_servers + 1) ## the task(service) 0 represents the first service which its ID is '1'
+        # print(f"task_index:{task_index}")
+        server_index = ((translated_action - 1) % total_num_servers + 1) ## (action % total_num_servers) + 1 ## the server 0 represents the first server which its ID is '1'
+        # print(f"server_index:{server_index}")
+
+        # Validate indices
+        if task_index > total_num_tasks:
+            raise ValueError("Action index out of bounds for the given number of tasks and servers.")
+
+        print(f"task_index {task_index}, server_index {server_index}")
+
+        # return task_index, server_index ## was
+        return torch.tensor([[task_index, server_index]])
 
     """
     Based on my understanding, it would be better to consider the state = [service, server], where the range of
@@ -726,7 +732,7 @@ def my_rl_in_edgesimpy(parameters):
     # n_observations = len(state) ## was working fine
 
     ## number of observation is equal to the number of action that can be taken!?
-    n_observations = (len(Service.all())*len(EdgeServer.all()))
+    n_observations = len(state)
 
     policy_net = DQN(n_observations, n_actions).to(device)
     target_net = DQN(n_observations, n_actions).to(device)
@@ -740,7 +746,7 @@ def my_rl_in_edgesimpy(parameters):
     episode_crtc_allc_services = []
 
     def is_service_allocated_before(wanted_to_go_state):
-        print(f"is_service_allocated_before->state:{wanted_to_go_state}")
+        # print(f"is_service_allocated_before->state:{wanted_to_go_state}")
         """
         Check the state to see if the selected_service is chosen before and is in its procedure of allocation or not
 
@@ -757,10 +763,10 @@ def my_rl_in_edgesimpy(parameters):
             for service in Service.all()
         ]
 
-        if (unassigned_services_indices[wanted_to_go_state[0]] == 1):
+        if (unassigned_services_indices[(wanted_to_go_state[0]-1)] == 1):
             # print(f"unassigned_services_indices[wanted_to_go_state[0]]:{unassigned_services_indices[wanted_to_go_state[0]]}")
             return True
-        elif (unassigned_services_indices[wanted_to_go_state[0]] == 0):
+        elif (unassigned_services_indices[(wanted_to_go_state[0]-1)] == 0):
             # print(f"unassigned_services_indices[wanted_to_go_state[0]]:{unassigned_services_indices[wanted_to_go_state[0]]}")
             return False
         else:
@@ -1036,8 +1042,9 @@ def my_rl_in_edgesimpy(parameters):
         for t in count():
             action = select_action(state)
             # rl_task, rl_server = map_action_to_task_server(action.item()) ## amin was work fine
+            # print(f"Action {action}")
             rl_task, rl_server = action[0][0].item(), action[0][1].item()
-            print(f"Action {action} corresponds to Task {rl_task} and Server {rl_server}.") ## amin
+            # print(f"Action {action} corresponds to Task {rl_task} and Server {rl_server}.") ## amin
 
             rl_selected_service = next((s for s in Service._instances if s.id == (rl_task)), None) ## amin
             # rl_selected_application = next((s for s in Application._instances if s.id == (rl_task)), None)  ## amin
@@ -1048,8 +1055,8 @@ def my_rl_in_edgesimpy(parameters):
             rl_selected_user = next((user for user in User._instances if rl_selected_application in user.applications), None)
             rl_selected_server = next((s for s in EdgeServer._instances if s.id == (rl_server)), None)  ## amin
 
-            print(f"rl_selected_service:{rl_selected_service}\trl_selected_application:{rl_selected_application}\t"
-                  f"rl_selected_user:{rl_selected_user}\trl_selected_server:{rl_selected_server}")
+            # print(f"rl_selected_service:{rl_selected_service}\trl_selected_application:{rl_selected_application}\t"
+            #       f"rl_selected_user:{rl_selected_user}\trl_selected_server:{rl_selected_server}")
 
             # print(f"cpu U of {rl_selected_server}: {rl_selected_server.total_cpu_utilization}")
             # print(f"memory U of {rl_selected_server}: {rl_selected_server.total_memory_utilization}")
@@ -1065,6 +1072,7 @@ def my_rl_in_edgesimpy(parameters):
             ### was working fine
             # if not is_service_allocated_before(state.squeeze(0).tolist(), rl_selected_service.id):
             if not is_service_allocated_before(action.squeeze(0).tolist()):
+                # print(f"action.squeeze(0).tolist():{action.squeeze(0).tolist()}")
                 avoid_redundant_service = 1
                 # print(f"avoid_redundant_service = True")
                 if rl_selected_server.has_capacity_to_host(service=rl_selected_service):  ## amin
@@ -1114,22 +1122,25 @@ def my_rl_in_edgesimpy(parameters):
                     #################################################
                     if (response_time_for_service < list(rl_selected_user.delay_slas.values())[0]):
                         service_deadline_likely_met = 1
-                        # observation = update_state(state.squeeze(0).tolist(), rl_selected_service.id) ## was
+                        # observation = update_state(state.squeeze(0).tolist(), rl_selected_service.id) ## was was
                         num_likely_MEET_deadline += 1
-                        observation = update_state(state.squeeze(0).tolist(), action.item())
+                        # observation = update_state(state.squeeze(0).tolist(), action.item()) ## was
+                        observation = action.squeeze(0).tolist()
                     else:
                         service_deadline_likely_met = -1
                         response_time_for_service = -1
                         num_likely_missed_deadline += 1
                         service_criticality_level = get_service_criticality_level(list(rl_selected_user.delay_slas.values())[0])
-                        observation = update_state(state.squeeze(0).tolist(), action.item())
+                        # observation = update_state(state.squeeze(0).tolist(), action.item()) ## was
+                        observation = action.squeeze(0).tolist()
                 else:
                     server_poses_capacity = -1
                     # service_deadline_likely_met = False
                     response_time_for_service = -1
                     num_likely_missed_deadline += 1
                     service_criticality_level = get_service_criticality_level(list(rl_selected_user.delay_slas.values())[0])
-                    observation = update_state(state.squeeze(0).tolist(), action.item())
+                    # observation = update_state(state.squeeze(0).tolist(), action.item()) ## was
+                    observation = action.squeeze(0).tolist()
 
                 # print(f"can host but service {rl_selected_service} is NOT the earliest service")  ## amin
             else:
@@ -1140,20 +1151,21 @@ def my_rl_in_edgesimpy(parameters):
                 response_time_for_service = -1
                 num_likely_missed_deadline += 1
                 service_criticality_level = get_service_criticality_level(list(rl_selected_user.delay_slas.values())[0])
-                observation = update_state(state.squeeze(0).tolist(), action.item())
+                # observation = update_state(state.squeeze(0).tolist(), action.item()) was
+                observation = action.squeeze(0).tolist()
 
             # print(f"observation: {sum(1 for item in observation if item == 1)}")
             # print(f"next step: {sum(1 for item in sum(observation) if item == 1)}")
             ##################################
             ## calculating the reward
 
-            # Check if observation is not None or empty
-            if observation is not None and len(observation) > 0:
-                # Count how many ones are in the list
-                count_ones = observation.count(1.0)  # List method for counting
-            else:
-                # Handle the case where observation is None or empty
-                count_ones = 0  # Or any other default behavior you want to implement
+            # # Check if observation is not None or empty
+            # if observation is not None and len(observation) > 0:
+            #     # Count how many ones are in the list
+            #     count_ones = observation.count(1.0)  # List method for counting
+            # else:
+            #     # Handle the case where observation is None or empty
+            #     # count_ones = 0  # Or any other default behavior you want to implement
 
             reward = compute_reward(avoid_redundant_service, server_poses_capacity, service_deadline_likely_met, rl_selected_server.total_cpu_utilization,
                            rl_selected_server.total_memory_utilization, service_criticality_level, response_time_for_service, num_likely_MEET_deadline, num_likely_missed_deadline)
