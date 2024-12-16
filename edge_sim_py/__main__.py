@@ -1315,12 +1315,11 @@ def my_rl_in_edgesimpy(parameters):
 
         # Check for convergence
         if len(total_allocations_records) >= sliding_window:
-            avg_reward = sum(total_rewards[-sliding_window:]) / sliding_window  # Compute average reward
+            avg_reward = sum(total_allocations_records[-sliding_window:]) / sliding_window  # Compute average reward
             average_value_for_allocation.append(avg_reward)
 
             # Ensures the agent's performance exceeds the threshold, varying by less than 0.02% of the optimal value.
-            if (average_value_for_allocation >= objective_value_threshold) and len(
-                    average_value_for_allocation) > 1:
+            if (avg_reward >= objective_value_threshold) and len(average_value_for_allocation) > 1:
                 # Checks that the agent's performance is stable and not fluctuating around the threshold.
                 if abs(average_value_for_allocation[-1] - average_value_for_allocation[-2]) < 1e-3:
                     print(f"Policy converged after {i_episode} episodes.")
