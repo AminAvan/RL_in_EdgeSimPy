@@ -497,6 +497,19 @@ def my_rl_in_edgesimpy(parameters):
     # Override 'has_capacity_to_host' for all instances of the EdgeServer class
     EdgeServer.has_capacity_to_host = has_capacity_to_host_proposed
 
+    """
+    Convergence threshold is considered if the objective value (i.e., correct services allocation by scheduler in edge computing)
+        exceeds less than 0.02% of the optimal value [2].
+    
+    [2]: Yu, Ming, et al. "Convergent policy optimization for safe reinforcement learning." Advances in Neural Information Processing Systems 32 (2019).
+    """
+    sliding_window = 100
+    objective_value_threshold = (0.98 * len(Service.all()))
+    average_value_for_allocation, total_allocations_records = [], []
+
+
+    num_completely_scheduled = 0
+
     steps_done = 0
 
     def select_action(state):
@@ -1175,8 +1188,13 @@ def my_rl_in_edgesimpy(parameters):
 
             reward = torch.tensor([reward], device=device)
 
+            total_allocations_records.append(num_likely_MEET_deadline)
+
+
+
             if num_likely_MEET_deadline == len(Service.all()):
                 terminated = True
+                num_completely_scheduled += 1
             else:
                 terminated = False
 
@@ -1294,6 +1312,19 @@ def my_rl_in_edgesimpy(parameters):
                 if (i_episode > 0) and (i_episode % 50 == 0):
                     plot_durations()
                 break
+
+        # Check for convergence
+        if len(total_allocations_records) >= sliding_window:
+            avg_reward = sum(total_rewards[-sliding_window:]) / sliding_window  # Compute average reward
+            average_value_for_allocation.append(avg_reward)
+
+            # Ensures the agent's performance exceeds the threshold, varying by less than 0.02% of the optimal value.
+            if (average_value_for_allocation >= objective_value_threshold) and len(
+                    average_value_for_allocation) > 1:
+                # Checks that the agent's performance is stable and not fluctuating around the threshold.
+                if abs(average_value_for_allocation[-1] - average_value_for_allocation[-2]) < 1e-3:
+                    print(f"Policy converged after {i_episode} episodes.")
+                    break
 
     print('Complete')
     plot_durations(show_result=True)
