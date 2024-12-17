@@ -1188,9 +1188,6 @@ def my_rl_in_edgesimpy(parameters):
 
             reward = torch.tensor([reward], device=device)
 
-            total_allocations_records.append(num_likely_MEET_deadline)
-
-
 
             if num_likely_MEET_deadline == len(Service.all()):
                 terminated = True
@@ -1237,6 +1234,7 @@ def my_rl_in_edgesimpy(parameters):
             if terminated or truncated:
             # if terminated:
                 done = True
+                total_allocations_records.append(num_likely_MEET_deadline)
             else:
                 done = False
 
@@ -1281,7 +1279,7 @@ def my_rl_in_edgesimpy(parameters):
                 print(f"episode_duration: {episode_durations[-1]}, and total rewards: {total_rewards}")
                 if episode_durations:
                     average_duration = sum(episode_durations) / len(episode_durations)
-                    print(f"Average duration is: {average_duration}")
+                    # print(f"Average duration is: {average_duration}")
 
                 if next_state is not None:
                     count_ones = torch.sum(next_state == 1).item()
@@ -1313,10 +1311,16 @@ def my_rl_in_edgesimpy(parameters):
                     plot_durations()
                 break
 
+        print(f"len(total_allocations_records): {len(total_allocations_records)}")
+        print(f"sliding_window: {sliding_window}")
         # Check for convergence
         if len(total_allocations_records) >= sliding_window:
             avg_reward = sum(total_allocations_records[-sliding_window:]) / sliding_window  # Compute average reward
             average_value_for_allocation.append(avg_reward)
+
+            print(f"avg_reward: {avg_reward}")
+            print(f"average_value_for_allocation.append(avg_reward): {average_value_for_allocation[-1]}")
+            print(f"objective_value_threshold: {objective_value_threshold}")
 
             # Ensures the agent's performance exceeds the threshold, varying by less than 0.02% of the optimal value.
             if (avg_reward >= objective_value_threshold) and len(average_value_for_allocation) > 1:
@@ -1324,6 +1328,7 @@ def my_rl_in_edgesimpy(parameters):
                 if abs(average_value_for_allocation[-1] - average_value_for_allocation[-2]) < 1e-3:
                     print(f"Policy converged after {i_episode} episodes.")
                     break
+        print(f"=========================")
 
     print('Complete')
     plot_durations(show_result=True)
