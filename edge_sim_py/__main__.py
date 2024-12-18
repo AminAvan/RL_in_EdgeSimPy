@@ -1293,8 +1293,8 @@ def my_rl_in_edgesimpy(parameters):
                     # print(f"Average allocation {round((average_episode_allocated_service/len(Service.all())),2)*100}% in {len(episode_allocated_service)} episodes")
                 if episode_crtc_allc_services:
                     average_episode_crtc_allc_services = sum(episode_crtc_allc_services) / len(episode_crtc_allc_services)
-                    print(
-                        f"Average of CORRECT allocated services is {round(average_episode_crtc_allc_services, 1)} in {len(episode_allocated_service)} episodes")
+                    # print(
+                    #     f"Average of CORRECT allocated services is {round(average_episode_crtc_allc_services, 1)} in {len(episode_allocated_service)} episodes")
                     print(
                         f"Average CORRECT allocation {round((average_episode_crtc_allc_services / len(Service.all())), 2) * 100}% in {len(episode_allocated_service)} episodes")
                 # Count the total number of elements equal to 1
