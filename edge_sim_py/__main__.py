@@ -954,10 +954,15 @@ def my_rl_in_edgesimpy(parameters):
         plt.plot(allocated_t.numpy(), label='Allocated Services')
 
         # Plot the moving average if there are enough episodes
-        if len(allocated_t) >= 100:
-            means = allocated_t.unfold(0, 100, 1).mean(1).view(-1)
-            means = torch.cat((torch.zeros(99), means))
-            plt.plot(means.numpy(), label='100-Episode Average')
+        # if len(allocated_t) >= 100:
+        #     means = allocated_t.unfold(0, 100, 1).mean(1).view(-1)
+        #     means = torch.cat((torch.zeros(99), means))
+        #     plt.plot(means.numpy(), label='100-Episode Average')
+        if len(allocated_t) > 0:
+            mean_all = allocated_t.mean().item()  # Calculate the mean of all elements in allocated_t
+            means = torch.full((len(allocated_t),),
+                               mean_all)  # Create a tensor of the same length, filled with the mean value
+            plt.plot(means.numpy(), label='Overall Average')  # Plot the overall average
 
         # Add legend for clarity
         plt.legend()
