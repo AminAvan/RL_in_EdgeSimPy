@@ -1328,8 +1328,9 @@ def my_rl_in_edgesimpy(parameters):
                 # Checks that the agent's performance is stable and not fluctuating around the threshold.
                 if abs(average_value_for_allocation[-1] - average_value_for_allocation[-2]) < 1e-3:
                     print(f"Policy converged after {i_episode} episodes.")
+                    print(f"=========================")
                     break
-        print(f"=========================")
+
 
     print('Complete')
     plot_durations(show_result=True)
