@@ -1301,9 +1301,10 @@ def my_rl_in_edgesimpy(parameters):
                 # Print the result
                 # print(f"num_likely_missed_deadline: {num_likely_missed_deadline}")
 
-                print(f"Total number services are allocated: {count_ones}")
+                # print(f"Total number services are allocated: {count_ones}")
                 print(f"Total number services are CORRECTED allocated: {num_likely_MEET_deadline}")
                 print(f"num_likely_missed_deadline:{num_likely_missed_deadline}")
+                print(f"objective_value_threshold: {objective_value_threshold}")
                 # print(f"reward_is_zero:{reward_is_zero}")
                 last_num_of_allocated_services = count_ones
                 print(f"========================================")
@@ -1311,16 +1312,16 @@ def my_rl_in_edgesimpy(parameters):
                     plot_durations()
                 break
 
-        print(f"len(total_allocations_records): {len(total_allocations_records)}")
-        print(f"sliding_window: {sliding_window}")
+        # print(f"len(total_allocations_records): {len(total_allocations_records)}")
+        # print(f"sliding_window: {sliding_window}")
         # Check for convergence
         if len(total_allocations_records) >= sliding_window:
             avg_reward = sum(total_allocations_records[-sliding_window:]) / sliding_window  # Compute average reward
             average_value_for_allocation.append(avg_reward)
 
-            print(f"avg_reward: {avg_reward}")
-            print(f"average_value_for_allocation.append(avg_reward): {average_value_for_allocation[-1]}")
-            print(f"objective_value_threshold: {objective_value_threshold}")
+            # print(f"avg_reward: {avg_reward}")
+            # print(f"average_value_for_allocation.append(avg_reward): {average_value_for_allocation[-1]}")
+            # print(f"objective_value_threshold: {objective_value_threshold}")
 
             # Ensures the agent's performance exceeds the threshold, varying by less than 0.02% of the optimal value.
             if (avg_reward >= objective_value_threshold) and len(average_value_for_allocation) > 1:
