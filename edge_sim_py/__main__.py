@@ -1276,7 +1276,6 @@ def my_rl_in_edgesimpy(parameters):
             # print()
             if done:
                 episode_durations.append(t + 1)
-                print(f"episode_duration: {episode_durations[-1]}, and total rewards: {total_rewards}")
                 if episode_durations:
                     average_duration = sum(episode_durations) / len(episode_durations)
                     # print(f"Average duration is: {average_duration}")
@@ -1287,6 +1286,10 @@ def my_rl_in_edgesimpy(parameters):
                     count_ones = len(Service.all())  # Handle the case where next_state is None
                 episode_allocated_service.append(count_ones)
                 episode_crtc_allc_services.append(num_likely_MEET_deadline)
+
+                print(
+                    f"Episode {len(episode_allocated_service)} with duration: {episode_durations[-1]}, and total rewards: {total_rewards}")
+
                 # if episode_allocated_service:
                 #     average_episode_allocated_service = sum(episode_allocated_service) / len(episode_allocated_service)
                 #     print(f"Average of allocated services is {round(average_episode_allocated_service,1) } in {len(episode_allocated_service)} episodes")
@@ -1303,7 +1306,7 @@ def my_rl_in_edgesimpy(parameters):
 
                 # print(f"Total number services are allocated: {count_ones}")
                 print(f"Total number services are CORRECTED allocated: {num_likely_MEET_deadline}")
-                print(f"num_likely_missed_deadline:{num_likely_missed_deadline}")
+                print(f"Number of services that are missed their deadline:{num_likely_missed_deadline}")
                 print(f"objective_value_threshold: {objective_value_threshold}")
                 # print(f"reward_is_zero:{reward_is_zero}")
                 last_num_of_allocated_services = count_ones
