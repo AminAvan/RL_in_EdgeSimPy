@@ -948,7 +948,7 @@ def my_rl_in_edgesimpy(parameters):
         # Set plot title and labels
         plt.title('Result' if show_result else 'Training...')
         plt.xlabel('Episode')
-        plt.ylabel('Allocated Services')
+        plt.ylabel('Hit-ratio')
 
         # Plot the allocated services
         plt.plot(allocated_t.numpy(), label='Allocated Services')
