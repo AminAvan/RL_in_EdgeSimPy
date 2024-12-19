@@ -1175,7 +1175,6 @@ def my_rl_in_edgesimpy(parameters):
 
             reward = torch.tensor([reward], device=device)
 
-
             if num_likely_MEET_deadline == len(Service.all()):
                 terminated = True
                 num_completely_scheduled += 1
@@ -1186,7 +1185,6 @@ def my_rl_in_edgesimpy(parameters):
                 truncated = True
             else:
                 truncated = False
-
 
             if terminated or truncated:
                 done = True
@@ -1223,7 +1221,6 @@ def my_rl_in_edgesimpy(parameters):
             for key in policy_net_state_dict:
                 target_net_state_dict[key] = policy_net_state_dict[key] * TAU + target_net_state_dict[key] * (1 - TAU)
             target_net.load_state_dict(target_net_state_dict)
-
 
             if done:
                 episode_durations.append(t + 1)
