@@ -939,12 +939,12 @@ def my_rl_in_edgesimpy(parameters):
     def plot_durations(show_result=False):
         plt.figure(1)  # Work on figure #1
 
-        allocated_t = torch.tensor(episode_crtc_allc_services, dtype=torch.float)
+        allocated_t = torch.tensor((episode_crtc_allc_services/len(Service.all())*100), dtype=torch.float)
         plt.title('Result' if show_result else 'Training...')
         plt.xlabel('Episode')
         plt.ylabel('Hit-ratio')
 
-        plt.plot(allocated_t.numpy(), label='Allocated Services')
+        plt.plot(allocated_t.numpy(), label='Hit-ratio (%)')
 
         if len(allocated_t) > 10:
             means = allocated_t.unfold(0, 10, 1).mean(1).view(-1)
