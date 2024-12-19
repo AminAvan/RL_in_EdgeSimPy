@@ -1065,7 +1065,7 @@ def my_rl_in_edgesimpy(parameters):
             # for server in EdgeServer.all():
             #     print(f"in loop - server: {server.total_cpu_utilization}")
             # print(f"service {rl_selected_service}, {rl_selected_application}, {rl_selected_user}, {rl_selected_server}")  ## amin
-            ### was working fine
+
             # if not is_service_allocated_before(state.squeeze(0).tolist(), rl_selected_service.id):
             if not is_service_allocated_before(action.squeeze(0).tolist()):
                 # print(f"action.squeeze(0).tolist():{action.squeeze(0).tolist()}")
