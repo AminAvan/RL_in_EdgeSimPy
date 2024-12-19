@@ -1003,6 +1003,9 @@ def my_rl_in_edgesimpy(parameters):
     else:
         num_episodes = 500
 
+    ### Measuring the power and memory usages
+    process = psutil.Process(os.getpid())
+
     num_step_in_last_time_completion = 0
     last_num_of_allocated_services = 0
     for i_episode in range(num_episodes):
@@ -1150,10 +1153,6 @@ def my_rl_in_edgesimpy(parameters):
                 # observation = update_state(state.squeeze(0).tolist(), action.item()) was
                 observation = action.squeeze(0).tolist()
 
-            ### Measuring memory & power usages of normal-RL
-            process = psutil.Process(os.getpid())
-            resource_tracker.update(process.memory_info().rss)
-
             # print(f"observation: {sum(1 for item in observation if item == 1)}")
             # print(f"next step: {sum(1 for item in sum(observation) if item == 1)}")
             ##################################
@@ -1189,6 +1188,8 @@ def my_rl_in_edgesimpy(parameters):
             if terminated or truncated:
                 done = True
                 total_allocations_records.append(num_likely_MEET_deadline)
+                ### Measuring memory & power usages of normal-RL
+                resource_tracker.update(process.memory_info().rss)
             else:
                 done = False
 
