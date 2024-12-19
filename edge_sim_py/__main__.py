@@ -1250,14 +1250,14 @@ def my_rl_in_edgesimpy(parameters):
                     # print(
                     #     f"Average of CORRECT allocated services is {round(average_episode_crtc_allc_services, 1)} in {len(episode_allocated_service)} episodes")
                     print(
-                        f"Average CORRECT allocation {round((average_episode_crtc_allc_services / len(Service.all())), 2) * 100}% in {len(episode_allocated_service)} episodes")
+                        f"\tAverage CORRECT allocation {round((average_episode_crtc_allc_services / len(Service.all())), 2) * 100}% in {len(episode_allocated_service)} episodes")
                 # Count the total number of elements equal to 1
                 # Print the result
 
                 # print(f"Total number services are allocated: {count_ones}")
-                print(f"Total number services are CORRECTED allocated: {num_likely_MEET_deadline}")
-                print(f"Number of services that are missed their deadline:{num_likely_missed_deadline}")
-                print(f"objective_value_threshold: {objective_value_threshold}")
+                print(f"\tTotal number services are CORRECTED allocated: {num_likely_MEET_deadline}")
+                print(f"\tNumber of services that are missed their deadline:{num_likely_missed_deadline}")
+                print(f"\tObjective_value_threshold: {objective_value_threshold}")
                 # print(f"reward_is_zero:{reward_is_zero}")
                 last_num_of_allocated_services = count_ones
 
