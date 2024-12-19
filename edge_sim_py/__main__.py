@@ -1249,7 +1249,6 @@ def my_rl_in_edgesimpy(parameters):
                         f"Average CORRECT allocation {round((average_episode_crtc_allc_services / len(Service.all())), 2) * 100}% in {len(episode_allocated_service)} episodes")
                 # Count the total number of elements equal to 1
                 # Print the result
-                # print(f"num_likely_missed_deadline: {num_likely_missed_deadline}")
 
                 # print(f"Total number services are allocated: {count_ones}")
                 print(f"Total number services are CORRECTED allocated: {num_likely_MEET_deadline}")
@@ -1257,13 +1256,15 @@ def my_rl_in_edgesimpy(parameters):
                 print(f"objective_value_threshold: {objective_value_threshold}")
                 # print(f"reward_is_zero:{reward_is_zero}")
                 last_num_of_allocated_services = count_ones
+
+                ### Measuring memory & power usages of normal-RL
+                process = psutil.Process(os.getpid())
+                resource_tracker.update(process.memory_info().rss)
                 print(f"========================================")
                 if (i_episode > 0) and (i_episode % 50 == 0):
                     plot_durations()
                 break
 
-        # print(f"len(total_allocations_records): {len(total_allocations_records)}")
-        # print(f"sliding_window: {sliding_window}")
         # Check for convergence
         if len(total_allocations_records) >= sliding_window:
             avg_reward = sum(total_allocations_records[-sliding_window:]) / sliding_window  # Compute average reward
