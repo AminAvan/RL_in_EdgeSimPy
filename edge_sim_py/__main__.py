@@ -1191,25 +1191,6 @@ def my_rl_in_edgesimpy(parameters):
             # else:
             #     truncated = False
 
-            """
-            Key Considerations for Real-Time Applications
-            1. Deadline for Task Completion
-                Each task must be scheduled within a strict timeframe.
-                Since there are 262 tasks to schedule, set STEPS_PER_EPISODE to match the number of tasks.
-                    STEPS_PER_EPISODE = 262  # One step per task, no retries allowed
-
-            2. Exploration vs. Exploitation
-                For real-time applications, the agent must shift quickly from exploration to exploitation
-                to ensure tasks are scheduled efficiently.
-                Decay epsilon (exploration rate) over approximately 3 episodes:
-                    EPS_DECAY = STEPS_PER_EPISODE * 3  # Decay exploration over 3 episodes
-
-            3. Minimize Retries
-                Retries should be avoided as they delay task completion.
-                The agent must be designed to focus on allocating each task once during each episode.
-                    This is naturally enforced by setting STEPS_PER_EPISODE = 262.
-            """
-
             # EPS_DECAY = 4*262  # Quick transition from exploration to exploitation
             # EPS_DECAY = 262*262  # Quick transition from exploration to exploitation
             # STEPS_PER_EPISODE = 262  # Equal to the number of tasks (minimal retries)
