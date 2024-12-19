@@ -1196,7 +1196,6 @@ def my_rl_in_edgesimpy(parameters):
             # STEPS_PER_EPISODE = 262  # Equal to the number of tasks (minimal retries)
 
             if terminated or truncated:
-            # if terminated:
                 done = True
                 total_allocations_records.append(num_likely_MEET_deadline)
             else:
