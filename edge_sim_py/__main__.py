@@ -1150,6 +1150,10 @@ def my_rl_in_edgesimpy(parameters):
                 # observation = update_state(state.squeeze(0).tolist(), action.item()) was
                 observation = action.squeeze(0).tolist()
 
+            ### Measuring memory & power usages of normal-RL
+            process = psutil.Process(os.getpid())
+            resource_tracker.update(process.memory_info().rss)
+
             # print(f"observation: {sum(1 for item in observation if item == 1)}")
             # print(f"next step: {sum(1 for item in sum(observation) if item == 1)}")
             ##################################
@@ -1257,9 +1261,8 @@ def my_rl_in_edgesimpy(parameters):
                 # print(f"reward_is_zero:{reward_is_zero}")
                 last_num_of_allocated_services = count_ones
 
-                ### Measuring memory & power usages of normal-RL
-                process = psutil.Process(os.getpid())
-                resource_tracker.update(process.memory_info().rss)
+                ### Reporting the measured memory & power usages of normal-RL
+                resource_tracker.report()
                 print(f"========================================")
                 if (i_episode > 0) and (i_episode % 50 == 0):
                     plot_durations()
