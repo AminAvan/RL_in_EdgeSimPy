@@ -558,12 +558,12 @@ def my_rl_in_edgesimpy(parameters):
 
     # env = gym.make("CartPole-v1")
 
-    # set up matplotlib
-    is_ipython = 'inline' in matplotlib.get_backend()
-    if is_ipython:
-        from IPython import display
-
-    plt.ion()
+    ## leads to two figures: one completely blank and otherone actual
+    # # set up matplotlib
+    # is_ipython = 'inline' in matplotlib.get_backend()
+    # if is_ipython:
+    #     from IPython import display
+    # plt.ion()
 
     # if GPU is to be used
     device = torch.device(
@@ -936,49 +936,23 @@ def my_rl_in_edgesimpy(parameters):
         # print(f"reward:{reward}")
         return reward
 
-
-    ## was working properly but create a blank page in each call
     def plot_durations(show_result=False):
-        # Get the current figure or create a new one
-        plt.gcf().clear()  # Clear the current figure to prevent overlaps
+        plt.figure(1)  # Work on figure #1
 
-        # Convert data to tensors for plotting
-        # durations_t = torch.tensor(episode_durations, dtype=torch.float)
-        # allocated_t = torch.tensor(episode_allocated_service, dtype=torch.float)
         allocated_t = torch.tensor(episode_crtc_allc_services, dtype=torch.float)
-
-        # Set plot title and labels
         plt.title('Result' if show_result else 'Training...')
         plt.xlabel('Episode')
         plt.ylabel('Hit-ratio')
 
-        # Plot the allocated services
         plt.plot(allocated_t.numpy(), label='Allocated Services')
 
-        # Plot the moving average if there are enough episodes
-        # if len(allocated_t) >= 100:
-        #     means = allocated_t.unfold(0, 100, 1).mean(1).view(-1)
-        #     means = torch.cat((torch.zeros(99), means))
-        #     plt.plot(means.numpy(), label='100-Episode Average')
-
-        ### Plot the moving average if there are enough episodes
         if len(allocated_t) > 10:
             means = allocated_t.unfold(0, 10, 1).mean(1).view(-1)
             means = torch.cat((torch.zeros(9), means))
             plt.plot(means.numpy(), label='10-Episode Average')
 
-
-        # Add legend for clarity
         plt.legend()
-
-        # Pause to update the plot
-        plt.pause(0.001)
-
-        # Use IPython display if applicable
-        if is_ipython:
-            display.clear_output(wait=True)
-            display.display(plt.gcf())
-
+        plt.pause(0.001)  # Update the figure
 
     def optimize_model():
         if len(rl_memory) < BATCH_SIZE:
