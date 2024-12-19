@@ -1178,22 +1178,11 @@ def my_rl_in_edgesimpy(parameters):
             else:
                 terminated = False
 
-            # ## 160 in avg
-            # if (num_likely_missed_deadline+num_likely_MEET_deadline) == (len(Service.all())*len(EdgeServer.all())):
             if ((num_likely_missed_deadline+num_likely_MEET_deadline) >= len(Service.all())):
                 truncated = True
             else:
                 truncated = False
 
-            # if t > (len(Service.all())*len(EdgeServer.all())):
-            # if t > len(Service.all()):
-            #     truncated = True
-            # else:
-            #     truncated = False
-
-            # EPS_DECAY = 4*262  # Quick transition from exploration to exploitation
-            # EPS_DECAY = 262*262  # Quick transition from exploration to exploitation
-            # STEPS_PER_EPISODE = 262  # Equal to the number of tasks (minimal retries)
 
             if terminated or truncated:
                 done = True
@@ -1207,10 +1196,6 @@ def my_rl_in_edgesimpy(parameters):
             else:
                 next_state = torch.tensor(observation, dtype=torch.float32, device=device).unsqueeze(0)
 
-            # log_state_transition(i_episode, t, state, action.item(), next_state, reward.item())
-
-            ############### UNTIL HERE WAS WORKED ##############
-
             # print(f"type(state): {type(state)}")
             # print(f"type(action): {type(action)}")
             # print(f"type(next_state): {type(next_state)}")
@@ -1220,7 +1205,6 @@ def my_rl_in_edgesimpy(parameters):
 
             # Store the transition in rl_memory
             rl_memory.push(state, action, next_state, reward)
-
 
             # Move to the next state
             state = next_state
@@ -1236,7 +1220,7 @@ def my_rl_in_edgesimpy(parameters):
                 target_net_state_dict[key] = policy_net_state_dict[key] * TAU + target_net_state_dict[key] * (1 - TAU)
             target_net.load_state_dict(target_net_state_dict)
 
-            # print()
+
             if done:
                 episode_durations.append(t + 1)
                 if episode_durations:
