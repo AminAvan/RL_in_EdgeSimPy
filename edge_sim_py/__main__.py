@@ -504,7 +504,8 @@ def my_rl_in_edgesimpy(parameters):
     [2]: Yu, Ming, et al. "Convergent policy optimization for safe reinforcement learning." Advances in Neural Information Processing Systems 32 (2019).
     """
     sliding_window = 100
-    objective_value_threshold = (0.98 * len(Service.all()))
+    # objective_value_threshold = (0.98 * len(Service.all()))  ## was for hit-ratio based on services
+    objective_value_threshold = (0.98 * len(User.all()))  ## is for hit-ratio based on services
     average_value_for_allocation, total_allocations_records = [], []
 
 
@@ -1201,7 +1202,8 @@ def my_rl_in_edgesimpy(parameters):
 
             if terminated or truncated:
                 done = True
-                total_allocations_records.append(num_likely_MEET_deadline)
+                # total_allocations_records.append(num_likely_MEET_deadline)
+                total_allocations_records.append((len(User.all()) - len(user_miss_deadline)))
                 ### Measuring memory & power usages of normal-RL
                 resource_tracker.update(process.memory_info().rss)
             else:
@@ -1283,17 +1285,35 @@ def my_rl_in_edgesimpy(parameters):
                     plot_durations()
                 break
 
-        # Check for convergence
-        if len(total_allocations_records) >= sliding_window:
-            avg_reward = sum(total_allocations_records[-sliding_window:]) / sliding_window  # Compute average reward
-            average_value_for_allocation.append(avg_reward)
+        # # Check for convergence by services
+        # if len(total_allocations_records) >= sliding_window:
+        #     avg_reward = sum(total_allocations_records[-sliding_window:]) / sliding_window  # Compute average reward
+        #     average_value_for_allocation.append(avg_reward)
+        #
+        #     # print(f"avg_reward: {avg_reward}")
+        #     # print(f"average_value_for_allocation.append(avg_reward): {average_value_for_allocation[-1]}")
+        #     # print(f"objective_value_threshold: {objective_value_threshold}")
+        #
+        #     # Ensures the agent's performance exceeds the threshold, varying by less than 0.02% of the optimal value.
+        #     if (avg_reward >= objective_value_threshold) and len(average_value_for_allocation) > 1:
+        #         # Checks that the agent's performance is stable and not fluctuating around the threshold.
+        #         if abs(average_value_for_allocation[-1] - average_value_for_allocation[-2]) < 1e-3:
+        #             print(f"Policy converged after {i_episode} episodes.")
+        #             print(f"=========================")
+        #             break
 
-            # print(f"avg_reward: {avg_reward}")
-            # print(f"average_value_for_allocation.append(avg_reward): {average_value_for_allocation[-1]}")
+        # Check for convergence by users
+        if len(total_allocations_records) >= sliding_window:
+            avg_hit_ratio = sum(
+                total_allocations_records[-sliding_window:]) / sliding_window  # Compute average reward
+            average_value_for_allocation.append(avg_hit_ratio)
+
+            # print(f"avg_hit_ratio: {avg_hit_ratio}")
+            # print(f"average_value_for_allocation.append(avg_hit_ratio): {average_value_for_allocation[-1]}")
             # print(f"objective_value_threshold: {objective_value_threshold}")
 
             # Ensures the agent's performance exceeds the threshold, varying by less than 0.02% of the optimal value.
-            if (avg_reward >= objective_value_threshold) and len(average_value_for_allocation) > 1:
+            if (avg_hit_ratio >= objective_value_threshold) and len(average_value_for_allocation) > 1:
                 # Checks that the agent's performance is stable and not fluctuating around the threshold.
                 if abs(average_value_for_allocation[-1] - average_value_for_allocation[-2]) < 1e-3:
                     print(f"Policy converged after {i_episode} episodes.")
