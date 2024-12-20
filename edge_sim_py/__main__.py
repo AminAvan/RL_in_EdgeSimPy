@@ -945,14 +945,14 @@ def my_rl_in_edgesimpy(parameters):
 
         plt.title('Result' if show_result else 'Training...')
         plt.xlabel('Episode')
-        plt.ylabel('Allocated services')
+        plt.ylabel('Hit-ratio (%)')
 
-        plt.plot(allocated_t.numpy(), label='Allocated services')
+        plt.plot(allocated_t.numpy(), label='1-episode hit-ratio')
 
         if len(allocated_t) > 10:
             means = allocated_t.unfold(0, 10, 1).mean(1).view(-1)
             means = torch.cat((torch.zeros(9), means))
-            plt.plot(means.numpy(), label='10-Episode Average')
+            plt.plot(means.numpy(), label='10-episode average')
 
         plt.legend()
         plt.pause(0.001)  # Update the figure
