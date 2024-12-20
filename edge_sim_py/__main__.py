@@ -757,6 +757,7 @@ def my_rl_in_edgesimpy(parameters):
     episode_durations = []
     episode_allocated_service = []
     episode_crtc_allc_services = []
+    episodes_user_miss_deadline = []  ## number of users that miss their deadline in each episode
 
     def is_service_allocated_before(wanted_to_go_state):
         # print(f"is_service_allocated_before->state:{wanted_to_go_state}")
@@ -939,7 +940,9 @@ def my_rl_in_edgesimpy(parameters):
     def plot_durations(show_result=False):
         plt.figure(1)  # Work on figure #1
 
-        allocated_t = torch.tensor(episode_crtc_allc_services, dtype=torch.float)
+        # allocated_t = torch.tensor(episode_crtc_allc_services, dtype=torch.float) ## was
+        allocated_t = torch.tensor(episodes_user_miss_deadline, dtype=torch.float)
+
         plt.title('Result' if show_result else 'Training...')
         plt.xlabel('Episode')
         plt.ylabel('Allocated services')
@@ -1131,7 +1134,9 @@ def my_rl_in_edgesimpy(parameters):
                         service_deadline_likely_met = -1
                         response_time_for_service = -1
                         num_likely_missed_deadline += 1
-                        print(f"user who lost deadline: {rl_selected_user}")
+                        # print(f"user who lost deadline: {rl_selected_user.id}, and type {type(rl_selected_user.id)}")
+                        if rl_selected_user.id not in user_miss_deadline:
+                            user_miss_deadline.append(rl_selected_user.id)
                         service_criticality_level = get_service_criticality_level(list(rl_selected_user.delay_slas.values())[0])
                         # observation = update_state(state.squeeze(0).tolist(), action.item()) ## was
                         observation = action.squeeze(0).tolist()
@@ -1140,7 +1145,9 @@ def my_rl_in_edgesimpy(parameters):
                     # service_deadline_likely_met = False
                     response_time_for_service = -1
                     num_likely_missed_deadline += 1
-                    print(f"user who lost deadline: {rl_selected_user}")
+                    # print(f"user who lost deadline: {rl_selected_user.id}, and type {type(rl_selected_user.id)}")
+                    if rl_selected_user.id not in user_miss_deadline:
+                        user_miss_deadline.append(rl_selected_user.id)
                     service_criticality_level = get_service_criticality_level(list(rl_selected_user.delay_slas.values())[0])
                     # observation = update_state(state.squeeze(0).tolist(), action.item()) ## was
                     observation = action.squeeze(0).tolist()
@@ -1153,7 +1160,9 @@ def my_rl_in_edgesimpy(parameters):
                 # service_deadline_likely_met = False
                 response_time_for_service = -1
                 num_likely_missed_deadline += 1
-                print(f"user who lost deadline: {rl_selected_user}")
+                # print(f"user who lost deadline: {rl_selected_user.id}, and type {type(rl_selected_user.id)}")
+                if rl_selected_user.id not in user_miss_deadline:
+                    user_miss_deadline.append(rl_selected_user.id)
                 service_criticality_level = get_service_criticality_level(list(rl_selected_user.delay_slas.values())[0])
                 # observation = update_state(state.squeeze(0).tolist(), action.item()) was
                 observation = action.squeeze(0).tolist()
@@ -1240,6 +1249,7 @@ def my_rl_in_edgesimpy(parameters):
                     count_ones = len(Service.all())  # Handle the case where next_state is None
                 episode_allocated_service.append(count_ones)
                 episode_crtc_allc_services.append(num_likely_MEET_deadline)
+                episodes_user_miss_deadline.append(((len(user_miss_deadline)/len(User.all()))*100))
 
                 print(
                     f"Episode {len(episode_allocated_service)} with duration: {episode_durations[-1]}, and total rewards: {total_rewards}")
@@ -1248,20 +1258,22 @@ def my_rl_in_edgesimpy(parameters):
                 #     average_episode_allocated_service = sum(episode_allocated_service) / len(episode_allocated_service)
                 #     print(f"Average of allocated services is {round(average_episode_allocated_service,1) } in {len(episode_allocated_service)} episodes")
                     # print(f"Average allocation {round((average_episode_allocated_service/len(Service.all())),2)*100}% in {len(episode_allocated_service)} episodes")
-                if episode_crtc_allc_services:
-                    average_episode_crtc_allc_services = sum(episode_crtc_allc_services) / len(episode_crtc_allc_services)
-                    # print(
-                    #     f"Average of CORRECT allocated services is {round(average_episode_crtc_allc_services, 1)} in {len(episode_allocated_service)} episodes")
-                    print(
-                        f"  Average CORRECT allocation {round((average_episode_crtc_allc_services / len(Service.all())), 2) * 100}% in {len(episode_allocated_service)} episodes")
-                # Count the total number of elements equal to 1
-                # Print the result
+                # if episode_crtc_allc_services:
+                #     average_episode_crtc_allc_services = sum(episode_crtc_allc_services) / len(episode_crtc_allc_services)
+                #     # print(
+                #     #     f"Average of CORRECT allocated services is {round(average_episode_crtc_allc_services, 1)} in {len(episode_allocated_service)} episodes")
+                #     print(
+                #         f"  Average CORRECT allocation {round((average_episode_crtc_allc_services / len(Service.all())), 2) * 100}% in {len(episode_allocated_service)} episodes")
+                # # Count the total number of elements equal to 1
+                # # Print the result
+                #
+                # # print(f"Total number services are allocated: {count_ones}")
+                # print(f"  Total number services are CORRECTED allocated: {num_likely_MEET_deadline}")
+                # print(f"  Number of services that are missed their deadline:{num_likely_missed_deadline}")
+                # print(f"  Objective_value_threshold: {objective_value_threshold}")
 
-                # print(f"Total number services are allocated: {count_ones}")
-                print(f"  Total number services are CORRECTED allocated: {num_likely_MEET_deadline}")
-                print(f"  Number of services that are missed their deadline:{num_likely_missed_deadline}")
-                print(f"  Objective_value_threshold: {objective_value_threshold}")
-                # print(f"reward_is_zero:{reward_is_zero}")
+                print(f"Hit-ratio: {round(((len(user_miss_deadline)/len(User.all()))*100),2)}%")
+
                 last_num_of_allocated_services = count_ones
 
                 ### Reporting the measured memory & power usages of normal-RL
