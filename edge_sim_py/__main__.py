@@ -1035,6 +1035,8 @@ def my_rl_in_edgesimpy(parameters):
 
         num_likely_missed_deadline = 0
         num_likely_MEET_deadline = 0
+        # a list of users that miss their deadline due to missing of a service in their application
+        user_miss_deadline = []
         reward_is_zero = 0
         total_rewards = 0
 
@@ -1076,7 +1078,7 @@ def my_rl_in_edgesimpy(parameters):
                 # print(f"avoid_redundant_service = True")
                 if rl_selected_server.has_capacity_to_host(service=rl_selected_service):  ## amin
                     server_poses_capacity = 1 ## put some positive reward in reward-function
-                    # rl_selected_service.provision(target_server=rl_selected_server)     ## amin
+
                     service_criticality_level = get_service_criticality_level(
                         list(rl_selected_user.delay_slas.values())[0])
                     # print(f"can host and service {rl_selected_service} is the earliest service, at {rl_selected_application},"
@@ -1129,6 +1131,7 @@ def my_rl_in_edgesimpy(parameters):
                         service_deadline_likely_met = -1
                         response_time_for_service = -1
                         num_likely_missed_deadline += 1
+                        print(f"user who lost deadline: {rl_selected_user}")
                         service_criticality_level = get_service_criticality_level(list(rl_selected_user.delay_slas.values())[0])
                         # observation = update_state(state.squeeze(0).tolist(), action.item()) ## was
                         observation = action.squeeze(0).tolist()
@@ -1137,6 +1140,7 @@ def my_rl_in_edgesimpy(parameters):
                     # service_deadline_likely_met = False
                     response_time_for_service = -1
                     num_likely_missed_deadline += 1
+                    print(f"user who lost deadline: {rl_selected_user}")
                     service_criticality_level = get_service_criticality_level(list(rl_selected_user.delay_slas.values())[0])
                     # observation = update_state(state.squeeze(0).tolist(), action.item()) ## was
                     observation = action.squeeze(0).tolist()
@@ -1149,6 +1153,7 @@ def my_rl_in_edgesimpy(parameters):
                 # service_deadline_likely_met = False
                 response_time_for_service = -1
                 num_likely_missed_deadline += 1
+                print(f"user who lost deadline: {rl_selected_user}")
                 service_criticality_level = get_service_criticality_level(list(rl_selected_user.delay_slas.values())[0])
                 # observation = update_state(state.squeeze(0).tolist(), action.item()) was
                 observation = action.squeeze(0).tolist()
@@ -1248,14 +1253,14 @@ def my_rl_in_edgesimpy(parameters):
                     # print(
                     #     f"Average of CORRECT allocated services is {round(average_episode_crtc_allc_services, 1)} in {len(episode_allocated_service)} episodes")
                     print(
-                        f"\tAverage CORRECT allocation {round((average_episode_crtc_allc_services / len(Service.all())), 2) * 100}% in {len(episode_allocated_service)} episodes")
+                        f"  Average CORRECT allocation {round((average_episode_crtc_allc_services / len(Service.all())), 2) * 100}% in {len(episode_allocated_service)} episodes")
                 # Count the total number of elements equal to 1
                 # Print the result
 
                 # print(f"Total number services are allocated: {count_ones}")
-                print(f"\tTotal number services are CORRECTED allocated: {num_likely_MEET_deadline}")
-                print(f"\tNumber of services that are missed their deadline:{num_likely_missed_deadline}")
-                print(f"\tObjective_value_threshold: {objective_value_threshold}")
+                print(f"  Total number services are CORRECTED allocated: {num_likely_MEET_deadline}")
+                print(f"  Number of services that are missed their deadline:{num_likely_missed_deadline}")
+                print(f"  Objective_value_threshold: {objective_value_threshold}")
                 # print(f"reward_is_zero:{reward_is_zero}")
                 last_num_of_allocated_services = count_ones
 
