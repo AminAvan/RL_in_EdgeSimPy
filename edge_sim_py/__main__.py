@@ -1249,8 +1249,8 @@ def my_rl_in_edgesimpy(parameters):
                     count_ones = len(Service.all())  # Handle the case where next_state is None
                 episode_allocated_service.append(count_ones)
                 episode_crtc_allc_services.append(num_likely_MEET_deadline)
-                episodes_user_miss_deadline.append(((len(user_miss_deadline)/len(User.all()))*100))
-
+                episodes_user_miss_deadline.append((((len(User.all()) - len(user_miss_deadline)) / len(User.all())) * 100))
+                
                 print(
                     f"Episode {len(episode_allocated_service)} with duration: {episode_durations[-1]}, and total rewards: {total_rewards}")
 
@@ -1272,7 +1272,7 @@ def my_rl_in_edgesimpy(parameters):
                 # print(f"  Number of services that are missed their deadline:{num_likely_missed_deadline}")
                 # print(f"  Objective_value_threshold: {objective_value_threshold}")
 
-                print(f"Hit-ratio: {round(((len(user_miss_deadline)/len(User.all()))*100),2)}%")
+                print(f"Hit-ratio: {round((((len(User.all()) - len(user_miss_deadline)) / len(User.all())) * 100),2)}%")
 
                 last_num_of_allocated_services = count_ones
 
