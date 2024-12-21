@@ -953,6 +953,7 @@ def my_rl_in_edgesimpy(parameters):
         if len(allocated_t) > 10:
             means = allocated_t.unfold(0, 10, 1).mean(1).view(-1)
             means = torch.cat((torch.zeros(9), means))
+            print(f"means:{means}")
             plt.plot(means.numpy(), label='10-episode average')
 
         plt.legend()
