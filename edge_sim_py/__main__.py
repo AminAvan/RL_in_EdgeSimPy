@@ -1303,8 +1303,8 @@ def my_rl_in_edgesimpy(parameters):
                 resource_tracker.report()
                 print(f"========================================")
                 file.write(f"========================================\n")
-                if (i_episode > 0) and (i_episode % 50 == 0):
-                    plot_durations()
+                # if (i_episode > 0) and (i_episode % 50 == 0):
+                #     plot_durations()
                 break
 
         # # Check for convergence by services
