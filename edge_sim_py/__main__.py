@@ -28,11 +28,19 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 import torch.nn.functional as F
-
+import csv
 import sys
+from datetime import datetime
 
 # import my_rl
 ####################################################
+# Generate the filename with the current date and time
+current_time = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")  # Format: YYYY-MM-DD_HH-MM-SS
+filename = f"Results_{current_time}.csv"
+file = open(filename, 'w')  # Open the file
+file.write("Results:\n")  # Header
+#####################################################
+#####################################################
 
 class ResourceTracker:
     def __init__(self):
@@ -59,14 +67,19 @@ class ResourceTracker:
     def report(self):
         total_time = time.time() - self.start_time
         print(f"runtime: {total_time:.2f} seconds")
+        file.write(f"runtime: {total_time:.2f} seconds\n")
         print(f"memory consumption: {self.total_memory / (1024 * 1024):.2f} MB until {total_time:.2f} seconds")
+        file.write(f"memory consumption: {self.total_memory / (1024 * 1024):.2f} MB until {total_time:.2f} seconds\n")
         print(f"power consumption: {self.total_power:.2f} Watt-seconds until {total_time:.2f} seconds")
+        file.write(f"power consumption: {self.total_power:.2f} Watt-seconds until {total_time:.2f} seconds\n")
         # print(f"Number of calls: {self.call_count}")
 
 
     def final_report(self):
         print(f"Total memory consumption: {self.total_memory / (1024 * 1024):.2f} MB")
+        file.write(f"Total memory consumption: {self.total_memory / (1024 * 1024):.2f} MB\n")
         print(f"Total power consumption: {self.total_power:.2f} Watt-seconds")
+        file.write(f"Total power consumption: {self.total_power:.2f} Watt-seconds\n")
 
 resource_tracker = ResourceTracker()
 
@@ -953,7 +966,6 @@ def my_rl_in_edgesimpy(parameters):
         if len(allocated_t) > 10:
             means = allocated_t.unfold(0, 10, 1).mean(1).view(-1)
             means = torch.cat((torch.zeros(9), means))
-            print(f"means:{means}")
             plt.plot(means.numpy(), label='10-episode average')
 
         plt.legend()
@@ -1256,6 +1268,7 @@ def my_rl_in_edgesimpy(parameters):
                 
                 print(
                     f"Episode {len(episode_allocated_service)} with duration: {episode_durations[-1]}, and total rewards: {total_rewards}")
+                file.write(f"Episode {len(episode_allocated_service)} with duration: {episode_durations[-1]}, and total rewards: {total_rewards}\n")
 
                 # if episode_allocated_service:
                 #     average_episode_allocated_service = sum(episode_allocated_service) / len(episode_allocated_service)
@@ -1275,13 +1288,21 @@ def my_rl_in_edgesimpy(parameters):
                 # print(f"  Number of services that are missed their deadline:{num_likely_missed_deadline}")
                 # print(f"  Objective_value_threshold: {objective_value_threshold}")
 
-                print(f"Hit-ratio: {round((((len(User.all()) - len(user_miss_deadline)) / len(User.all())) * 100),2)}%")
+                print(f"Hit-ratio: {round((((len(User.all()) - len(user_miss_deadline)) / len(User.all())) * 100),2)}% in episode {i_episode}.")
+                file.write(
+                    f"Hit-ratio: {round((((len(User.all()) - len(user_miss_deadline)) / len(User.all())) * 100),2)}% in episode {i_episode}.\n")
 
+                if len(total_allocations_records) >= 10:
+                    last_10_items = total_allocations_records[-10:]  # Get the last 10 items
+                    avg = sum(last_10_items) / len(last_10_items)  # Calculate the average
+                    print(f"  Average of last 10 episodes is: {avg}")
+                    file.write(f"  Average of last 10 episodes is: {avg}.\n")
                 last_num_of_allocated_services = count_ones
 
                 ### Reporting the measured memory & power usages of normal-RL
                 resource_tracker.report()
                 print(f"========================================")
+                file.write(f"========================================\n")
                 if (i_episode > 0) and (i_episode % 50 == 0):
                     plot_durations()
                 break
@@ -1318,11 +1339,14 @@ def my_rl_in_edgesimpy(parameters):
                 # Checks that the agent's performance is stable and not fluctuating around the threshold.
                 if abs(average_value_for_allocation[-1] - average_value_for_allocation[-2]) < 1e-3:
                     print(f"Policy converged after {i_episode} episodes.")
+                    file.write(f"Policy converged after {i_episode} episodes.\n")
                     print(f"=========================")
+                    file.write(f"=========================\n")
                     break
 
 
     print('Complete')
+    file.write(f"Complete\n")
     plot_durations(show_result=True)
     plt.ioff()
     plt.show()
@@ -1622,8 +1646,16 @@ scheduling_algorithm = "my_rl_in_edgesimpy"
 
 # @measure_memory
 def wrapped_Service_Provisioning(parameters, algorithm_name=scheduling_algorithm):
+    # # for normal running
+    # # Get the function based on the algorithm name
+    # result = algorithm_functions[algorithm_name](parameters)
+    # process = psutil.Process(os.getpid())
+    # resource_tracker.update(process.memory_info().rss)
+
+    # for testing RL for 31 runs
     # Get the function based on the algorithm name
-    result = algorithm_functions[algorithm_name](parameters)
+    for i in range(2):
+        result = algorithm_functions[algorithm_name](parameters)
     process = psutil.Process(os.getpid())
     resource_tracker.update(process.memory_info().rss)
     return result
@@ -1669,4 +1701,4 @@ duration_edgesimpy = end_time_edgesimpy - start_time_edgesimpy
 print(f"Total runtime: {duration_edgesimpy:.2f} seconds")
 
 resource_tracker.final_report()
-
+file.close()
