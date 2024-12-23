@@ -81,7 +81,8 @@ class ResourceTracker:
         print(f"Total power consumption: {self.total_power:.2f} Watt-seconds")
         file.write(f"Total power consumption: {self.total_power:.2f} Watt-seconds\n")
 
-resource_tracker = ResourceTracker()
+resource_tracker = ResourceTracker() ## was for normal use rather 31 runs
+
 
 #################################################################
 # Adjust display settings to show all columns and increase width
@@ -509,6 +510,9 @@ def EDF_algorithm(parameters):
 def my_rl_in_edgesimpy(parameters):
     # Override 'has_capacity_to_host' for all instances of the EdgeServer class
     EdgeServer.has_capacity_to_host = has_capacity_to_host_proposed
+
+    ## for 31runs
+    resource_tracker = ResourceTracker()
 
     """
     Convergence threshold is considered if the objective value (i.e., correct services allocation by scheduler in edge computing)
