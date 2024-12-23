@@ -1292,9 +1292,9 @@ def my_rl_in_edgesimpy(parameters):
                 # print(f"  Number of services that are missed their deadline:{num_likely_missed_deadline}")
                 # print(f"  Objective_value_threshold: {objective_value_threshold}")
 
-                print(f"Hit-ratio: {round((((len(User.all()) - len(user_miss_deadline)) / len(User.all())) * 100),2)}% in episode {i_episode}.")
+                print(f"Hit-ratio: {round((((len(User.all()) - len(user_miss_deadline)) / len(User.all())) * 100),2)}%.")
                 file.write(
-                    f"Hit-ratio: {round((((len(User.all()) - len(user_miss_deadline)) / len(User.all())) * 100),2)}% in episode {i_episode}.\n")
+                    f"Hit-ratio: {round((((len(User.all()) - len(user_miss_deadline)) / len(User.all())) * 100),2)}%.\n")
 
                 if len(total_allocations_records) >= 10:
                     last_10_items = total_allocations_records[-10:]  # Get the last 10 items
