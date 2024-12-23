@@ -1270,8 +1270,7 @@ def my_rl_in_edgesimpy(parameters):
                 episode_crtc_allc_services.append(num_likely_MEET_deadline)
                 episodes_user_miss_deadline.append((((len(User.all()) - len(user_miss_deadline)) / len(User.all())) * 100))
                 
-                print(
-                    f"Episode {len(episode_allocated_service)} with duration: {episode_durations[-1]}, and total rewards: {total_rewards}")
+                print(f"Episode {len(episode_allocated_service)} with duration: {episode_durations[-1]}, and total rewards: {total_rewards}")
                 file.write(f"Episode {len(episode_allocated_service)} with duration: {episode_durations[-1]}, and total rewards: {total_rewards}\n")
 
                 # if episode_allocated_service:
@@ -1290,18 +1289,19 @@ def my_rl_in_edgesimpy(parameters):
                 # # print(f"Total number services are allocated: {count_ones}")
                 # print(f"  Total number services are CORRECTED allocated: {num_likely_MEET_deadline}")
                 print(f"  Number of services that are missed their deadline:{num_likely_missed_deadline}")
+                file.write(f"  Number of services that are missed their deadline:{num_likely_missed_deadline}\n")
                 print(f"Users who miss deadline due to service failure: {user_miss_deadline}")
+                file.write(f"Users who miss deadline due to service failure: {user_miss_deadline}\n")
                 # print(f"  Objective_value_threshold: {objective_value_threshold}")
 
                 print(f"Hit-ratio: {round((((len(User.all()) - len(user_miss_deadline)) / len(User.all())) * 100),2)}%.")
-                file.write(
-                    f"Hit-ratio: {round((((len(User.all()) - len(user_miss_deadline)) / len(User.all())) * 100),2)}%.\n")
+                file.write(f"Hit-ratio: {round((((len(User.all()) - len(user_miss_deadline)) / len(User.all())) * 100),2)}%.\n")
 
                 if len(total_allocations_records) >= 10:
                     last_10_items = total_allocations_records[-10:]  # Get the last 10 items
                     avg = (sum(last_10_items) / len(last_10_items))/(len(User.all()))  # Calculate the average
-                    print(f"  Average of hit-ratio in last 10-episodes is: {round(avg,2)}%")
-                    file.write(f"  Average of hit-ratio in last 10-episodes is: {round(avg,2)}%.\n")
+                    print(f"  Average of hit-ratio in last 10-episodes is: {round((avg*100),2)}%")
+                    file.write(f"  Average of hit-ratio in last 10-episodes is: {round((avg*100),2)}%.\n")
                 last_num_of_allocated_services = count_ones
 
                 ### Reporting the measured memory & power usages of normal-RL
@@ -1335,8 +1335,8 @@ def my_rl_in_edgesimpy(parameters):
                 total_allocations_records[-sliding_window:]) / sliding_window  # Compute average reward
             average_value_for_allocation.append(avg_hit_ratio)
 
-            print(f"avg_hit_ratio: {round((avg_hit_ratio/(len(User.all()))),2)}%")
-            print(f"objective_value_threshold: {round((objective_value_threshold/(len(User.all()))),2)}%")
+            # print(f"avg_hit_ratio: {round((avg_hit_ratio/(len(User.all()))),2)}%")
+            # print(f"objective_value_threshold: {round((objective_value_threshold/(len(User.all()))),2)}%")
 
             # Ensures the agent's performance exceeds the threshold, varying by less than 0.02% of the optimal value.
             if (avg_hit_ratio >= objective_value_threshold) and len(average_value_for_allocation) > 1:
