@@ -1289,7 +1289,8 @@ def my_rl_in_edgesimpy(parameters):
                 #
                 # # print(f"Total number services are allocated: {count_ones}")
                 # print(f"  Total number services are CORRECTED allocated: {num_likely_MEET_deadline}")
-                # print(f"  Number of services that are missed their deadline:{num_likely_missed_deadline}")
+                print(f"  Number of services that are missed their deadline:{num_likely_missed_deadline}")
+                print(f"Users who miss deadline due to service failure: {user_miss_deadline}")
                 # print(f"  Objective_value_threshold: {objective_value_threshold}")
 
                 print(f"Hit-ratio: {round((((len(User.all()) - len(user_miss_deadline)) / len(User.all())) * 100),2)}%.")
@@ -1298,9 +1299,9 @@ def my_rl_in_edgesimpy(parameters):
 
                 if len(total_allocations_records) >= 10:
                     last_10_items = total_allocations_records[-10:]  # Get the last 10 items
-                    avg = sum(last_10_items) / len(last_10_items)  # Calculate the average
-                    print(f"  Average of last 10 episodes is: {avg}")
-                    file.write(f"  Average of last 10 episodes is: {avg}.\n")
+                    avg = (sum(last_10_items) / len(last_10_items))/(len(User.all()))  # Calculate the average
+                    print(f"  Average of hit-ratio in last 10-episodes is: {round(avg,2)}%")
+                    file.write(f"  Average of hit-ratio in last 10-episodes is: {round(avg,2)}%.\n")
                 last_num_of_allocated_services = count_ones
 
                 ### Reporting the measured memory & power usages of normal-RL
@@ -1334,9 +1335,8 @@ def my_rl_in_edgesimpy(parameters):
                 total_allocations_records[-sliding_window:]) / sliding_window  # Compute average reward
             average_value_for_allocation.append(avg_hit_ratio)
 
-            # print(f"avg_hit_ratio: {avg_hit_ratio}")
-            # print(f"average_value_for_allocation.append(avg_hit_ratio): {average_value_for_allocation[-1]}")
-            # print(f"objective_value_threshold: {objective_value_threshold}")
+            print(f"avg_hit_ratio: {round((avg_hit_ratio/(len(User.all()))),2)}%")
+            print(f"objective_value_threshold: {round((objective_value_threshold/(len(User.all()))),2)}%")
 
             # Ensures the agent's performance exceeds the threshold, varying by less than 0.02% of the optimal value.
             if (avg_hit_ratio >= objective_value_threshold) and len(average_value_for_allocation) > 1:
