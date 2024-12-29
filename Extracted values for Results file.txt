@@ -17,7 +17,6 @@ Avg power converged: 19930.07
 ======================================================================================================================
 
 
-
 Extracted metrics for 'Episode 1':
 Average Hit-ratio: 67.12
 Average runtime: 0.46
