@@ -7,6 +7,8 @@ Avg runtime converged:
 memory usage converged: []
 Avg runtime converged:
 
+power usage converged: []
+Avg power converged:
 
 Extracted metrics for 'Episode 1':
 Average Hit-ratio: 68.30
