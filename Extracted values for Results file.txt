@@ -1,0 +1,2302 @@
+converged: []
+Average converged episodes:
+
+runtime converged: []
+Avg runtime converged:
+
+memory usage converged: []
+Avg runtime converged:
+
+
+Extracted metrics for 'Episode 1':
+Average Hit-ratio: 68.30
+Average runtime: 0.49
+Average memory consumption: 1928.72
+Average power consumption: 5.53
+
+Extracted metrics for 'Episode 2':
+Average Hit-ratio: 68.61
+Average runtime: 0.93
+Average memory consumption: 3857.42
+Average power consumption: 11.52
+
+Extracted metrics for 'Episode 3':
+Average Hit-ratio: 72.27
+Average runtime: 1.39
+Average memory consumption: 5786.14
+Average power consumption: 17.04
+
+Extracted metrics for 'Episode 4':
+Average Hit-ratio: 71.46
+Average runtime: 2.00
+Average memory consumption: 7714.86
+Average power consumption: 24.30
+
+Extracted metrics for 'Episode 5':
+Average Hit-ratio: 73.82
+Average runtime: 3.97
+Average memory consumption: 9643.41
+Average power consumption: 29.75
+
+Extracted metrics for 'Episode 6':
+Average Hit-ratio: 71.46
+Average runtime: 5.96
+Average memory consumption: 11571.38
+Average power consumption: 35.42
+
+Extracted metrics for 'Episode 7':
+Average Hit-ratio: 77.73
+Average runtime: 7.97
+Average memory consumption: 13499.37
+Average power consumption: 41.24
+
+Extracted metrics for 'Episode 8':
+Average Hit-ratio: 73.14
+Average runtime: 10.00
+Average memory consumption: 15427.09
+Average power consumption: 47.74
+
+Extracted metrics for 'Episode 9':
+Average Hit-ratio: 69.48
+Average runtime: 12.06
+Average memory consumption: 17354.64
+Average power consumption: 55.27
+
+Extracted metrics for 'Episode 10':
+Average Hit-ratio: 74.69
+Average runtime: 14.15
+Average memory consumption: 19281.81
+Average power consumption: 61.33
+
+Extracted metrics for 'Episode 11':
+Average Hit-ratio: 74.88
+Average runtime: 16.24
+Average memory consumption: 21208.53
+Average power consumption: 66.58
+
+Extracted metrics for 'Episode 12':
+Average Hit-ratio: 71.03
+Average runtime: 18.35
+Average memory consumption: 23133.78
+Average power consumption: 71.85
+
+Extracted metrics for 'Episode 13':
+Average Hit-ratio: 69.97
+Average runtime: 20.48
+Average memory consumption: 25059.06
+Average power consumption: 77.43
+
+Extracted metrics for 'Episode 14':
+Average Hit-ratio: 75.19
+Average runtime: 22.62
+Average memory consumption: 26984.36
+Average power consumption: 83.09
+
+Extracted metrics for 'Episode 15':
+Average Hit-ratio: 75.93
+Average runtime: 24.76
+Average memory consumption: 28909.76
+Average power consumption: 89.07
+
+Extracted metrics for 'Episode 16':
+Average Hit-ratio: 75.81
+Average runtime: 27.14
+Average memory consumption: 30835.40
+Average power consumption: 94.86
+
+Extracted metrics for 'Episode 17':
+Average Hit-ratio: 76.36
+Average runtime: 29.35
+Average memory consumption: 32761.35
+Average power consumption: 100.79
+
+Extracted metrics for 'Episode 18':
+Average Hit-ratio: 73.01
+Average runtime: 31.55
+Average memory consumption: 34687.52
+Average power consumption: 106.38
+
+Extracted metrics for 'Episode 19':
+Average Hit-ratio: 73.82
+Average runtime: 33.75
+Average memory consumption: 36614.05
+Average power consumption: 112.09
+
+Extracted metrics for 'Episode 20':
+Average Hit-ratio: 78.54
+Average runtime: 35.97
+Average memory consumption: 38541.01
+Average power consumption: 117.64
+
+Extracted metrics for 'Episode 21':
+Average Hit-ratio: 75.37
+Average runtime: 38.19
+Average memory consumption: 40468.26
+Average power consumption: 123.50
+
+Extracted metrics for 'Episode 22':
+Average Hit-ratio: 80.33
+Average runtime: 40.41
+Average memory consumption: 42395.88
+Average power consumption: 129.45
+
+Extracted metrics for 'Episode 23':
+Average Hit-ratio: 77.48
+Average runtime: 42.64
+Average memory consumption: 44323.78
+Average power consumption: 135.19
+
+Extracted metrics for 'Episode 24':
+Average Hit-ratio: 80.21
+Average runtime: 44.87
+Average memory consumption: 46252.11
+Average power consumption: 140.94
+
+Extracted metrics for 'Episode 25':
+Average Hit-ratio: 79.78
+Average runtime: 47.34
+Average memory consumption: 48180.81
+Average power consumption: 146.60
+
+Extracted metrics for 'Episode 26':
+Average Hit-ratio: 80.46
+Average runtime: 49.58
+Average memory consumption: 50109.82
+Average power consumption: 152.19
+
+Extracted metrics for 'Episode 27':
+Average Hit-ratio: 81.27
+Average runtime: 51.82
+Average memory consumption: 52039.37
+Average power consumption: 157.99
+
+Extracted metrics for 'Episode 28':
+Average Hit-ratio: 83.25
+Average runtime: 54.07
+Average memory consumption: 53969.15
+Average power consumption: 163.54
+
+Extracted metrics for 'Episode 29':
+Average Hit-ratio: 81.08
+Average runtime: 56.34
+Average memory consumption: 55899.28
+Average power consumption: 169.91
+
+Extracted metrics for 'Episode 30':
+Average Hit-ratio: 82.51
+Average runtime: 58.58
+Average memory consumption: 57829.90
+Average power consumption: 175.55
+
+Extracted metrics for 'Episode 31':
+Average Hit-ratio: 83.00
+Average runtime: 60.84
+Average memory consumption: 59760.83
+Average power consumption: 181.15
+
+Extracted metrics for 'Episode 32':
+Average Hit-ratio: 83.75
+Average runtime: 63.12
+Average memory consumption: 61692.18
+Average power consumption: 187.20
+
+Extracted metrics for 'Episode 33':
+Average Hit-ratio: 82.38
+Average runtime: 65.41
+Average memory consumption: 63623.89
+Average power consumption: 193.07
+
+Extracted metrics for 'Episode 34':
+Average Hit-ratio: 87.41
+Average runtime: 67.69
+Average memory consumption: 65555.93
+Average power consumption: 198.74
+
+Extracted metrics for 'Episode 35':
+Average Hit-ratio: 86.41
+Average runtime: 69.98
+Average memory consumption: 67488.31
+Average power consumption: 204.42
+
+Extracted metrics for 'Episode 36':
+Average Hit-ratio: 88.21
+Average runtime: 72.27
+Average memory consumption: 69421.13
+Average power consumption: 209.93
+
+Extracted metrics for 'Episode 37':
+Average Hit-ratio: 85.92
+Average runtime: 74.58
+Average memory consumption: 71354.34
+Average power consumption: 215.99
+
+Extracted metrics for 'Episode 38':
+Average Hit-ratio: 87.47
+Average runtime: 76.91
+Average memory consumption: 73287.87
+Average power consumption: 221.42
+
+Extracted metrics for 'Episode 39':
+Average Hit-ratio: 87.03
+Average runtime: 79.21
+Average memory consumption: 75221.88
+Average power consumption: 227.14
+
+Extracted metrics for 'Episode 40':
+Average Hit-ratio: 87.16
+Average runtime: 81.51
+Average memory consumption: 77156.20
+Average power consumption: 233.19
+
+Extracted metrics for 'Episode 41':
+Average Hit-ratio: 85.98
+Average runtime: 83.81
+Average memory consumption: 79090.97
+Average power consumption: 238.80
+
+Extracted metrics for 'Episode 42':
+Average Hit-ratio: 86.23
+Average runtime: 86.12
+Average memory consumption: 81026.23
+Average power consumption: 244.10
+
+Extracted metrics for 'Episode 43':
+Average Hit-ratio: 85.98
+Average runtime: 88.43
+Average memory consumption: 82961.85
+Average power consumption: 249.14
+
+Extracted metrics for 'Episode 44':
+Average Hit-ratio: 83.62
+Average runtime: 90.75
+Average memory consumption: 84897.98
+Average power consumption: 254.29
+
+Extracted metrics for 'Episode 45':
+Average Hit-ratio: 89.14
+Average runtime: 93.06
+Average memory consumption: 86834.37
+Average power consumption: 260.10
+
+Extracted metrics for 'Episode 46':
+Average Hit-ratio: 88.40
+Average runtime: 95.38
+Average memory consumption: 88771.10
+Average power consumption: 265.94
+
+Extracted metrics for 'Episode 47':
+Average Hit-ratio: 88.83
+Average runtime: 97.70
+Average memory consumption: 90708.31
+Average power consumption: 271.50
+
+Extracted metrics for 'Episode 48':
+Average Hit-ratio: 88.71
+Average runtime: 100.03
+Average memory consumption: 92645.82
+Average power consumption: 276.71
+
+Extracted metrics for 'Episode 49':
+Average Hit-ratio: 91.56
+Average runtime: 102.35
+Average memory consumption: 94583.71
+Average power consumption: 282.11
+
+Extracted metrics for 'Episode 50':
+Average Hit-ratio: 89.76
+Average runtime: 104.69
+Average memory consumption: 96522.00
+Average power consumption: 287.21
+
+Extracted metrics for 'Episode 51':
+Average Hit-ratio: 90.88
+Average runtime: 107.02
+Average memory consumption: 98460.61
+Average power consumption: 293.23
+
+Extracted metrics for 'Episode 52':
+Average Hit-ratio: 87.84
+Average runtime: 109.34
+Average memory consumption: 100399.63
+Average power consumption: 298.87
+
+Extracted metrics for 'Episode 53':
+Average Hit-ratio: 90.38
+Average runtime: 111.67
+Average memory consumption: 102339.06
+Average power consumption: 304.44
+
+Extracted metrics for 'Episode 54':
+Average Hit-ratio: 91.13
+Average runtime: 114.01
+Average memory consumption: 104278.92
+Average power consumption: 309.83
+
+Extracted metrics for 'Episode 55':
+Average Hit-ratio: 90.82
+Average runtime: 116.35
+Average memory consumption: 106219.19
+Average power consumption: 315.09
+
+Extracted metrics for 'Episode 56':
+Average Hit-ratio: 90.01
+Average runtime: 118.68
+Average memory consumption: 108159.82
+Average power consumption: 320.46
+
+Extracted metrics for 'Episode 57':
+Average Hit-ratio: 88.52
+Average runtime: 121.02
+Average memory consumption: 110100.76
+Average power consumption: 326.06
+
+Extracted metrics for 'Episode 58':
+Average Hit-ratio: 90.82
+Average runtime: 123.37
+Average memory consumption: 112042.15
+Average power consumption: 331.90
+
+Extracted metrics for 'Episode 59':
+Average Hit-ratio: 91.07
+Average runtime: 125.73
+Average memory consumption: 113983.94
+Average power consumption: 337.92
+
+Extracted metrics for 'Episode 60':
+Average Hit-ratio: 92.00
+Average runtime: 128.07
+Average memory consumption: 115926.12
+Average power consumption: 343.99
+
+Extracted metrics for 'Episode 61':
+Average Hit-ratio: 90.32
+Average runtime: 130.42
+Average memory consumption: 117868.76
+Average power consumption: 349.24
+
+Extracted metrics for 'Episode 62':
+Average Hit-ratio: 90.94
+Average runtime: 132.77
+Average memory consumption: 119811.68
+Average power consumption: 354.64
+
+Extracted metrics for 'Episode 63':
+Average Hit-ratio: 91.94
+Average runtime: 135.12
+Average memory consumption: 121754.97
+Average power consumption: 360.08
+
+Extracted metrics for 'Episode 64':
+Average Hit-ratio: 89.95
+Average runtime: 137.50
+Average memory consumption: 123698.79
+Average power consumption: 365.35
+
+Extracted metrics for 'Episode 65':
+Average Hit-ratio: 92.68
+Average runtime: 139.87
+Average memory consumption: 125642.99
+Average power consumption: 370.68
+
+Extracted metrics for 'Episode 66':
+Average Hit-ratio: 90.76
+Average runtime: 142.24
+Average memory consumption: 127587.62
+Average power consumption: 376.02
+
+Extracted metrics for 'Episode 67':
+Average Hit-ratio: 92.87
+Average runtime: 144.62
+Average memory consumption: 129532.69
+Average power consumption: 381.60
+
+Extracted metrics for 'Episode 68':
+Average Hit-ratio: 93.67
+Average runtime: 147.00
+Average memory consumption: 131478.06
+Average power consumption: 387.56
+
+Extracted metrics for 'Episode 69':
+Average Hit-ratio: 93.49
+Average runtime: 149.38
+Average memory consumption: 133423.83
+Average power consumption: 392.97
+
+Extracted metrics for 'Episode 70':
+Average Hit-ratio: 92.99
+Average runtime: 151.76
+Average memory consumption: 135370.09
+Average power consumption: 398.47
+
+Extracted metrics for 'Episode 71':
+Average Hit-ratio: 92.49
+Average runtime: 154.14
+Average memory consumption: 137316.79
+Average power consumption: 403.65
+
+Extracted metrics for 'Episode 72':
+Average Hit-ratio: 94.29
+Average runtime: 156.51
+Average memory consumption: 139263.94
+Average power consumption: 409.20
+
+Extracted metrics for 'Episode 73':
+Average Hit-ratio: 93.05
+Average runtime: 158.91
+Average memory consumption: 141211.40
+Average power consumption: 414.76
+
+Extracted metrics for 'Episode 74':
+Average Hit-ratio: 93.61
+Average runtime: 161.29
+Average memory consumption: 143159.26
+Average power consumption: 420.06
+
+Extracted metrics for 'Episode 75':
+Average Hit-ratio: 93.24
+Average runtime: 163.68
+Average memory consumption: 145107.53
+Average power consumption: 425.79
+
+Extracted metrics for 'Episode 76':
+Average Hit-ratio: 92.49
+Average runtime: 166.08
+Average memory consumption: 147056.14
+Average power consumption: 431.28
+
+Extracted metrics for 'Episode 77':
+Average Hit-ratio: 93.49
+Average runtime: 168.48
+Average memory consumption: 149005.22
+Average power consumption: 437.01
+
+Extracted metrics for 'Episode 78':
+Average Hit-ratio: 94.60
+Average runtime: 170.89
+Average memory consumption: 150954.80
+Average power consumption: 442.53
+
+Extracted metrics for 'Episode 79':
+Average Hit-ratio: 94.60
+Average runtime: 173.28
+Average memory consumption: 152904.69
+Average power consumption: 448.68
+
+Extracted metrics for 'Episode 80':
+Average Hit-ratio: 94.60
+Average runtime: 175.67
+Average memory consumption: 154854.91
+Average power consumption: 454.30
+
+Extracted metrics for 'Episode 81':
+Average Hit-ratio: 94.42
+Average runtime: 178.08
+Average memory consumption: 156805.63
+Average power consumption: 459.73
+
+Extracted metrics for 'Episode 82':
+Average Hit-ratio: 94.35
+Average runtime: 180.49
+Average memory consumption: 158756.73
+Average power consumption: 465.47
+
+Extracted metrics for 'Episode 83':
+Average Hit-ratio: 93.92
+Average runtime: 182.91
+Average memory consumption: 160708.25
+Average power consumption: 470.96
+
+Extracted metrics for 'Episode 84':
+Average Hit-ratio: 94.35
+Average runtime: 185.31
+Average memory consumption: 162660.35
+Average power consumption: 476.64
+
+Extracted metrics for 'Episode 85':
+Average Hit-ratio: 95.04
+Average runtime: 187.71
+Average memory consumption: 164612.73
+Average power consumption: 482.22
+
+Extracted metrics for 'Episode 86':
+Average Hit-ratio: 94.73
+Average runtime: 190.12
+Average memory consumption: 166565.69
+Average power consumption: 487.60
+
+Extracted metrics for 'Episode 87':
+Average Hit-ratio: 94.36
+Average runtime: 192.52
+Average memory consumption: 168518.96
+Average power consumption: 493.18
+
+Extracted metrics for 'Episode 88':
+Average Hit-ratio: 94.35
+Average runtime: 194.95
+Average memory consumption: 170472.66
+Average power consumption: 498.39
+
+Extracted metrics for 'Episode 89':
+Average Hit-ratio: 94.48
+Average runtime: 197.36
+Average memory consumption: 172426.80
+Average power consumption: 503.67
+
+Extracted metrics for 'Episode 90':
+Average Hit-ratio: 96.09
+Average runtime: 199.77
+Average memory consumption: 174381.22
+Average power consumption: 509.03
+
+Extracted metrics for 'Episode 91':
+Average Hit-ratio: 95.47
+Average runtime: 202.20
+Average memory consumption: 176336.13
+Average power consumption: 514.26
+
+Extracted metrics for 'Episode 92':
+Average Hit-ratio: 95.28
+Average runtime: 204.61
+Average memory consumption: 178291.49
+Average power consumption: 519.59
+
+Extracted metrics for 'Episode 93':
+Average Hit-ratio: 95.72
+Average runtime: 207.04
+Average memory consumption: 180247.30
+Average power consumption: 525.02
+
+Extracted metrics for 'Episode 94':
+Average Hit-ratio: 95.78
+Average runtime: 209.47
+Average memory consumption: 182203.44
+Average power consumption: 530.97
+
+Extracted metrics for 'Episode 95':
+Average Hit-ratio: 94.35
+Average runtime: 211.89
+Average memory consumption: 184160.12
+Average power consumption: 536.64
+
+Extracted metrics for 'Episode 96':
+Average Hit-ratio: 96.09
+Average runtime: 214.32
+Average memory consumption: 186117.16
+Average power consumption: 542.17
+
+Extracted metrics for 'Episode 97':
+Average Hit-ratio: 96.46
+Average runtime: 216.74
+Average memory consumption: 188074.58
+Average power consumption: 547.33
+
+Extracted metrics for 'Episode 98':
+Average Hit-ratio: 95.91
+Average runtime: 219.16
+Average memory consumption: 190032.54
+Average power consumption: 552.79
+
+Extracted metrics for 'Episode 99':
+Average Hit-ratio: 95.72
+Average runtime: 221.62
+Average memory consumption: 191990.83
+Average power consumption: 558.63
+
+Extracted metrics for 'Episode 100':
+Average Hit-ratio: 95.91
+Average runtime: 224.05
+Average memory consumption: 193949.52
+Average power consumption: 564.52
+
+Extracted metrics for 'Episode 101':
+Average Hit-ratio: 96.71
+Average runtime: 226.49
+Average memory consumption: 195908.62
+Average power consumption: 570.57
+
+Extracted metrics for 'Episode 102':
+Average Hit-ratio: 95.66
+Average runtime: 228.92
+Average memory consumption: 197868.09
+Average power consumption: 576.11
+
+Extracted metrics for 'Episode 103':
+Average Hit-ratio: 97.08
+Average runtime: 231.35
+Average memory consumption: 199828.07
+Average power consumption: 581.82
+
+Extracted metrics for 'Episode 104':
+Average Hit-ratio: 96.40
+Average runtime: 233.81
+Average memory consumption: 201788.29
+Average power consumption: 587.19
+
+Extracted metrics for 'Episode 105':
+Average Hit-ratio: 96.09
+Average runtime: 236.25
+Average memory consumption: 203749.02
+Average power consumption: 592.61
+
+Extracted metrics for 'Episode 106':
+Average Hit-ratio: 96.59
+Average runtime: 238.68
+Average memory consumption: 205710.19
+Average power consumption: 598.08
+
+Extracted metrics for 'Episode 107':
+Average Hit-ratio: 96.03
+Average runtime: 241.14
+Average memory consumption: 207671.58
+Average power consumption: 603.19
+
+Extracted metrics for 'Episode 108':
+Average Hit-ratio: 96.53
+Average runtime: 243.59
+Average memory consumption: 209633.53
+Average power consumption: 609.07
+
+Extracted metrics for 'Episode 109':
+Average Hit-ratio: 95.16
+Average runtime: 246.03
+Average memory consumption: 211595.93
+Average power consumption: 615.05
+
+Extracted metrics for 'Episode 110':
+Average Hit-ratio: 97.39
+Average runtime: 248.50
+Average memory consumption: 213558.76
+Average power consumption: 621.16
+
+Extracted metrics for 'Episode 111':
+Average Hit-ratio: 96.90
+Average runtime: 250.94
+Average memory consumption: 215521.93
+Average power consumption: 626.30
+
+Extracted metrics for 'Episode 112':
+Average Hit-ratio: 97.83
+Average runtime: 253.39
+Average memory consumption: 217485.59
+Average power consumption: 632.11
+
+Extracted metrics for 'Episode 113':
+Average Hit-ratio: 96.84
+Average runtime: 255.84
+Average memory consumption: 219449.61
+Average power consumption: 637.29
+
+Extracted metrics for 'Episode 114':
+Average Hit-ratio: 97.15
+Average runtime: 258.29
+Average memory consumption: 221413.94
+Average power consumption: 643.29
+
+Extracted metrics for 'Episode 115':
+Average Hit-ratio: 96.96
+Average runtime: 260.77
+Average memory consumption: 223378.70
+Average power consumption: 649.08
+
+Extracted metrics for 'Episode 116':
+Average Hit-ratio: 97.15
+Average runtime: 263.22
+Average memory consumption: 225343.81
+Average power consumption: 654.60
+
+Extracted metrics for 'Episode 117':
+Average Hit-ratio: 97.08
+Average runtime: 265.67
+Average memory consumption: 227309.46
+Average power consumption: 660.08
+
+Extracted metrics for 'Episode 118':
+Average Hit-ratio: 96.46
+Average runtime: 268.14
+Average memory consumption: 229275.38
+Average power consumption: 665.79
+
+Extracted metrics for 'Episode 119':
+Average Hit-ratio: 96.96
+Average runtime: 270.60
+Average memory consumption: 231241.62
+Average power consumption: 671.53
+
+Extracted metrics for 'Episode 120':
+Average Hit-ratio: 96.84
+Average runtime: 273.05
+Average memory consumption: 233208.38
+Average power consumption: 676.95
+
+Extracted metrics for 'Episode 121':
+Average Hit-ratio: 97.02
+Average runtime: 275.54
+Average memory consumption: 235175.38
+Average power consumption: 682.31
+
+Extracted metrics for 'Episode 122':
+Average Hit-ratio: 96.59
+Average runtime: 278.01
+Average memory consumption: 237142.88
+Average power consumption: 687.62
+
+Extracted metrics for 'Episode 123':
+Average Hit-ratio: 96.84
+Average runtime: 280.47
+Average memory consumption: 239110.75
+Average power consumption: 693.33
+
+Extracted metrics for 'Episode 124':
+Average Hit-ratio: 96.96
+Average runtime: 282.95
+Average memory consumption: 241078.95
+Average power consumption: 698.88
+
+Extracted metrics for 'Episode 125':
+Average Hit-ratio: 97.27
+Average runtime: 285.40
+Average memory consumption: 243047.52
+Average power consumption: 704.54
+
+Extracted metrics for 'Episode 126':
+Average Hit-ratio: 97.33
+Average runtime: 287.89
+Average memory consumption: 245016.46
+Average power consumption: 710.26
+
+Extracted metrics for 'Episode 127':
+Average Hit-ratio: 97.08
+Average runtime: 290.40
+Average memory consumption: 246985.75
+Average power consumption: 715.63
+
+Extracted metrics for 'Episode 128':
+Average Hit-ratio: 96.96
+Average runtime: 292.89
+Average memory consumption: 248955.37
+Average power consumption: 720.84
+
+Extracted metrics for 'Episode 129':
+Average Hit-ratio: 96.96
+Average runtime: 295.37
+Average memory consumption: 250925.37
+Average power consumption: 727.00
+
+Extracted metrics for 'Episode 130':
+Average Hit-ratio: 97.27
+Average runtime: 297.88
+Average memory consumption: 252895.70
+Average power consumption: 732.91
+
+Extracted metrics for 'Episode 131':
+Average Hit-ratio: 97.58
+Average runtime: 300.36
+Average memory consumption: 254866.32
+Average power consumption: 738.48
+
+Extracted metrics for 'Episode 132':
+Average Hit-ratio: 97.58
+Average runtime: 302.86
+Average memory consumption: 256837.30
+Average power consumption: 744.03
+
+Extracted metrics for 'Episode 133':
+Average Hit-ratio: 97.77
+Average runtime: 305.38
+Average memory consumption: 258808.58
+Average power consumption: 749.45
+
+Extracted metrics for 'Episode 134':
+Average Hit-ratio: 97.77
+Average runtime: 307.88
+Average memory consumption: 260780.37
+Average power consumption: 755.01
+
+Extracted metrics for 'Episode 135':
+Average Hit-ratio: 98.26
+Average runtime: 310.37
+Average memory consumption: 262752.42
+Average power consumption: 760.50
+
+Extracted metrics for 'Episode 136':
+Average Hit-ratio: 97.95
+Average runtime: 312.89
+Average memory consumption: 264724.80
+Average power consumption: 766.03
+
+Extracted metrics for 'Episode 137':
+Average Hit-ratio: 98.26
+Average runtime: 315.40
+Average memory consumption: 266697.59
+Average power consumption: 771.55
+
+Extracted metrics for 'Episode 138':
+Average Hit-ratio: 97.15
+Average runtime: 317.94
+Average memory consumption: 268670.64
+Average power consumption: 777.09
+
+Extracted metrics for 'Episode 139':
+Average Hit-ratio: 98.01
+Average runtime: 320.47
+Average memory consumption: 270644.16
+Average power consumption: 782.41
+
+Extracted metrics for 'Episode 140':
+Average Hit-ratio: 97.58
+Average runtime: 323.00
+Average memory consumption: 272618.04
+Average power consumption: 788.50
+
+Extracted metrics for 'Episode 141':
+Average Hit-ratio: 96.92
+Average runtime: 325.48
+Average memory consumption: 274129.28
+Average power consumption: 793.21
+
+Extracted metrics for 'Episode 142':
+Average Hit-ratio: 97.56
+Average runtime: 328.01
+Average memory consumption: 276101.56
+Average power consumption: 798.66
+
+Extracted metrics for 'Episode 143':
+Average Hit-ratio: 97.37
+Average runtime: 330.52
+Average memory consumption: 278074.23
+Average power consumption: 803.88
+
+Extracted metrics for 'Episode 144':
+Average Hit-ratio: 97.76
+Average runtime: 333.03
+Average memory consumption: 280047.44
+Average power consumption: 809.35
+
+Extracted metrics for 'Episode 145':
+Average Hit-ratio: 97.37
+Average runtime: 335.58
+Average memory consumption: 282020.97
+Average power consumption: 814.60
+
+Extracted metrics for 'Episode 146':
+Average Hit-ratio: 97.48
+Average runtime: 338.11
+Average memory consumption: 284206.73
+Average power consumption: 820.89
+
+Extracted metrics for 'Episode 147':
+Average Hit-ratio: 97.08
+Average runtime: 340.55
+Average memory consumption: 286045.51
+Average power consumption: 827.51
+
+Extracted metrics for 'Episode 148':
+Average Hit-ratio: 96.51
+Average runtime: 343.07
+Average memory consumption: 288020.46
+Average power consumption: 832.71
+
+Extracted metrics for 'Episode 149':
+Average Hit-ratio: 97.65
+Average runtime: 345.60
+Average memory consumption: 289995.84
+Average power consumption: 838.13
+
+Extracted metrics for 'Episode 150':
+Average Hit-ratio: 97.08
+Average runtime: 348.18
+Average memory consumption: 292456.41
+Average power consumption: 845.26
+
+Extracted metrics for 'Episode 151':
+Average Hit-ratio: 97.23
+Average runtime: 350.73
+Average memory consumption: 294436.31
+Average power consumption: 850.44
+
+Extracted metrics for 'Episode 152':
+Average Hit-ratio: 96.87
+Average runtime: 353.18
+Average memory consumption: 295843.80
+Average power consumption: 856.15
+
+Extracted metrics for 'Episode 153':
+Average Hit-ratio: 97.20
+Average runtime: 355.71
+Average memory consumption: 297820.51
+Average power consumption: 861.20
+
+Extracted metrics for 'Episode 154':
+Average Hit-ratio: 97.36
+Average runtime: 358.24
+Average memory consumption: 299797.71
+Average power consumption: 866.54
+
+Extracted metrics for 'Episode 155':
+Average Hit-ratio: 97.03
+Average runtime: 360.78
+Average memory consumption: 301775.40
+Average power consumption: 873.33
+
+Extracted metrics for 'Episode 156':
+Average Hit-ratio: 97.60
+Average runtime: 363.29
+Average memory consumption: 303753.59
+Average power consumption: 879.43
+
+Extracted metrics for 'Episode 157':
+Average Hit-ratio: 97.24
+Average runtime: 365.84
+Average memory consumption: 305064.50
+Average power consumption: 887.11
+
+Extracted metrics for 'Episode 158':
+Average Hit-ratio: 97.74
+Average runtime: 368.39
+Average memory consumption: 307040.70
+Average power consumption: 892.85
+
+Extracted metrics for 'Episode 159':
+Average Hit-ratio: 98.41
+Average runtime: 370.93
+Average memory consumption: 309017.43
+Average power consumption: 898.79
+
+Extracted metrics for 'Episode 160':
+Average Hit-ratio: 98.16
+Average runtime: 373.46
+Average memory consumption: 310994.61
+Average power consumption: 904.33
+
+Extracted metrics for 'Episode 161':
+Average Hit-ratio: 97.38
+Average runtime: 376.05
+Average memory consumption: 312296.71
+Average power consumption: 910.46
+
+Extracted metrics for 'Episode 162':
+Average Hit-ratio: 97.62
+Average runtime: 378.63
+Average memory consumption: 315620.34
+Average power consumption: 905.83
+
+Extracted metrics for 'Episode 163':
+Average Hit-ratio: 96.89
+Average runtime: 381.17
+Average memory consumption: 317601.72
+Average power consumption: 911.68
+
+Extracted metrics for 'Episode 164':
+Average Hit-ratio: 97.69
+Average runtime: 383.66
+Average memory consumption: 319978.19
+Average power consumption: 915.92
+
+Extracted metrics for 'Episode 165':
+Average Hit-ratio: 97.89
+Average runtime: 386.21
+Average memory consumption: 321962.34
+Average power consumption: 921.96
+
+Extracted metrics for 'Episode 166':
+Average Hit-ratio: 98.38
+Average runtime: 388.87
+Average memory consumption: 324705.52
+Average power consumption: 928.84
+
+Extracted metrics for 'Episode 167':
+Average Hit-ratio: 98.48
+Average runtime: 391.42
+Average memory consumption: 326694.93
+Average power consumption: 935.10
+
+Extracted metrics for 'Episode 168':
+Average Hit-ratio: 97.67
+Average runtime: 394.00
+Average memory consumption: 328684.89
+Average power consumption: 941.16
+
+Extracted metrics for 'Episode 169':
+Average Hit-ratio: 97.57
+Average runtime: 396.55
+Average memory consumption: 330675.19
+Average power consumption: 946.90
+
+Extracted metrics for 'Episode 170':
+Average Hit-ratio: 97.54
+Average runtime: 399.08
+Average memory consumption: 331639.26
+Average power consumption: 950.90
+
+Extracted metrics for 'Episode 171':
+Average Hit-ratio: 98.08
+Average runtime: 401.65
+Average memory consumption: 333625.85
+Average power consumption: 956.50
+
+Extracted metrics for 'Episode 172':
+Average Hit-ratio: 97.86
+Average runtime: 404.21
+Average memory consumption: 335612.97
+Average power consumption: 962.66
+
+Extracted metrics for 'Episode 173':
+Average Hit-ratio: 97.54
+Average runtime: 406.77
+Average memory consumption: 337600.58
+Average power consumption: 968.69
+
+Extracted metrics for 'Episode 174':
+Average Hit-ratio: 97.65
+Average runtime: 409.35
+Average memory consumption: 339588.75
+Average power consumption: 974.49
+
+Extracted metrics for 'Episode 175':
+Average Hit-ratio: 97.62
+Average runtime: 411.89
+Average memory consumption: 340287.97
+Average power consumption: 981.77
+
+Extracted metrics for 'Episode 176':
+Average Hit-ratio: 97.62
+Average runtime: 414.43
+Average memory consumption: 342271.11
+Average power consumption: 987.50
+
+Extracted metrics for 'Episode 177':
+Average Hit-ratio: 97.06
+Average runtime: 417.02
+Average memory consumption: 344254.72
+Average power consumption: 993.16
+
+Extracted metrics for 'Episode 178':
+Average Hit-ratio: 97.96
+Average runtime: 419.58
+Average memory consumption: 346238.91
+Average power consumption: 998.84
+
+Extracted metrics for 'Episode 179':
+Average Hit-ratio: 97.24
+Average runtime: 422.15
+Average memory consumption: 348816.25
+Average power consumption: 1005.69
+
+Extracted metrics for 'Episode 180':
+Average Hit-ratio: 96.27
+Average runtime: 424.71
+Average memory consumption: 350804.57
+Average power consumption: 1011.45
+
+Extracted metrics for 'Episode 181':
+Average Hit-ratio: 97.36
+Average runtime: 427.31
+Average memory consumption: 352793.47
+Average power consumption: 1017.09
+
+Extracted metrics for 'Episode 182':
+Average Hit-ratio: 97.84
+Average runtime: 429.88
+Average memory consumption: 354782.84
+Average power consumption: 1023.11
+
+Extracted metrics for 'Episode 183':
+Average Hit-ratio: 96.75
+Average runtime: 432.46
+Average memory consumption: 356772.73
+Average power consumption: 1029.58
+
+Extracted metrics for 'Episode 184':
+Average Hit-ratio: 97.36
+Average runtime: 435.05
+Average memory consumption: 358763.18
+Average power consumption: 1035.39
+
+Extracted metrics for 'Episode 185':
+Average Hit-ratio: 98.32
+Average runtime: 437.62
+Average memory consumption: 360754.25
+Average power consumption: 1041.42
+
+Extracted metrics for 'Episode 186':
+Average Hit-ratio: 98.08
+Average runtime: 440.21
+Average memory consumption: 362745.74
+Average power consumption: 1047.59
+
+Extracted metrics for 'Episode 187':
+Average Hit-ratio: 98.08
+Average runtime: 442.80
+Average memory consumption: 364737.73
+Average power consumption: 1053.34
+
+Extracted metrics for 'Episode 188':
+Average Hit-ratio: 97.84
+Average runtime: 445.40
+Average memory consumption: 366730.35
+Average power consumption: 1058.95
+
+Extracted metrics for 'Episode 189':
+Average Hit-ratio: 97.96
+Average runtime: 447.98
+Average memory consumption: 368723.43
+Average power consumption: 1064.98
+
+Extracted metrics for 'Episode 190':
+Average Hit-ratio: 98.08
+Average runtime: 450.55
+Average memory consumption: 370131.90
+Average power consumption: 1069.34
+
+Extracted metrics for 'Episode 191':
+Average Hit-ratio: 97.95
+Average runtime: 453.14
+Average memory consumption: 372122.52
+Average power consumption: 1077.12
+
+Extracted metrics for 'Episode 192':
+Average Hit-ratio: 98.08
+Average runtime: 455.73
+Average memory consumption: 374113.75
+Average power consumption: 1083.76
+
+Extracted metrics for 'Episode 193':
+Average Hit-ratio: 97.56
+Average runtime: 458.32
+Average memory consumption: 376105.64
+Average power consumption: 1090.15
+
+Extracted metrics for 'Episode 194':
+Average Hit-ratio: 98.08
+Average runtime: 460.96
+Average memory consumption: 378098.02
+Average power consumption: 1096.67
+
+Extracted metrics for 'Episode 195':
+Average Hit-ratio: 96.92
+Average runtime: 463.56
+Average memory consumption: 380090.98
+Average power consumption: 1103.45
+
+Extracted metrics for 'Episode 196':
+Average Hit-ratio: 97.82
+Average runtime: 466.17
+Average memory consumption: 382084.60
+Average power consumption: 1110.24
+
+Extracted metrics for 'Episode 197':
+Average Hit-ratio: 96.79
+Average runtime: 468.75
+Average memory consumption: 384078.61
+Average power consumption: 1116.46
+
+Extracted metrics for 'Episode 198':
+Average Hit-ratio: 97.44
+Average runtime: 471.35
+Average memory consumption: 386073.32
+Average power consumption: 1122.67
+
+Extracted metrics for 'Episode 199':
+Average Hit-ratio: 97.56
+Average runtime: 473.99
+Average memory consumption: 388068.56
+Average power consumption: 1130.80
+
+Extracted metrics for 'Episode 200':
+Average Hit-ratio: 98.20
+Average runtime: 476.60
+Average memory consumption: 390064.37
+Average power consumption: 1138.59
+
+Extracted metrics for 'Episode 201':
+Average Hit-ratio: 96.92
+Average runtime: 479.21
+Average memory consumption: 392060.81
+Average power consumption: 1150.54
+
+Extracted metrics for 'Episode 202':
+Average Hit-ratio: 98.33
+Average runtime: 481.89
+Average memory consumption: 394057.54
+Average power consumption: 1159.23
+
+Extracted metrics for 'Episode 203':
+Average Hit-ratio: 97.69
+Average runtime: 484.58
+Average memory consumption: 396054.95
+Average power consumption: 1170.79
+
+Extracted metrics for 'Episode 204':
+Average Hit-ratio: 98.49
+Average runtime: 487.18
+Average memory consumption: 400817.03
+Average power consumption: 1173.17
+
+Extracted metrics for 'Episode 205':
+Average Hit-ratio: 97.66
+Average runtime: 489.80
+Average memory consumption: 402825.25
+Average power consumption: 1181.43
+
+Extracted metrics for 'Episode 206':
+Average Hit-ratio: 97.53
+Average runtime: 492.42
+Average memory consumption: 404834.01
+Average power consumption: 1188.12
+
+Extracted metrics for 'Episode 207':
+Average Hit-ratio: 97.39
+Average runtime: 495.03
+Average memory consumption: 406843.34
+Average power consumption: 1197.38
+
+Extracted metrics for 'Episode 208':
+Average Hit-ratio: 98.08
+Average runtime: 497.66
+Average memory consumption: 408853.15
+Average power consumption: 1203.95
+
+Extracted metrics for 'Episode 209':
+Average Hit-ratio: 97.25
+Average runtime: 500.27
+Average memory consumption: 410863.46
+Average power consumption: 1209.19
+
+Extracted metrics for 'Episode 210':
+Average Hit-ratio: 98.35
+Average runtime: 502.90
+Average memory consumption: 412874.44
+Average power consumption: 1214.28
+
+Extracted metrics for 'Episode 211':
+Average Hit-ratio: 97.80
+Average runtime: 505.51
+Average memory consumption: 414885.94
+Average power consumption: 1219.44
+
+Extracted metrics for 'Episode 212':
+Average Hit-ratio: 97.94
+Average runtime: 508.13
+Average memory consumption: 416898.10
+Average power consumption: 1225.24
+
+Extracted metrics for 'Episode 213':
+Average Hit-ratio: 97.25
+Average runtime: 510.76
+Average memory consumption: 418910.71
+Average power consumption: 1230.47
+
+Extracted metrics for 'Episode 214':
+Average Hit-ratio: 97.39
+Average runtime: 513.37
+Average memory consumption: 420923.77
+Average power consumption: 1235.47
+
+Extracted metrics for 'Episode 215':
+Average Hit-ratio: 97.66
+Average runtime: 515.99
+Average memory consumption: 422937.36
+Average power consumption: 1241.09
+
+Extracted metrics for 'Episode 216':
+Average Hit-ratio: 97.39
+Average runtime: 518.60
+Average memory consumption: 424951.56
+Average power consumption: 1246.70
+
+Extracted metrics for 'Episode 217':
+Average Hit-ratio: 96.84
+Average runtime: 521.30
+Average memory consumption: 426966.32
+Average power consumption: 1253.04
+
+Extracted metrics for 'Episode 218':
+Average Hit-ratio: 98.35
+Average runtime: 523.93
+Average memory consumption: 428981.69
+Average power consumption: 1258.44
+
+Extracted metrics for 'Episode 219':
+Average Hit-ratio: 98.49
+Average runtime: 526.55
+Average memory consumption: 430997.52
+Average power consumption: 1264.73
+
+Extracted metrics for 'Episode 220':
+Average Hit-ratio: 98.08
+Average runtime: 529.18
+Average memory consumption: 433013.95
+Average power consumption: 1270.55
+
+Extracted metrics for 'Episode 221':
+Average Hit-ratio: 98.49
+Average runtime: 531.81
+Average memory consumption: 435031.00
+Average power consumption: 1275.87
+
+Extracted metrics for 'Episode 222':
+Average Hit-ratio: 98.37
+Average runtime: 534.61
+Average memory consumption: 435712.68
+Average power consumption: 1285.82
+
+Extracted metrics for 'Episode 223':
+Average Hit-ratio: 97.34
+Average runtime: 537.24
+Average memory consumption: 437727.38
+Average power consumption: 1292.28
+
+Extracted metrics for 'Episode 224':
+Average Hit-ratio: 98.08
+Average runtime: 539.87
+Average memory consumption: 439742.68
+Average power consumption: 1297.82
+
+Extracted metrics for 'Episode 225':
+Average Hit-ratio: 98.08
+Average runtime: 542.52
+Average memory consumption: 441758.50
+Average power consumption: 1303.13
+
+Extracted metrics for 'Episode 226':
+Average Hit-ratio: 97.76
+Average runtime: 545.27
+Average memory consumption: 444686.52
+Average power consumption: 1314.67
+
+Extracted metrics for 'Episode 227':
+Average Hit-ratio: 97.92
+Average runtime: 547.88
+Average memory consumption: 446707.42
+Average power consumption: 1320.03
+
+Extracted metrics for 'Episode 228':
+Average Hit-ratio: 97.43
+Average runtime: 550.53
+Average memory consumption: 448728.91
+Average power consumption: 1325.39
+
+Extracted metrics for 'Episode 229':
+Average Hit-ratio: 96.63
+Average runtime: 553.18
+Average memory consumption: 450751.17
+Average power consumption: 1330.57
+
+Extracted metrics for 'Episode 230':
+Average Hit-ratio: 97.12
+Average runtime: 555.82
+Average memory consumption: 452773.90
+Average power consumption: 1335.57
+
+Extracted metrics for 'Episode 231':
+Average Hit-ratio: 98.40
+Average runtime: 558.45
+Average memory consumption: 454797.30
+Average power consumption: 1340.76
+
+Extracted metrics for 'Episode 232':
+Average Hit-ratio: 97.92
+Average runtime: 561.08
+Average memory consumption: 456821.37
+Average power consumption: 1345.76
+
+Extracted metrics for 'Episode 233':
+Average Hit-ratio: 98.56
+Average runtime: 563.73
+Average memory consumption: 458846.07
+Average power consumption: 1351.09
+
+Extracted metrics for 'Episode 234':
+Average Hit-ratio: 97.12
+Average runtime: 566.39
+Average memory consumption: 460871.54
+Average power consumption: 1356.82
+
+Extracted metrics for 'Episode 235':
+Average Hit-ratio: 97.60
+Average runtime: 569.03
+Average memory consumption: 462897.70
+Average power consumption: 1362.26
+
+Extracted metrics for 'Episode 236':
+Average Hit-ratio: 98.56
+Average runtime: 571.70
+Average memory consumption: 464924.44
+Average power consumption: 1367.44
+
+Extracted metrics for 'Episode 237':
+Average Hit-ratio: 97.76
+Average runtime: 574.33
+Average memory consumption: 466951.75
+Average power consumption: 1372.77
+
+Extracted metrics for 'Episode 238':
+Average Hit-ratio: 97.92
+Average runtime: 576.98
+Average memory consumption: 468979.81
+Average power consumption: 1378.05
+
+Extracted metrics for 'Episode 239':
+Average Hit-ratio: 97.28
+Average runtime: 579.62
+Average memory consumption: 471008.54
+Average power consumption: 1384.12
+
+Extracted metrics for 'Episode 240':
+Average Hit-ratio: 97.12
+Average runtime: 582.25
+Average memory consumption: 473037.96
+Average power consumption: 1389.66
+
+Extracted metrics for 'Episode 241':
+Average Hit-ratio: 97.92
+Average runtime: 584.92
+Average memory consumption: 475068.15
+Average power consumption: 1396.29
+
+Extracted metrics for 'Episode 242':
+Average Hit-ratio: 96.95
+Average runtime: 587.59
+Average memory consumption: 477098.95
+Average power consumption: 1402.20
+
+Extracted metrics for 'Episode 243':
+Average Hit-ratio: 97.76
+Average runtime: 590.25
+Average memory consumption: 479130.43
+Average power consumption: 1407.80
+
+Extracted metrics for 'Episode 244':
+Average Hit-ratio: 97.92
+Average runtime: 592.94
+Average memory consumption: 481162.62
+Average power consumption: 1412.90
+
+Extracted metrics for 'Episode 245':
+Average Hit-ratio: 96.31
+Average runtime: 595.59
+Average memory consumption: 483195.52
+Average power consumption: 1418.18
+
+Extracted metrics for 'Episode 246':
+Average Hit-ratio: 97.38
+Average runtime: 597.51
+Average memory consumption: 484026.06
+Average power consumption: 1431.27
+
+Extracted metrics for 'Episode 247':
+Average Hit-ratio: 97.03
+Average runtime: 600.18
+Average memory consumption: 486055.01
+Average power consumption: 1437.94
+
+Extracted metrics for 'Episode 248':
+Average Hit-ratio: 97.55
+Average runtime: 602.82
+Average memory consumption: 488084.65
+Average power consumption: 1443.96
+
+Extracted metrics for 'Episode 249':
+Average Hit-ratio: 97.73
+Average runtime: 605.51
+Average memory consumption: 490114.89
+Average power consumption: 1449.36
+
+Extracted metrics for 'Episode 250':
+Average Hit-ratio: 97.73
+Average runtime: 608.18
+Average memory consumption: 492145.79
+Average power consumption: 1454.69
+
+Extracted metrics for 'Episode 251':
+Average Hit-ratio: 96.85
+Average runtime: 610.84
+Average memory consumption: 494177.44
+Average power consumption: 1460.45
+
+Extracted metrics for 'Episode 252':
+Average Hit-ratio: 97.73
+Average runtime: 613.53
+Average memory consumption: 496209.74
+Average power consumption: 1466.32
+
+Extracted metrics for 'Episode 253':
+Average Hit-ratio: 96.85
+Average runtime: 616.23
+Average memory consumption: 498242.70
+Average power consumption: 1471.71
+
+Extracted metrics for 'Episode 254':
+Average Hit-ratio: 97.73
+Average runtime: 618.92
+Average memory consumption: 500276.27
+Average power consumption: 1477.17
+
+Extracted metrics for 'Episode 255':
+Average Hit-ratio: 97.73
+Average runtime: 621.62
+Average memory consumption: 502310.66
+Average power consumption: 1482.57
+
+Extracted metrics for 'Episode 256':
+Average Hit-ratio: 97.55
+Average runtime: 624.29
+Average memory consumption: 504345.67
+Average power consumption: 1488.84
+
+Extracted metrics for 'Episode 257':
+Average Hit-ratio: 97.90
+Average runtime: 627.01
+Average memory consumption: 506381.49
+Average power consumption: 1494.05
+
+Extracted metrics for 'Episode 258':
+Average Hit-ratio: 96.85
+Average runtime: 629.71
+Average memory consumption: 508418.00
+Average power consumption: 1499.23
+
+Extracted metrics for 'Episode 259':
+Average Hit-ratio: 97.73
+Average runtime: 632.39
+Average memory consumption: 510455.14
+Average power consumption: 1504.53
+
+Extracted metrics for 'Episode 260':
+Average Hit-ratio: 96.54
+Average runtime: 634.67
+Average memory consumption: 514089.08
+Average power consumption: 1513.97
+
+Extracted metrics for 'Episode 261':
+Average Hit-ratio: 96.92
+Average runtime: 637.38
+Average memory consumption: 516131.75
+Average power consumption: 1519.46
+
+Extracted metrics for 'Episode 262':
+Average Hit-ratio: 96.34
+Average runtime: 640.07
+Average memory consumption: 518175.29
+Average power consumption: 1524.77
+
+Extracted metrics for 'Episode 263':
+Average Hit-ratio: 97.31
+Average runtime: 642.78
+Average memory consumption: 520219.39
+Average power consumption: 1530.10
+
+Extracted metrics for 'Episode 264':
+Average Hit-ratio: 97.31
+Average runtime: 645.47
+Average memory consumption: 522264.12
+Average power consumption: 1535.63
+
+Extracted metrics for 'Episode 265':
+Average Hit-ratio: 97.31
+Average runtime: 648.15
+Average memory consumption: 524309.65
+Average power consumption: 1541.25
+
+Extracted metrics for 'Episode 266':
+Average Hit-ratio: 97.89
+Average runtime: 650.90
+Average memory consumption: 526355.86
+Average power consumption: 1547.34
+
+Extracted metrics for 'Episode 267':
+Average Hit-ratio: 96.58
+Average runtime: 652.48
+Average memory consumption: 526624.09
+Average power consumption: 1485.73
+
+Extracted metrics for 'Episode 268':
+Average Hit-ratio: 95.51
+Average runtime: 655.19
+Average memory consumption: 528664.67
+Average power consumption: 1491.07
+
+Extracted metrics for 'Episode 269':
+Average Hit-ratio: 97.86
+Average runtime: 657.89
+Average memory consumption: 530706.07
+Average power consumption: 1496.32
+
+Extracted metrics for 'Episode 270':
+Average Hit-ratio: 96.37
+Average runtime: 660.60
+Average memory consumption: 532747.91
+Average power consumption: 1501.64
+
+Extracted metrics for 'Episode 271':
+Average Hit-ratio: 96.58
+Average runtime: 663.32
+Average memory consumption: 534790.44
+Average power consumption: 1506.64
+
+Extracted metrics for 'Episode 272':
+Average Hit-ratio: 96.80
+Average runtime: 666.02
+Average memory consumption: 536833.69
+Average power consumption: 1511.86
+
+Extracted metrics for 'Episode 273':
+Average Hit-ratio: 96.15
+Average runtime: 668.69
+Average memory consumption: 538877.69
+Average power consumption: 1517.12
+
+Extracted metrics for 'Episode 274':
+Average Hit-ratio: 95.94
+Average runtime: 671.42
+Average memory consumption: 540922.50
+Average power consumption: 1522.74
+
+Extracted metrics for 'Episode 275':
+Average Hit-ratio: 97.22
+Average runtime: 674.14
+Average memory consumption: 542967.87
+Average power consumption: 1528.07
+
+Extracted metrics for 'Episode 276':
+Average Hit-ratio: 96.80
+Average runtime: 676.84
+Average memory consumption: 545014.01
+Average power consumption: 1533.07
+
+Extracted metrics for 'Episode 277':
+Average Hit-ratio: 97.01
+Average runtime: 679.57
+Average memory consumption: 547060.85
+Average power consumption: 1538.66
+
+Extracted metrics for 'Episode 278':
+Average Hit-ratio: 96.79
+Average runtime: 682.31
+Average memory consumption: 549108.44
+Average power consumption: 1544.21
+
+Extracted metrics for 'Episode 279':
+Average Hit-ratio: 98.08
+Average runtime: 684.66
+Average memory consumption: 547579.88
+Average power consumption: 1550.84
+
+Extracted metrics for 'Episode 280':
+Average Hit-ratio: 97.36
+Average runtime: 687.39
+Average memory consumption: 549621.05
+Average power consumption: 1555.97
+
+Extracted metrics for 'Episode 281':
+Average Hit-ratio: 97.36
+Average runtime: 690.09
+Average memory consumption: 551663.01
+Average power consumption: 1561.52
+
+Extracted metrics for 'Episode 282':
+Average Hit-ratio: 97.35
+Average runtime: 692.79
+Average memory consumption: 553705.67
+Average power consumption: 1566.78
+
+Extracted metrics for 'Episode 283':
+Average Hit-ratio: 95.67
+Average runtime: 695.54
+Average memory consumption: 555748.97
+Average power consumption: 1572.19
+
+Extracted metrics for 'Episode 284':
+Average Hit-ratio: 97.12
+Average runtime: 698.28
+Average memory consumption: 557793.05
+Average power consumption: 1578.43
+
+Extracted metrics for 'Episode 285':
+Average Hit-ratio: 95.91
+Average runtime: 700.99
+Average memory consumption: 559837.93
+Average power consumption: 1583.82
+
+Extracted metrics for 'Episode 286':
+Average Hit-ratio: 95.43
+Average runtime: 703.72
+Average memory consumption: 561883.56
+Average power consumption: 1589.24
+
+Extracted metrics for 'Episode 287':
+Average Hit-ratio: 96.88
+Average runtime: 706.47
+Average memory consumption: 563929.82
+Average power consumption: 1594.53
+
+Extracted metrics for 'Episode 288':
+Average Hit-ratio: 96.88
+Average runtime: 709.21
+Average memory consumption: 565976.82
+Average power consumption: 1599.97
+
+Extracted metrics for 'Episode 289':
+Average Hit-ratio: 96.39
+Average runtime: 711.94
+Average memory consumption: 568024.58
+Average power consumption: 1604.97
+
+Extracted metrics for 'Episode 290':
+Average Hit-ratio: 96.15
+Average runtime: 714.65
+Average memory consumption: 570072.98
+Average power consumption: 1610.23
+
+Extracted metrics for 'Episode 291':
+Average Hit-ratio: 95.67
+Average runtime: 717.37
+Average memory consumption: 572122.23
+Average power consumption: 1615.53
+
+Extracted metrics for 'Episode 292':
+Average Hit-ratio: 96.63
+Average runtime: 720.13
+Average memory consumption: 574172.01
+Average power consumption: 1620.81
+
+Extracted metrics for 'Episode 293':
+Average Hit-ratio: 96.39
+Average runtime: 722.88
+Average memory consumption: 576222.69
+Average power consumption: 1625.81
+
+Extracted metrics for 'Episode 294':
+Average Hit-ratio: 97.60
+Average runtime: 725.60
+Average memory consumption: 578274.04
+Average power consumption: 1631.08
+
+Extracted metrics for 'Episode 295':
+Average Hit-ratio: 98.32
+Average runtime: 728.35
+Average memory consumption: 580326.17
+Average power consumption: 1636.62
+
+Extracted metrics for 'Episode 296':
+Average Hit-ratio: 98.08
+Average runtime: 731.11
+Average memory consumption: 582379.05
+Average power consumption: 1642.15
+
+Extracted metrics for 'Episode 297':
+Average Hit-ratio: 97.60
+Average runtime: 733.87
+Average memory consumption: 584432.56
+Average power consumption: 1647.30
+
+Extracted metrics for 'Episode 298':
+Average Hit-ratio: 98.80
+Average runtime: 736.62
+Average memory consumption: 586486.76
+Average power consumption: 1652.59
+
+Extracted metrics for 'Episode 299':
+Average Hit-ratio: 98.08
+Average runtime: 739.36
+Average memory consumption: 588541.71
+Average power consumption: 1657.72
+
+Extracted metrics for 'Episode 300':
+Average Hit-ratio: 97.36
+Average runtime: 742.09
+Average memory consumption: 590597.49
+Average power consumption: 1662.72
+
+Extracted metrics for 'Episode 301':
+Average Hit-ratio: 98.80
+Average runtime: 744.87
+Average memory consumption: 592654.00
+Average power consumption: 1669.47
+
+Extracted metrics for 'Episode 302':
+Average Hit-ratio: 96.64
+Average runtime: 747.62
+Average memory consumption: 594711.28
+Average power consumption: 1674.63
+
+Extracted metrics for 'Episode 303':
+Average Hit-ratio: 96.88
+Average runtime: 750.36
+Average memory consumption: 596769.28
+Average power consumption: 1681.00
+
+Extracted metrics for 'Episode 304':
+Average Hit-ratio: 98.56
+Average runtime: 753.14
+Average memory consumption: 598827.98
+Average power consumption: 1686.29
+
+Extracted metrics for 'Episode 305':
+Average Hit-ratio: 97.80
+Average runtime: 755.38
+Average memory consumption: 597449.60
+Average power consumption: 1690.71
+
+Extracted metrics for 'Episode 306':
+Average Hit-ratio: 96.98
+Average runtime: 758.30
+Average memory consumption: 599500.11
+Average power consumption: 1696.16
+
+Extracted metrics for 'Episode 307':
+Average Hit-ratio: 98.35
+Average runtime: 761.06
+Average memory consumption: 601551.47
+Average power consumption: 1701.53
+
+Extracted metrics for 'Episode 308':
+Average Hit-ratio: 97.80
+Average runtime: 763.81
+Average memory consumption: 603603.85
+Average power consumption: 1707.44
+
+Extracted metrics for 'Episode 309':
+Average Hit-ratio: 98.08
+Average runtime: 766.55
+Average memory consumption: 605656.79
+Average power consumption: 1712.86
+
+Extracted metrics for 'Episode 310':
+Average Hit-ratio: 98.35
+Average runtime: 769.33
+Average memory consumption: 607710.69
+Average power consumption: 1717.86
+
+Extracted metrics for 'Episode 311':
+Average Hit-ratio: 98.90
+Average runtime: 772.07
+Average memory consumption: 609765.41
+Average power consumption: 1723.37
+
+Extracted metrics for 'Episode 312':
+Average Hit-ratio: 97.25
+Average runtime: 774.82
+Average memory consumption: 611821.10
+Average power consumption: 1729.43
+
+Extracted metrics for 'Episode 313':
+Average Hit-ratio: 97.53
+Average runtime: 777.58
+Average memory consumption: 613877.69
+Average power consumption: 1735.03
+
+Extracted metrics for 'Episode 314':
+Average Hit-ratio: 98.63
+Average runtime: 780.36
+Average memory consumption: 615935.08
+Average power consumption: 1740.36
+
+Extracted metrics for 'Episode 315':
+Average Hit-ratio: 96.43
+Average runtime: 783.12
+Average memory consumption: 617993.34
+Average power consumption: 1745.64
+
+Extracted metrics for 'Episode 316':
+Average Hit-ratio: 98.08
+Average runtime: 785.89
+Average memory consumption: 620052.34
+Average power consumption: 1750.81
+
+Extracted metrics for 'Episode 317':
+Average Hit-ratio: 98.63
+Average runtime: 788.66
+Average memory consumption: 622112.11
+Average power consumption: 1756.31
+
+Extracted metrics for 'Episode 318':
+Average Hit-ratio: 97.53
+Average runtime: 791.41
+Average memory consumption: 624172.72
+Average power consumption: 1761.78
+
+Extracted metrics for 'Episode 319':
+Average Hit-ratio: 98.35
+Average runtime: 794.17
+Average memory consumption: 626234.32
+Average power consumption: 1767.24
+
+Extracted metrics for 'Episode 320':
+Average Hit-ratio: 96.15
+Average runtime: 796.98
+Average memory consumption: 628296.57
+Average power consumption: 1772.65
+
+Extracted metrics for 'Episode 321':
+Average Hit-ratio: 97.80
+Average runtime: 799.74
+Average memory consumption: 630359.63
+Average power consumption: 1777.79
+
+Extracted metrics for 'Episode 322':
+Average Hit-ratio: 97.25
+Average runtime: 802.49
+Average memory consumption: 632423.59
+Average power consumption: 1782.95
+
+Extracted metrics for 'Episode 323':
+Average Hit-ratio: 97.53
+Average runtime: 805.27
+Average memory consumption: 634488.33
+Average power consumption: 1788.23
+
+Extracted metrics for 'Episode 324':
+Average Hit-ratio: 96.80
+Average runtime: 807.93
+Average memory consumption: 631462.04
+Average power consumption: 1798.76
+
+Extracted metrics for 'Episode 325':
+Average Hit-ratio: 96.80
+Average runtime: 810.70
+Average memory consumption: 633515.23
+Average power consumption: 1804.13
+
+Extracted metrics for 'Episode 326':
+Average Hit-ratio: 97.76
+Average runtime: 813.46
+Average memory consumption: 635569.17
+Average power consumption: 1810.48
+
+Extracted metrics for 'Episode 327':
+Average Hit-ratio: 96.80
+Average runtime: 816.22
+Average memory consumption: 637624.02
+Average power consumption: 1816.66
+
+Extracted metrics for 'Episode 328':
+Average Hit-ratio: 96.48
+Average runtime: 818.98
+Average memory consumption: 639679.64
+Average power consumption: 1822.00
+
+Extracted metrics for 'Episode 329':
+Average Hit-ratio: 94.55
+Average runtime: 821.80
+Average memory consumption: 641736.15
+Average power consumption: 1827.00
+
+Extracted metrics for 'Episode 330':
+Average Hit-ratio: 97.44
+Average runtime: 824.56
+Average memory consumption: 643793.51
+Average power consumption: 1832.39
+
+Extracted metrics for 'Episode 331':
+Average Hit-ratio: 97.44
+Average runtime: 827.34
+Average memory consumption: 645851.64
+Average power consumption: 1838.13
+
+Extracted metrics for 'Episode 332':
+Average Hit-ratio: 96.15
+Average runtime: 830.13
+Average memory consumption: 647910.64
+Average power consumption: 1843.13
+
+Extracted metrics for 'Episode 333':
+Average Hit-ratio: 95.51
+Average runtime: 832.89
+Average memory consumption: 649970.48
+Average power consumption: 1848.29
+
+Extracted metrics for 'Episode 334':
+Average Hit-ratio: 96.92
+Average runtime: 835.53
+Average memory consumption: 651915.09
+Average power consumption: 1855.83
+
+Extracted metrics for 'Episode 335':
+Average Hit-ratio: 96.54
+Average runtime: 838.34
+Average memory consumption: 653980.93
+Average power consumption: 1861.04
+
+Extracted metrics for 'Episode 336':
+Average Hit-ratio: 97.31
+Average runtime: 841.12
+Average memory consumption: 656047.70
+Average power consumption: 1866.22
+
+Extracted metrics for 'Episode 337':
+Average Hit-ratio: 96.54
+Average runtime: 843.89
+Average memory consumption: 658115.24
+Average power consumption: 1871.22
+
+Extracted metrics for 'Episode 338':
+Average Hit-ratio: 96.15
+Average runtime: 846.64
+Average memory consumption: 660183.51
+Average power consumption: 1876.45
+
+Extracted metrics for 'Episode 339':
+Average Hit-ratio: 98.46
+Average runtime: 849.49
+Average memory consumption: 662252.71
+Average power consumption: 1881.45
+
+Extracted metrics for 'Episode 340':
+Average Hit-ratio: 97.31
+Average runtime: 852.26
+Average memory consumption: 664322.58
+Average power consumption: 1886.45
+
+Extracted metrics for 'Episode 341':
+Average Hit-ratio: 95.39
+Average runtime: 855.04
+Average memory consumption: 666393.57
+Average power consumption: 1891.65
+
+Extracted metrics for 'Episode 342':
+Average Hit-ratio: 97.69
+Average runtime: 857.85
+Average memory consumption: 668465.36
+Average power consumption: 1898.64
+
+Extracted metrics for 'Episode 343':
+Average Hit-ratio: 98.08
+Average runtime: 860.63
+Average memory consumption: 670538.05
+Average power consumption: 1904.72
+
+Extracted metrics for 'Episode 344':
+Average Hit-ratio: 95.38
+Average runtime: 863.46
+Average memory consumption: 672611.58
+Average power consumption: 1909.72
+
+Extracted metrics for 'Episode 345':
+Average Hit-ratio: 98.08
+Average runtime: 866.29
+Average memory consumption: 674685.82
+Average power consumption: 1914.72
+
+Extracted metrics for 'Episode 346':
+Average Hit-ratio: 96.92
+Average runtime: 869.09
+Average memory consumption: 676761.01
+Average power consumption: 1921.49
+
+Extracted metrics for 'Episode 347':
+Average Hit-ratio: 97.69
+Average runtime: 871.87
+Average memory consumption: 678836.95
+Average power consumption: 1927.10
+
+Extracted metrics for 'Episode 348':
+Average Hit-ratio: 97.31
+Average runtime: 874.65
+Average memory consumption: 680913.85
+Average power consumption: 1932.36
+
+Extracted metrics for 'Episode 349':
+Average Hit-ratio: 96.15
+Average runtime: 877.51
+Average memory consumption: 682991.58
+Average power consumption: 1938.40
+
+Extracted metrics for 'Episode 350':
+Average Hit-ratio: 98.08
+Average runtime: 880.29
+Average memory consumption: 685070.27
+Average power consumption: 1944.02
+
+Extracted metrics for 'Episode 351':
+Average Hit-ratio: 97.31
+Average runtime: 883.09
+Average memory consumption: 687149.61
+Average power consumption: 1949.74
+
+Extracted metrics for 'Episode 352':
+Average Hit-ratio: 96.54
+Average runtime: 885.92
+Average memory consumption: 689229.83
+Average power consumption: 1954.74
+
+Extracted metrics for 'Episode 353':
+Average Hit-ratio: 98.85
+Average runtime: 888.71
+Average memory consumption: 691310.98
+Average power consumption: 1963.54
+
+Extracted metrics for 'Episode 354':
+Average Hit-ratio: 95.77
+Average runtime: 891.54
+Average memory consumption: 693392.81
+Average power consumption: 1968.54
+
+Extracted metrics for 'Episode 355':
+Average Hit-ratio: 96.92
+Average runtime: 894.36
+Average memory consumption: 695475.61
+Average power consumption: 1974.17
+
+Extracted metrics for 'Episode 356':
+Average Hit-ratio: 96.92
+Average runtime: 897.16
+Average memory consumption: 697559.12
+Average power consumption: 1979.80
+
+Extracted metrics for 'Episode 357':
+Average Hit-ratio: 96.92
+Average runtime: 899.95
+Average memory consumption: 699643.59
+Average power consumption: 1985.02
+
+Extracted metrics for 'Episode 358':
+Average Hit-ratio: 96.54
+Average runtime: 902.74
+Average memory consumption: 701728.95
+Average power consumption: 1990.94
+
+Extracted metrics for 'Episode 359':
+Average Hit-ratio: 97.69
+Average runtime: 905.63
+Average memory consumption: 703815.09
+Average power consumption: 1995.94
+
+Extracted metrics for 'Episode 360':
+Average Hit-ratio: 97.69
+Average runtime: 908.45
+Average memory consumption: 705902.08
+Average power consumption: 2001.83
+
+Extracted metrics for 'Episode 361':
+Average Hit-ratio: 97.31
+Average runtime: 911.44
+Average memory consumption: 707989.95
+Average power consumption: 2007.52
+
+Extracted metrics for 'Episode 362':
+Average Hit-ratio: 96.92
+Average runtime: 914.25
+Average memory consumption: 710078.64
+Average power consumption: 2012.52
+
+===================================================================================================================
+===================================================================================================================
+===================================================================================================================
+import csv
+import re
+
+def extract_episode_content(file_path,x):
+    # x = input("Enter the value of 'x' (1 to 3 digits): ")
+    # if not x.isdigit() or not (1 <= int(x) <= 999):
+    #     print("Invalid input! 'x' must be an integer with 1 to 3 digits.")
+    #     return
+
+    search_phrase = f"Episode {x} with"
+    found = False
+    extracted_content = []
+    metrics = {
+        "Hit-ratio": [],
+        "runtime": [],
+        "memory consumption": [],
+        "power consumption": []
+    }
+
+    with open(file_path, 'r', encoding='utf-8') as csvfile:
+        reader = csv.reader(csvfile)
+        for row in reader:
+            for cell in row:
+                if found:  # If we're in the middle of capturing content
+                    if '=' in cell:
+                        end_index = cell.find('=')
+                        extracted_content.append(cell[:end_index].strip())
+                        found = False  # Stop capturing after '='
+                        break
+                    else:
+                        extracted_content.append(cell.strip())
+                elif search_phrase in cell:  # Start capturing content
+                    found = True
+                    start_index = cell.find(search_phrase) + len(search_phrase)
+                    if '=' in cell[start_index:]:
+                        end_index = cell.find('=', start_index)
+                        extracted_content.append(cell[start_index:end_index].strip())
+                        found = False  # Stop capturing immediately if '=' is in the same cell
+                        break
+                    else:
+                        extracted_content.append(cell[start_index:].strip())
+
+    # Process extracted content to find and store required metrics
+    for line in extracted_content:
+        # Match metrics using regex
+        if "Hit-ratio:" in line:
+            match = re.search(r"Hit-ratio: ([\d.]+)%", line)
+            if match:
+                metrics["Hit-ratio"].append(float(match.group(1)))
+        elif "runtime:" in line:
+            match = re.search(r"runtime: ([\d.]+) seconds", line)
+            if match:
+                metrics["runtime"].append(float(match.group(1)))
+        elif "memory consumption:" in line:
+            match = re.search(r"memory consumption: ([\d.]+) MB", line)
+            if match:
+                metrics["memory consumption"].append(float(match.group(1)))
+        elif "power consumption:" in line:
+            match = re.search(r"power consumption: ([\d.]+) Watt-seconds", line)
+            if match:
+                metrics["power consumption"].append(float(match.group(1)))
+
+    # Calculate and display averages
+    print(f"\nExtracted metrics for 'Episode {x}':")
+    for key, values in metrics.items():
+        if values:
+            average = sum(values) / len(values)
+            print(f"Average {key}: {average:.2f}")
+        else:
+            print(f"No data for {key}.")
+
+# Example usage
+file_path = "/content/drive/MyDrive/Data Mining/Results_2024-12-23_16-53-56.csv"  # Replace with your actual CSV file path
+
+for i in range(1,363):
+  extract_episode_content(file_path,i)
+
+===================================================================================================================
+===================================================================================================================
+===================================================================================================================
+
+import re
+
+# Define the file path
+file_path = "/content/drive/MyDrive/Data Mining/test1.csv"
+
+# Initialize a list to store the results
+results = []
+
+# Temporary variables to hold the values until a pair is formed
+current_hit_ratio = None
+current_power = None
+
+# Read and process the file
+with open(file_path, "r") as file:
+    lines = file.readlines()
+    for line in lines:
+        # Match 'Average Hit-ratio'
+        hit_match = re.search(r"Average Hit-ratio: ([\d.]+)", line)
+        if hit_match:
+            current_hit_ratio = float(hit_match.group(1))
+
+        # Match 'Average power consumption'
+        power_match = re.search(r"Average power consumption: ([\d.]+)", line)
+        if power_match:
+            current_power = float(power_match.group(1))
+
+        # If both values are available, append the pair and reset
+        if current_hit_ratio is not None and current_power is not None:
+            results.append((current_power, current_hit_ratio))
+            current_hit_ratio = None
+            current_power = None
+
+# Print the results in the requested format
+
+for result in results:
+    print(result)
