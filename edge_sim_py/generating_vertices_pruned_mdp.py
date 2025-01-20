@@ -17,12 +17,15 @@ def generate_binary_matrices(n_rows, n_cols):
     order = 1
     for s in range(1, max_sum + 1):
         # Select s rows out of n_rows
-        row_combinations = list(combinations(range(n_rows), s))
-        print(f"row_combinations:{row_combinations}")
-        if 1 <= order <= len(row_combinations):
-            row_combinations = [row_combinations[order - 1]]
+        # print(f"n_rows:{n_rows}")
+        # print(f"s:{s}")
+        row_combinations = list(combinations(range(order), s))
+        # print(f"row_combinations:{row_combinations}")
+        # if 1 <= order <= len(row_combinations):
+        #     row_combinations = [row_combinations[order - 1]]
         order += 1
-
+        # print(f"row_combinations:{row_combinations}")
+        # print()
         for rows_selected in row_combinations:
             # print(f"row_combinations:{row_combinations}")
             # Generate all possible column assignments for these rows
