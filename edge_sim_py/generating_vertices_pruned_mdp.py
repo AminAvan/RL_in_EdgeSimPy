@@ -18,6 +18,7 @@ def generate_binary_matrices(n_rows, n_cols):
     for s in range(1, max_sum + 1):
         # Select s rows out of n_rows
         row_combinations = list(combinations(range(n_rows), s))
+        print(f"row_combinations:{row_combinations}")
         if 1 <= order <= len(row_combinations):
             row_combinations = [row_combinations[order - 1]]
         order += 1
