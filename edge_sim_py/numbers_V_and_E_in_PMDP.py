@@ -86,9 +86,11 @@ if __name__ == "__main__":
     # len(matrices) contain the root as well as the best_vertices
     print(f"\nTotal vertices: {len(matrices) + worst_vertices}")
     print(f"Total edges: {(len(matrices) + worst_vertices) - 1}")
+    ## [for drawing the actual matrix -- it face long time issue when the matrix get big (with more than 20 rows or columns)
     # for idx, mat in enumerate(matrices, 1):
     #     print(f"Matrix {idx}:")
     #     for row in mat:
     #         print(row)
     #     print()
+    ## [for drawing the actual matrix -- it face long time issue when the matrix get big (with more than 20 rows or columns)
 
