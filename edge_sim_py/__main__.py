@@ -33,8 +33,8 @@ import sys
 from datetime import datetime
 
 ## [for server which poses GPU
-import GPUtil
-import nvidia_smi
+# import GPUtil
+# import nvidia_smi
 # from pynvml import nvmlInit, nvmlDeviceGetHandleByIndex, nvmlDeviceGetUtilizationRates, nvmlShutdown
 ## for server which poses GPU]
 
@@ -63,39 +63,41 @@ class ResourceTracker:
         P_idle = 5  # Example idle power in watts (adjust based on your CPU)
         P_max = 98  # Example max power in watts at full load (adjust based on your CPU)
 
-        # # Estimate power consumption based on CPU usage
-        # cpu_percent = psutil.cpu_percent(interval=0.1)
-        # # Apply the CPU power consumption formula
-        # power_estimate = P_idle + (P_max - P_idle) * (cpu_percent / 100)
-        # # Add the power estimate to the total power consumption
-        # self.total_power += power_estimate
+        # Estimate power consumption based on CPU usage
+        cpu_percent = psutil.cpu_percent(interval=0.1)
+        # Apply the CPU power consumption formula
+        power_estimate = P_idle + (P_max - P_idle) * (cpu_percent / 100)
+        # Add the power estimate to the total power consumption
+        self.total_power += power_estimate
 
-        try:
-            gpus = GPUtil.getGPUs()
-            if gpus:
-                ### Values for NVIDIA GeForce GTX 1070
-                P_idle = 10  # Idle power for GTX 1070 (in watts)
-                P_max = 150  # Maximum power for GTX 1070 (in watts)
-
-
-                info_gpu = subprocess.run(
-                  ['nvidia-smi', '--query-gpu=utilization.gpu', '--format=csv,noheader,nounits'],
-                  stdout=subprocess.PIPE,
-                  stderr=subprocess.PIPE,
-                  text=True
-                )
-                gpu_utilization_percentage = float(info_gpu.stdout.strip())
-                # Apply the GPU power consumption formula (similar to CPU)
-                power_estimate = P_idle + (P_max - P_idle) * (gpu_utilization_percentage / 100)
-                self.total_power += power_estimate
-            else:
-                raise ValueError("No GPU found.")
-        except (ImportError, ValueError):
-            # Fallback to CPU utilization if GPU is not available
-            cpu_percent = psutil.cpu_percent(interval=0.1)
-            # Apply the CPU power consumption formula
-            power_estimate = P_idle + (P_max - P_idle) * (cpu_percent / 100)
-            self.total_power += power_estimate
+        # ### [Estimate power consumption based on GPU usage
+        # try:
+        #     gpus = GPUtil.getGPUs()
+        #     if gpus:
+        #         ### Values for NVIDIA GeForce GTX 1070
+        #         P_idle = 10  # Idle power for GTX 1070 (in watts)
+        #         P_max = 150  # Maximum power for GTX 1070 (in watts)
+        #
+        #
+        #         info_gpu = subprocess.run(
+        #           ['nvidia-smi', '--query-gpu=utilization.gpu', '--format=csv,noheader,nounits'],
+        #           stdout=subprocess.PIPE,
+        #           stderr=subprocess.PIPE,
+        #           text=True
+        #         )
+        #         gpu_utilization_percentage = float(info_gpu.stdout.strip())
+        #         # Apply the GPU power consumption formula (similar to CPU)
+        #         power_estimate = P_idle + (P_max - P_idle) * (gpu_utilization_percentage / 100)
+        #         self.total_power += power_estimate
+        #     else:
+        #         raise ValueError("No GPU found.")
+        # except (ImportError, ValueError):
+        #     # Fallback to CPU utilization if GPU is not available
+        #     cpu_percent = psutil.cpu_percent(interval=0.1)
+        #     # Apply the CPU power consumption formula
+        #     power_estimate = P_idle + (P_max - P_idle) * (cpu_percent / 100)
+        #     self.total_power += power_estimate
+        # ### Estimate power consumption based on GPU usage]
 
     def report(self):
         total_time = time.time() - self.start_time
@@ -1676,25 +1678,27 @@ algorithm_functions = {
 }
 # Define the name of the scheduling algorithm, that could be "lapse", "MASS", "BestFit", "EDF"
 # scheduling_algorithm = "rl"
-# scheduling_algorithm = "EDF"
-scheduling_algorithm = "my_rl_in_edgesimpy"
+scheduling_algorithm = "EDF"
+# scheduling_algorithm = "my_rl_in_edgesimpy"
 # scheduling_algorithm = "my_pruned_rl"
 # scheduling_algorithm = "test_my_pruned_rl"
 
 # @measure_memory
 def wrapped_Service_Provisioning(parameters, algorithm_name=scheduling_algorithm):
-    # # for normal running
+    ### for normal running
     # # Get the function based on the algorithm name
-    # result = algorithm_functions[algorithm_name](parameters)
-    # process = psutil.Process(os.getpid())
-    # resource_tracker.update(process.memory_info().rss)
-
-    # for testing RL for 31 runs
-    # Get the function based on the algorithm name
-    for i in range(31):
-        result = algorithm_functions[algorithm_name](parameters)
+    result = algorithm_functions[algorithm_name](parameters)
     process = psutil.Process(os.getpid())
     resource_tracker.update(process.memory_info().rss)
+
+    ###[ for testing RL for 31 runs
+    # Get the function based on the algorithm name
+    # for i in range(31):
+    #     result = algorithm_functions[algorithm_name](parameters)
+    # process = psutil.Process(os.getpid())
+    # resource_tracker.update(process.memory_info().rss)
+    ### for testing RL for 31 runs]
+
     return result
 
 
