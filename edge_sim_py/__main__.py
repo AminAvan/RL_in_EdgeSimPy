@@ -850,7 +850,7 @@ def v_RL(parameters):
     plt.show()
 
 
-#####################################
+################################
 ## Agile (aRL) implementation ##
 def a_RL(parameters):
     # Override 'has_capacity_to_host' for all instances of the EdgeServer class
