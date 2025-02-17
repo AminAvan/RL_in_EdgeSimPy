@@ -1,6 +1,4 @@
-#bestFit-AsifServer
 
-D:\PycharmProjects\RL_in_EdgeSimPy\.venv\Scripts\python.exe D:\PycharmProjects\RL_in_EdgeSimPy\edge_sim_py\__main__.py 
 10 out of 262 services are successfully scheduled.
 runtime: 0.13 seconds
 memory consumption: 297.42 MB until 0.13 seconds
