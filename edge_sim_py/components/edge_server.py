@@ -121,7 +121,7 @@ class EdgeServer(ComponentManager, Agent):
         self.model = None
         self.unique_id = None
 
-    def reset_attributes(self):  ## added by amin
+    def reset_attributes(self):
         """Resets all attributes of the instance to their default values."""
         self.total_cpu_utilization = 0.0
         self.total_memory_utilization = 0.0

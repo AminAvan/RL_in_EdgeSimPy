@@ -247,7 +247,7 @@ class Service(ComponentManager, Agent):
             elif migration["status"] == "migrating_service_state":
                 migration["migrating_service_state_time"] += 1
 
-            ### amin adds
+
             self.number_of_provisioning_attempt += 1
             # if (self.number_of_provisioning_attempt > 300):
             if (self.number_of_provisioning_attempt > 524):
