@@ -35,6 +35,8 @@ from datetime import datetime
 ## [for server which poses GPU
 import GPUtil
 import nvidia_smi
+from edge_sim_py.dataset_generator.create_dataset import base_station
+
 # from pynvml import nvmlInit, nvmlDeviceGetHandleByIndex, nvmlDeviceGetUtilizationRates, nvmlShutdown
 ## for server which poses GPU]
 
@@ -865,7 +867,8 @@ def a_RL(parameters):
 
     [2]: Yu, Ming, et al. "Convergent policy optimization for safe reinforcement learning." Advances in Neural Information Processing Systems 32 (2019).
     """
-    sliding_window = 100  # Number of consecutive episodes checking the objective's threshold
+    # sliding_window = 100  # Number of consecutive episodes checking the objective's threshold  ## was
+    sliding_window = 10 ## is due to checking the wireless_delay_fluctuation
     objective_value_threshold = (0.98 * len(User.all()))  ## Determining a threshold for the 'hit-ratio' objective
     average_value_for_allocation, total_allocations_records = [], []
     num_completely_scheduled = 0
@@ -1541,7 +1544,7 @@ def wrapped_Service_Provisioning(parameters, algorithm_name=scheduling_algorithm
     # Get the function based on the algorithm name
     for i in range(31):
         result = algorithm_functions[algorithm_name](parameters)
-        fluctuate_wireless_delay()
+        base_station.fluctuate_wireless_delay()
     process = psutil.Process(os.getpid())
     resource_tracker.update(process.memory_info().rss)
     return result
