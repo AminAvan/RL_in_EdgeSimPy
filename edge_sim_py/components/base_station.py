@@ -92,10 +92,18 @@ class BaseStation(ComponentManager, Agent):
 
             default ==> "wireless_delay": 2
         """
+        # Randomly decide *once* before the loop whether to skip even or odd
+        skip_even = random.choice([True, False])
+
         for station in BaseStation._instances:
-            # Optionally, skip some stations based on a condition:
-            if station.id % 2 == 0:  # for example, skip even IDs
-                continue
+            if skip_even:
+                # Skip even IDs
+                if station.id % 2 == 0:
+                    continue
+            else:
+                # Skip odd IDs
+                if station.id % 2 == 1:
+                    continue
 
             old_delay = station.wireless_delay
             if old_delay < 5:
@@ -107,8 +115,6 @@ class BaseStation(ComponentManager, Agent):
                 new_delay = old_delay + fluct_factor
                 station.wireless_delay = new_delay
 
-            # If you want to see what changed:
-            # print(f"Station {station['id']}: {old_delay:.2f} → {new_delay:.2f}")
         print("default wireless_delay: 2")
         for station in BaseStation._instances:
             print(f"station.id: {station.id}, station.wireless_delay: {station.wireless_delay}")
