@@ -1,3 +1,4 @@
+from Lib.platform import system
 from edge_sim_py import *
 import os
 import networkx as nx
@@ -1245,6 +1246,9 @@ def a_RL(parameters):
     num_step_in_last_time_completion = 0
     last_num_of_allocated_services = 0
     for i_episode in range(num_episodes):
+        terminated, truncated, done = False, False, False
+        # Create an empty dictionary to store your log messages
+        response_time_deadline_log_dict = {}
 
         # Initialize the environment and get its state # Use the reset method
         for server in EdgeServer._instances:
@@ -1324,11 +1328,15 @@ def a_RL(parameters):
 
                     #################################################
                     if (response_time_for_service < list(rl_selected_user.delay_slas.values())[0]):
-                        # print(f"response_time {response_time_for_service}, task deadline {list(rl_selected_user.delay_slas.values())[0]}")
+                        print(f"taskService_{rl_selected_service.id}, response_time {response_time_for_service}, deadline {list(rl_selected_user.delay_slas.values())[0]}")
                         service_deadline_likely_met = 1
                         num_likely_MEET_deadline += 1
+                        print(f"num_likely_MEET_deadline:{num_likely_MEET_deadline}")
                         observation = action.squeeze(0).tolist()
                     else:
+                        # if (len(episode_allocated_service) == 50):
+                        #     print(
+                        #     f" not meet response_time {response_time_for_service}, task deadline {list(rl_selected_user.delay_slas.values())[0]}")
                         service_deadline_likely_met = -1
                         response_time_for_service = -1
                         num_likely_missed_deadline += 1
@@ -1367,18 +1375,25 @@ def a_RL(parameters):
             reward = torch.tensor([reward], device=device)
 
             if num_likely_MEET_deadline == len(Service.all()):
+                print(f"num_likely_MEET_deadline:{num_likely_MEET_deadline}")
+                print(f"len(Service.all()):{len(Service.all())}")
                 terminated = True
                 num_completely_scheduled += 1
             else:
                 terminated = False
 
             if ((num_likely_missed_deadline + num_likely_MEET_deadline) >= len(Service.all())):
+                print(f"action taken:{num_likely_missed_deadline + num_likely_MEET_deadline}")
+                print(f"len(Service.all()):{len(Service.all())}")
                 truncated = True
             else:
                 truncated = False
 
             if terminated or truncated:
                 done = True
+                print(f"terminated:{terminated}")
+                print(f"truncated:{truncated}")
+                print(f"done:{done}")
                 # total_allocations_records.append(num_likely_MEET_deadline)
                 total_allocations_records.append((len(User.all()) - len(user_miss_deadline)))
                 ### Measuring memory & power usages of normal-RL
@@ -1432,12 +1447,19 @@ def a_RL(parameters):
 
 
                 print(f"  Number of services that are missed their deadline:{num_likely_missed_deadline}")
+                if (num_likely_missed_deadline == 0):
+                    for key, value in response_time_deadline_log_dict.items():
+                        print(f"{key}: {value}")
+                    # print(response_time_deadline_log_dict)
+
                 file.write(f"  Number of services that are missed their deadline:{num_likely_missed_deadline}\n")
                 print(f"Users who miss deadline due to service failure: {user_miss_deadline}")
                 file.write(f"Users who miss deadline due to service failure: {user_miss_deadline}\n")
 
                 print(
                     f"Hit-ratio: {round((((len(User.all()) - len(user_miss_deadline)) / len(User.all())) * 100), 2)}%.")
+                if(round((((len(User.all()) - len(user_miss_deadline)) / len(User.all())) * 100), 2) == 100):
+                    sys.exit(0)
                 file.write(
                     f"Hit-ratio: {round((((len(User.all()) - len(user_miss_deadline)) / len(User.all())) * 100), 2)}%.\n")
 
