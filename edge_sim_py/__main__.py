@@ -1324,6 +1324,7 @@ def a_RL(parameters):
 
                     #################################################
                     if (response_time_for_service < list(rl_selected_user.delay_slas.values())[0]):
+                        # print(f"response_time {response_time_for_service}, task deadline {list(rl_selected_user.delay_slas.values())[0]}")
                         service_deadline_likely_met = 1
                         num_likely_MEET_deadline += 1
                         observation = action.squeeze(0).tolist()

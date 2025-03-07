@@ -89,22 +89,30 @@ class BaseStation(ComponentManager, Agent):
 
             :param base_stations: A list (or iterable) of base station dicts.
             :param variation: The maximum percentage (±) by which to fluctuate the delay.
-            """
-        # for station in base_stations:
-        #     # Optionally, skip some stations based on a condition:
-        #     if station["id"] % 2 == 0:  # for example, skip even IDs
-        #         continue
-        #
-        #     old_delay = station["wireless_delay"]
-        #     fluct_factor = 1
-        #     new_delay = old_delay + fluct_factor
-        #
-        #     station["wireless_delay"] = new_delay
-        #
-        #     # If you want to see what changed:
-        #     # print(f"Station {station['id']}: {old_delay:.2f} → {new_delay:.2f}")
 
-        print("hello from fluctuate_wireless_delay")
+            default ==> "wireless_delay": 2
+        """
+        for station in BaseStation._instances:
+            # Optionally, skip some stations based on a condition:
+            if station.id % 2 == 0:  # for example, skip even IDs
+                continue
+
+            old_delay = station.wireless_delay
+            if old_delay < 5:
+                fluct_factor = 1
+                new_delay = old_delay + fluct_factor
+                station.wireless_delay = new_delay
+            elif old_delay >= 5:
+                fluct_factor = -1
+                new_delay = old_delay + fluct_factor
+                station.wireless_delay = new_delay
+
+            # If you want to see what changed:
+            # print(f"Station {station['id']}: {old_delay:.2f} → {new_delay:.2f}")
+        print("default wireless_delay: 2")
+        for station in BaseStation._instances:
+            print(f"station.id: {station.id}, station.wireless_delay: {station.wireless_delay}")
+
 
 
     def _connect_to_network_switch(self, network_switch: object) -> object:
