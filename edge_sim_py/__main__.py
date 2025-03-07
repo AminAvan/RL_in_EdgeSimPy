@@ -1541,6 +1541,7 @@ def wrapped_Service_Provisioning(parameters, algorithm_name=scheduling_algorithm
     # Get the function based on the algorithm name
     for i in range(31):
         result = algorithm_functions[algorithm_name](parameters)
+        fluctuate_wireless_delay()
     process = psutil.Process(os.getpid())
     resource_tracker.update(process.memory_info().rss)
     return result
