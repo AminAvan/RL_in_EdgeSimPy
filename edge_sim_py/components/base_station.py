@@ -84,6 +84,26 @@ class BaseStation(ComponentManager, Agent):
         ...
 
     def fluctuate_wireless_delay(self):
+        """
+            Randomly fluctuate the wireless_delay for each base station.
+
+            :param base_stations: A list (or iterable) of base station dicts.
+            :param variation: The maximum percentage (±) by which to fluctuate the delay.
+            """
+        # for station in base_stations:
+        #     # Optionally, skip some stations based on a condition:
+        #     if station["id"] % 2 == 0:  # for example, skip even IDs
+        #         continue
+        #
+        #     old_delay = station["wireless_delay"]
+        #     fluct_factor = 1
+        #     new_delay = old_delay + fluct_factor
+        #
+        #     station["wireless_delay"] = new_delay
+        #
+        #     # If you want to see what changed:
+        #     # print(f"Station {station['id']}: {old_delay:.2f} → {new_delay:.2f}")
+
         print("hello from fluctuate_wireless_delay")
 
 
