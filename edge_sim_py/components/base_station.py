@@ -83,6 +83,9 @@ class BaseStation(ComponentManager, Agent):
         """Method that executes the events involving the object at each time step."""
         ...
 
+    def fluctuate_wireless_delay(self, wireless_delay: object) -> object:
+        ...
+
     def _connect_to_network_switch(self, network_switch: object) -> object:
         """Creates a relationship between the base station and a given networkSwitch object.
 
