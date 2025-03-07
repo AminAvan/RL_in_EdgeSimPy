@@ -83,7 +83,7 @@ class BaseStation(ComponentManager, Agent):
         """Method that executes the events involving the object at each time step."""
         ...
 
-    def fluctuate_wireless_delay(self, wireless_delay: object) -> object:
+    def fluctuate_wireless_delay(self):
         print("hello from fluctuate_wireless_delay")
 
 

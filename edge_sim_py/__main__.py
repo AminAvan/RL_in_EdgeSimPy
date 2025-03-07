@@ -35,8 +35,6 @@ from datetime import datetime
 ## [for server which poses GPU
 import GPUtil
 import nvidia_smi
-from edge_sim_py.dataset_generator.create_dataset import base_station
-
 # from pynvml import nvmlInit, nvmlDeviceGetHandleByIndex, nvmlDeviceGetUtilizationRates, nvmlShutdown
 ## for server which poses GPU]
 
@@ -1544,7 +1542,7 @@ def wrapped_Service_Provisioning(parameters, algorithm_name=scheduling_algorithm
     # Get the function based on the algorithm name
     for i in range(31):
         result = algorithm_functions[algorithm_name](parameters)
-        base_station.fluctuate_wireless_delay()
+        BaseStation.fluctuate_wireless_delay
     process = psutil.Process(os.getpid())
     resource_tracker.update(process.memory_info().rss)
     return result
