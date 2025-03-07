@@ -103,7 +103,7 @@ class BaseStation(ComponentManager, Agent):
                 new_delay = old_delay + fluct_factor
                 station.wireless_delay = new_delay
             elif old_delay >= 5:
-                fluct_factor = -1
+                fluct_factor = -3
                 new_delay = old_delay + fluct_factor
                 station.wireless_delay = new_delay
 
