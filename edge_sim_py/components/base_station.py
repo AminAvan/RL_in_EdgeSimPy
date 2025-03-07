@@ -5,6 +5,7 @@ from edge_sim_py.component_manager import ComponentManager
 # Mesa modules
 from mesa import Agent
 
+import random
 
 class BaseStation(ComponentManager, Agent):
     """Class that represents a base station."""
