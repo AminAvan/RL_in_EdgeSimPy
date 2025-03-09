@@ -1128,47 +1128,68 @@ def a_RL(parameters):
             float: The computed reward.
         """
         reward = 0
-        penalty = 0
+        penalty = -missed_tasks
 
         ######################
         ## Positive Rewards ##
         ######################
 
-        if (num_crtc_alloc_services == len(Service.all())):
-            reward += len(Service.all()) * 10
+        # if (num_crtc_alloc_services == len(Service.all())):
+        #     # reward += len(Service.all()) * 10
+        #     reward += 1
 
         if (not_redundant == 1):
             # Reward for selecting the service with the earliest deadline
-            reward += num_crtc_alloc_services
+            # reward += num_crtc_alloc_services
+            # reward += len(Service.all())
+            reward += 1
+            # print(f"not_redundant:{not_redundant}, reward:{reward}")
 
         # Reward for efficient resource utilization (CPU and memory within capacity)
         if (enough_capacity == 1):
-            reward += (num_crtc_alloc_services * 2)
+            # reward += (num_crtc_alloc_services * 2)
+            reward += 1
+            # print(f"enough_capacity:{enough_capacity}, reward:{reward}")
 
         # Reward for meeting service deadlines
         if (service_deadline_met == 1):
-            reward += (num_crtc_alloc_services * 4)
+            # reward += (num_crtc_alloc_services * 3)
+            reward += 1
+            # print(f"service_deadline_met:{service_deadline_met}, reward:{reward}")
 
         ######################
         ## Negative Rewards ##
         ######################
 
-        if ((missed_tasks + num_crtc_alloc_services) == len(Service.all())):
-            reward -= missed_tasks * 1000
+        # if ((missed_tasks + num_crtc_alloc_services) == len(Service.all())):
+        #     reward += (num_crtc_alloc_services - missed_tasks)
+        #     print(f"reward:{reward}")
 
         # Redundant decision
         if (not_redundant == -1):
             # Reward for selecting the service with the earliest deadline
-            reward -= missed_tasks
+            # reward -= len(Service.all())
+            reward += -3
+            # print(f"not_redundant:{not_redundant}, reward:{reward}")
+
+        if (response_time_factor == -1):
+            reward += -1
+            # print(f"response_time_factor:{response_time_factor}, reward:{reward}")
 
         # Penalty for exceeding server capacity
         if (enough_capacity == -1):
-            reward -= (missed_tasks*1.5)
+            # reward -= (missed_tasks*2)
+            reward += -1
+            # print(f"enough_capacity:{enough_capacity}, reward:{reward}")
 
         # Severe penalty for missing deadlines
         if (service_deadline_met == -1):
-            reward -= (missed_tasks*2)
+            # reward -= (missed_tasks*4)
+            reward += -1
+            # print(f"service_deadline_met:{service_deadline_met}, reward:{reward}")
 
+        # reward += penalty
+        # print(f"action reward:{reward}")
         return reward
 
     def plot_durations(show_result=False):
@@ -1283,7 +1304,7 @@ def a_RL(parameters):
             service_deadline_likely_met = 0
 
 
-            if not is_service_allocated_before(action.squeeze(0).tolist()[0]):
+            if (not is_service_allocated_before(action.squeeze(0).tolist()[0])) and (not rl_selected_service.id in response_time_deadline_log_dict):
                 avoid_redundant_service = 1
                 if rl_selected_server.has_capacity_to_host(service=rl_selected_service):
                     server_poses_capacity = 1  ## put some positive reward in reward-function
@@ -1328,10 +1349,14 @@ def a_RL(parameters):
 
                     #################################################
                     if (response_time_for_service < list(rl_selected_user.delay_slas.values())[0]):
-                        print(f"taskService_{rl_selected_service.id}, response_time {response_time_for_service}, deadline {list(rl_selected_user.delay_slas.values())[0]}")
+                        # Build the message string
+                        message = f"response_time {response_time_for_service}, deadline {list(rl_selected_user.delay_slas.values())[0]}"
+                        # Store the string in the dictionary, using i or some unique key
+                        response_time_deadline_log_dict[rl_selected_service.id] = message
+
+                        # print(f"taskService_{rl_selected_service.id}, response_time {response_time_for_service}, deadline {list(rl_selected_user.delay_slas.values())[0]}")
                         service_deadline_likely_met = 1
                         num_likely_MEET_deadline += 1
-                        print(f"num_likely_MEET_deadline:{num_likely_MEET_deadline}")
                         observation = action.squeeze(0).tolist()
                     else:
                         # if (len(episode_allocated_service) == 50):
@@ -1340,8 +1365,9 @@ def a_RL(parameters):
                         service_deadline_likely_met = -1
                         response_time_for_service = -1
                         num_likely_missed_deadline += 1
-                        if rl_selected_user.id not in user_miss_deadline:
-                            user_miss_deadline.append(rl_selected_user.id)
+                        # if rl_selected_user.id not in user_miss_deadline:  ## was
+                        #     user_miss_deadline.append(rl_selected_user.id) ## was
+                        user_miss_deadline.append(rl_selected_user.id)  ## is
                         service_criticality_level = get_service_criticality_level(
                             list(rl_selected_user.delay_slas.values())[0])
                         observation = action.squeeze(0).tolist()
@@ -1349,8 +1375,9 @@ def a_RL(parameters):
                     server_poses_capacity = -1
                     response_time_for_service = -1
                     num_likely_missed_deadline += 1
-                    if rl_selected_user.id not in user_miss_deadline:
-                        user_miss_deadline.append(rl_selected_user.id)
+                    # if rl_selected_user.id not in user_miss_deadline:  ## was
+                    #     user_miss_deadline.append(rl_selected_user.id) ## was
+                    user_miss_deadline.append(rl_selected_user.id)  ## is
                     service_criticality_level = get_service_criticality_level(
                         list(rl_selected_user.delay_slas.values())[0])
                     observation = action.squeeze(0).tolist()
@@ -1359,8 +1386,9 @@ def a_RL(parameters):
                 avoid_redundant_service = -1
                 response_time_for_service = -1
                 num_likely_missed_deadline += 1
-                if rl_selected_user.id not in user_miss_deadline:
-                    user_miss_deadline.append(rl_selected_user.id)
+                # if rl_selected_user.id not in user_miss_deadline:  ## was
+                #     user_miss_deadline.append(rl_selected_user.id) ## was
+                user_miss_deadline.append(rl_selected_user.id)  ## is
                 service_criticality_level = get_service_criticality_level(list(rl_selected_user.delay_slas.values())[0])
                 observation = action.squeeze(0).tolist()
 
@@ -1447,19 +1475,16 @@ def a_RL(parameters):
 
 
                 print(f"  Number of services that are missed their deadline:{num_likely_missed_deadline}")
-                if (num_likely_missed_deadline == 0):
-                    for key, value in response_time_deadline_log_dict.items():
-                        print(f"{key}: {value}")
-                    # print(response_time_deadline_log_dict)
-
                 file.write(f"  Number of services that are missed their deadline:{num_likely_missed_deadline}\n")
                 print(f"Users who miss deadline due to service failure: {user_miss_deadline}")
                 file.write(f"Users who miss deadline due to service failure: {user_miss_deadline}\n")
 
                 print(
                     f"Hit-ratio: {round((((len(User.all()) - len(user_miss_deadline)) / len(User.all())) * 100), 2)}%.")
-                if(round((((len(User.all()) - len(user_miss_deadline)) / len(User.all())) * 100), 2) == 100):
-                    sys.exit(0)
+                if(round((((len(User.all()) - len(user_miss_deadline)) / len(User.all())) * 100), 2) > 95):
+                    print(f"len dict: {len(response_time_deadline_log_dict)}")
+                    # for key, value in response_time_deadline_log_dict.items():
+                    #     print(f"{key}: {value}")
                 file.write(
                     f"Hit-ratio: {round((((len(User.all()) - len(user_miss_deadline)) / len(User.all())) * 100), 2)}%.\n")
 
@@ -1476,6 +1501,7 @@ def a_RL(parameters):
                 resource_tracker.report()
                 print(f"========================================")
                 file.write(f"========================================\n")
+                # sys.exit(0)
                 break
 
         # Check for convergence by users
