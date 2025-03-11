@@ -875,6 +875,8 @@ def a_RL(parameters):
     num_states = 0
     edf_service_history = []
     Hist_is_service_allocated_before = []
+    response_time_deadline_log_dict = {}
+    selected_task_log_dict = {}
 
     def edf_idx():
         """
@@ -929,7 +931,13 @@ def a_RL(parameters):
             with torch.no_grad():
                 # Exploitation: Choose the best action based on policy_net
                 # Restricting to unassigned tasks is not necessary for exploitation
-                return map_action_to_task_server(policy_net(state).max(1).indices.view(1, 1).item())
+                # print(selected_task_log_dict)
+                if int(map_action_to_task_server(policy_net(state).max(1).indices.view(1, 1).item())[0][0]) in selected_task_log_dict:
+                    print(f"1st-action redundant: {map_action_to_task_server(policy_net(state).max(1).indices.view(1, 1).item())[0][0]}")
+                    print(f"2nd-action {map_action_to_task_server(policy_net(state).topk(2, dim=1).indices[0, 1].item())}")
+                    return map_action_to_task_server(policy_net(state).topk(2, dim=1).indices[0, 1].item())
+                else:
+                    return map_action_to_task_server(policy_net(state).max(1).indices.view(1, 1).item())
         else:
             # Exploration: Randomly select from unassigned tasks
             edf_service_idx = edf_idx()
@@ -1016,6 +1024,7 @@ def a_RL(parameters):
         if task_index > total_num_tasks:
             raise ValueError("Action index out of bounds for the given number of tasks and servers.")
 
+        # print(f"task_index:{task_index}")
 
         return torch.tensor([[task_index, server_index]], device=device)
 
@@ -1169,7 +1178,7 @@ def a_RL(parameters):
         if (not_redundant == -1):
             # Reward for selecting the service with the earliest deadline
             # reward -= len(Service.all())
-            reward += -3
+            reward += -1
             # print(f"not_redundant:{not_redundant}, reward:{reward}")
 
         if (response_time_factor == -1):
@@ -1270,6 +1279,7 @@ def a_RL(parameters):
         terminated, truncated, done = False, False, False
         # Create an empty dictionary to store your log messages
         response_time_deadline_log_dict = {}
+        selected_task_log_dict = {}
 
         # Initialize the environment and get its state # Use the reset method
         for server in EdgeServer._instances:
@@ -1289,8 +1299,13 @@ def a_RL(parameters):
         for t in count():
             action = select_action(state)
             rl_task, rl_server = action[0][0].item(), action[0][1].item()
-
+            # print(f"rl_task:{rl_task}")
             rl_selected_service = next((s for s in Service._instances if s.id == (rl_task)), None)
+
+            # print(f"rl_selected_service:{rl_selected_service}")
+            selected_task_log_dict[rl_selected_service.id] = f"{rl_selected_service.id} is selected"
+            # print(f"selected_task_log_dict:{selected_task_log_dict}\n")
+
             rl_selected_application = next(
                 (app for app in Application._instances if rl_task in [service.id for service in app.services]),
                 None
@@ -1302,7 +1317,6 @@ def a_RL(parameters):
             avoid_redundant_service = 0
             server_poses_capacity = 0
             service_deadline_likely_met = 0
-
 
             if (not is_service_allocated_before(action.squeeze(0).tolist()[0])) and (not rl_selected_service.id in response_time_deadline_log_dict):
                 avoid_redundant_service = 1
@@ -1365,9 +1379,8 @@ def a_RL(parameters):
                         service_deadline_likely_met = -1
                         response_time_for_service = -1
                         num_likely_missed_deadline += 1
-                        # if rl_selected_user.id not in user_miss_deadline:  ## was
-                        #     user_miss_deadline.append(rl_selected_user.id) ## was
-                        user_miss_deadline.append(rl_selected_user.id)  ## is
+                        if rl_selected_user.id not in user_miss_deadline:  ## was
+                            user_miss_deadline.append(rl_selected_user.id) ## was
                         service_criticality_level = get_service_criticality_level(
                             list(rl_selected_user.delay_slas.values())[0])
                         observation = action.squeeze(0).tolist()
@@ -1375,9 +1388,8 @@ def a_RL(parameters):
                     server_poses_capacity = -1
                     response_time_for_service = -1
                     num_likely_missed_deadline += 1
-                    # if rl_selected_user.id not in user_miss_deadline:  ## was
-                    #     user_miss_deadline.append(rl_selected_user.id) ## was
-                    user_miss_deadline.append(rl_selected_user.id)  ## is
+                    if rl_selected_user.id not in user_miss_deadline:  ## was
+                        user_miss_deadline.append(rl_selected_user.id) ## was
                     service_criticality_level = get_service_criticality_level(
                         list(rl_selected_user.delay_slas.values())[0])
                     observation = action.squeeze(0).tolist()
@@ -1386,9 +1398,8 @@ def a_RL(parameters):
                 avoid_redundant_service = -1
                 response_time_for_service = -1
                 num_likely_missed_deadline += 1
-                # if rl_selected_user.id not in user_miss_deadline:  ## was
-                #     user_miss_deadline.append(rl_selected_user.id) ## was
-                user_miss_deadline.append(rl_selected_user.id)  ## is
+                if rl_selected_user.id not in user_miss_deadline:  ## was
+                    user_miss_deadline.append(rl_selected_user.id) ## was
                 service_criticality_level = get_service_criticality_level(list(rl_selected_user.delay_slas.values())[0])
                 observation = action.squeeze(0).tolist()
 
