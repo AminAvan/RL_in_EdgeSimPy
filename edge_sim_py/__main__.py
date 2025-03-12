@@ -929,18 +929,36 @@ def a_RL(parameters):
 
         if sample > eps_threshold:
             with torch.no_grad():
+                # print("hi from sample > eps_threshold")
                 # Exploitation: Choose the best action based on policy_net
                 # Restricting to unassigned tasks is not necessary for exploitation
                 # print(selected_task_log_dict)
                 if int(map_action_to_task_server(policy_net(state).max(1).indices.view(1, 1).item())[0][0]) in selected_task_log_dict:
-                    print(f"1st-action redundant: {map_action_to_task_server(policy_net(state).max(1).indices.view(1, 1).item())[0][0]}")
-                    print(f"2nd-action {map_action_to_task_server(policy_net(state).topk(2, dim=1).indices[0, 1].item())}")
-                    return map_action_to_task_server(policy_net(state).topk(2, dim=1).indices[0, 1].item())
+
+                    red_act = 2
+                    while (int(map_action_to_task_server(policy_net(state).topk(red_act, dim=1).indices[0, (red_act-1)].item())[0][0]) in selected_task_log_dict):
+                        red_act += 1
+                    # print(f"select_action: {int(map_action_to_task_server(policy_net(state).topk(red_act, dim=1).indices[0, (red_act-1)].item())[0][0])}")
+                    # print(selected_task_log_dict)
+                    return map_action_to_task_server(policy_net(state).topk(red_act, dim=1).indices[0, (red_act-1)].item())
                 else:
+                    # print(
+                    #     f"ELSE_select_action: {int(map_action_to_task_server(policy_net(state).max(1).indices.view(1, 1).item())[0][0])}")
+                    # print(f"else{selected_task_log_dict}")
                     return map_action_to_task_server(policy_net(state).max(1).indices.view(1, 1).item())
+
+
+
+
         else:
             # Exploration: Randomly select from unassigned tasks
             edf_service_idx = edf_idx()
+            while (edf_service_idx in selected_task_log_dict):
+                edf_service_idx += 1
+            # if (edf_service_idx in selected_task_log_dict):
+            #     print(f"redundant_edf_service_idx: {edf_service_idx}")
+            # else:
+            #     print(f"edf_service_idx: {edf_service_idx}")
             edf_server_idx = random.randint(1, len(servers_range_indices))
             return torch.tensor([[edf_service_idx, edf_server_idx]], device=device, dtype=torch.long)
 
@@ -1301,8 +1319,8 @@ def a_RL(parameters):
             rl_task, rl_server = action[0][0].item(), action[0][1].item()
             # print(f"rl_task:{rl_task}")
             rl_selected_service = next((s for s in Service._instances if s.id == (rl_task)), None)
+            # print(f"rl_selected_service:{rl_selected_service}\n")
 
-            # print(f"rl_selected_service:{rl_selected_service}")
             selected_task_log_dict[rl_selected_service.id] = f"{rl_selected_service.id} is selected"
             # print(f"selected_task_log_dict:{selected_task_log_dict}\n")
 
@@ -1317,7 +1335,7 @@ def a_RL(parameters):
             avoid_redundant_service = 0
             server_poses_capacity = 0
             service_deadline_likely_met = 0
-
+            # print(f"rl_selected_service.id:{rl_selected_service.id}")
             if (not is_service_allocated_before(action.squeeze(0).tolist()[0])) and (not rl_selected_service.id in response_time_deadline_log_dict):
                 avoid_redundant_service = 1
                 if rl_selected_server.has_capacity_to_host(service=rl_selected_service):
@@ -1395,6 +1413,7 @@ def a_RL(parameters):
                     observation = action.squeeze(0).tolist()
 
             else:
+                print("redundant action\n")
                 avoid_redundant_service = -1
                 response_time_for_service = -1
                 num_likely_missed_deadline += 1
@@ -1410,7 +1429,7 @@ def a_RL(parameters):
                                     response_time_for_service, num_likely_MEET_deadline, num_likely_missed_deadline)
 
             total_rewards += reward
-
+            # print()
             reward = torch.tensor([reward], device=device)
 
             if num_likely_MEET_deadline == len(Service.all()):
