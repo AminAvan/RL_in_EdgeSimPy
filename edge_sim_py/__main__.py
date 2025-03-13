@@ -878,6 +878,9 @@ def a_RL(parameters):
     response_time_deadline_log_dict = {}
     selected_task_log_dict = {}
 
+    hi_from_edf = 0
+    hi_from_dl_decision = 0
+
     def edf_idx():
         """
         Check the earliest unassigned tasks until now!
@@ -903,12 +906,13 @@ def a_RL(parameters):
 
         for a in selected_users_def_edf_idx:
             for service_edf in a.applications[0].services:
-                if service_edf.id not in edf_service_history:
-                    edf_service_history.append(service_edf.id)
-                    return service_edf.id
+                # if service_edf.id not in edf_service_history:
+                #     edf_service_history.append(service_edf.id)
+                #     return service_edf.id
+                return service_edf.id
 
     def select_action(state):
-        nonlocal steps_done, num_states
+        nonlocal steps_done, num_states, hi_from_edf, hi_from_dl_decision
         sample = random.random()
         eps_threshold = EPS_END + (EPS_START - EPS_END) * \
                         math.exp(-1. * steps_done / EPS_DECAY)
@@ -928,15 +932,16 @@ def a_RL(parameters):
             raise ValueError("No unassigned tasks available for selection.")
 
         if sample > eps_threshold:
-            with torch.no_grad():
-                # print("hi from sample > eps_threshold")
+            with (torch.no_grad()):
+                hi_from_dl_decision += 1
                 # Exploitation: Choose the best action based on policy_net
                 # Restricting to unassigned tasks is not necessary for exploitation
                 # print(selected_task_log_dict)
-                if int(map_action_to_task_server(policy_net(state).max(1).indices.view(1, 1).item())[0][0]) in selected_task_log_dict:
+
+                if f"{int(map_action_to_task_server(policy_net(state).max(1).indices.view(1, 1).item())[0][0])}-{int(map_action_to_task_server(policy_net(state).max(1).indices.view(1, 1).item())[0][1])}" in selected_task_log_dict:
 
                     red_act = 2
-                    while (int(map_action_to_task_server(policy_net(state).topk(red_act, dim=1).indices[0, (red_act-1)].item())[0][0]) in selected_task_log_dict):
+                    while (f"{int(map_action_to_task_server(policy_net(state).topk(red_act, dim=1).indices[0, (red_act-1)].item())[0][0])}-{int(map_action_to_task_server(policy_net(state).topk(red_act, dim=1).indices[0, (red_act-1)].item())[0][1])}" in selected_task_log_dict):
                         red_act += 1
                     # print(f"select_action: {int(map_action_to_task_server(policy_net(state).topk(red_act, dim=1).indices[0, (red_act-1)].item())[0][0])}")
                     # print(selected_task_log_dict)
@@ -951,15 +956,27 @@ def a_RL(parameters):
 
 
         else:
+            hi_from_edf += 1
             # Exploration: Randomly select from unassigned tasks
             edf_service_idx = edf_idx()
-            while (edf_service_idx in selected_task_log_dict):
-                edf_service_idx += 1
+            # while (edf_service_idx in selected_task_log_dict):
+            #     edf_service_idx += 1
+            # if (edf_service_idx > 262):
+            #     edf_service_idx = 262
             # if (edf_service_idx in selected_task_log_dict):
             #     print(f"redundant_edf_service_idx: {edf_service_idx}")
             # else:
             #     print(f"edf_service_idx: {edf_service_idx}")
             edf_server_idx = random.randint(1, len(servers_range_indices))
+
+            while (f"{edf_service_idx}-{edf_server_idx}" in selected_task_log_dict):
+                seed_edf_service_idx = [x for x in range(1, 262) if x != int(edf_service_idx)]
+                seed_edf_server_idx = [x for x in range(1, 4) if x != int(edf_server_idx)]
+
+                edf_service_idx = random.choice(seed_edf_service_idx)
+                edf_server_idx = random.choice(seed_edf_server_idx)
+
+
             return torch.tensor([[edf_service_idx, edf_server_idx]], device=device, dtype=torch.long)
 
     # if GPU is to be used
@@ -1007,7 +1024,7 @@ def a_RL(parameters):
     GAMMA = 0.995
     EPS_START = 1.0
     EPS_END = 0.05
-    EPS_DECAY = ((len(Service.all()) * 600) / 10)
+    EPS_DECAY = 5000
     TAU = 0.005
     LR = 5e-4
 
@@ -1169,19 +1186,20 @@ def a_RL(parameters):
             # Reward for selecting the service with the earliest deadline
             # reward += num_crtc_alloc_services
             # reward += len(Service.all())
-            reward += 1
+            # reward += 1
+            reward += 0.25
             # print(f"not_redundant:{not_redundant}, reward:{reward}")
 
         # Reward for efficient resource utilization (CPU and memory within capacity)
         if (enough_capacity == 1):
             # reward += (num_crtc_alloc_services * 2)
-            reward += 1
+            reward += 0.25
             # print(f"enough_capacity:{enough_capacity}, reward:{reward}")
 
         # Reward for meeting service deadlines
         if (service_deadline_met == 1):
             # reward += (num_crtc_alloc_services * 3)
-            reward += 1
+            reward += 100
             # print(f"service_deadline_met:{service_deadline_met}, reward:{reward}")
 
         ######################
@@ -1196,25 +1214,27 @@ def a_RL(parameters):
         if (not_redundant == -1):
             # Reward for selecting the service with the earliest deadline
             # reward -= len(Service.all())
-            reward += -1
+            reward = reward - 3
             # print(f"not_redundant:{not_redundant}, reward:{reward}")
 
-        if (response_time_factor == -1):
-            reward += -1
-            # print(f"response_time_factor:{response_time_factor}, reward:{reward}")
+        if (response_time_factor == -1) or (service_deadline_met == -1):
+            reward = reward - (50*(missed_tasks)+100)
+            # print("penalty response_time_factor")
 
         # Penalty for exceeding server capacity
         if (enough_capacity == -1):
             # reward -= (missed_tasks*2)
-            reward += -1
-            # print(f"enough_capacity:{enough_capacity}, reward:{reward}")
+            reward = reward - 5
+            # print("penalty enough_capacity")
 
-        # Severe penalty for missing deadlines
-        if (service_deadline_met == -1):
-            # reward -= (missed_tasks*4)
-            reward += -1
-            # print(f"service_deadline_met:{service_deadline_met}, reward:{reward}")
+        # # Severe penalty for missing deadlines
+        # if (service_deadline_met == -1):
+        #     # reward -= (missed_tasks*4)
+        #     reward = reward - 2
+        #     # print("penalty service_deadline_met")
 
+        # if (not_redundant == -1) or (response_time_factor == -1) or (enough_capacity == -1) or (service_deadline_met == -1):
+        #     print()
         # reward += penalty
         # print(f"action reward:{reward}")
         return reward
@@ -1321,9 +1341,6 @@ def a_RL(parameters):
             rl_selected_service = next((s for s in Service._instances if s.id == (rl_task)), None)
             # print(f"rl_selected_service:{rl_selected_service}\n")
 
-            selected_task_log_dict[rl_selected_service.id] = f"{rl_selected_service.id} is selected"
-            # print(f"selected_task_log_dict:{selected_task_log_dict}\n")
-
             rl_selected_application = next(
                 (app for app in Application._instances if rl_task in [service.id for service in app.services]),
                 None
@@ -1332,11 +1349,15 @@ def a_RL(parameters):
                                     None)
             rl_selected_server = next((s for s in EdgeServer._instances if s.id == (rl_server)), None)
 
+            selected_task_log_dict[
+                f"{rl_selected_service.id}-{rl_selected_server.id}"] = f"{rl_selected_service.id}-{rl_selected_server.id} is selected"
+            # print(f"selected_task_log_dict:{selected_task_log_dict}\n")
+
             avoid_redundant_service = 0
             server_poses_capacity = 0
             service_deadline_likely_met = 0
             # print(f"rl_selected_service.id:{rl_selected_service.id}")
-            if (not is_service_allocated_before(action.squeeze(0).tolist()[0])) and (not rl_selected_service.id in response_time_deadline_log_dict):
+            if (not is_service_allocated_before(action.squeeze(0).tolist()[0])) and (not f"{rl_selected_service.id}-{rl_selected_server.id}" in response_time_deadline_log_dict):
                 avoid_redundant_service = 1
                 if rl_selected_server.has_capacity_to_host(service=rl_selected_service):
                     server_poses_capacity = 1  ## put some positive reward in reward-function
@@ -1384,13 +1405,14 @@ def a_RL(parameters):
                         # Build the message string
                         message = f"response_time {response_time_for_service}, deadline {list(rl_selected_user.delay_slas.values())[0]}"
                         # Store the string in the dictionary, using i or some unique key
-                        response_time_deadline_log_dict[rl_selected_service.id] = message
+                        response_time_deadline_log_dict[f"{rl_selected_service.id}-{rl_selected_server.id}"] = message
 
                         # print(f"taskService_{rl_selected_service.id}, response_time {response_time_for_service}, deadline {list(rl_selected_user.delay_slas.values())[0]}")
                         service_deadline_likely_met = 1
                         num_likely_MEET_deadline += 1
                         observation = action.squeeze(0).tolist()
                     else:
+                        # print("no response time")
                         # if (len(episode_allocated_service) == 50):
                         #     print(
                         #     f" not meet response_time {response_time_for_service}, task deadline {list(rl_selected_user.delay_slas.values())[0]}")
@@ -1403,6 +1425,7 @@ def a_RL(parameters):
                             list(rl_selected_user.delay_slas.values())[0])
                         observation = action.squeeze(0).tolist()
                 else:
+                    # print("no capacity")
                     server_poses_capacity = -1
                     response_time_for_service = -1
                     num_likely_missed_deadline += 1
@@ -1413,7 +1436,8 @@ def a_RL(parameters):
                     observation = action.squeeze(0).tolist()
 
             else:
-                print("redundant action\n")
+                # print("redundant action")
+                print(response_time_deadline_log_dict)
                 avoid_redundant_service = -1
                 response_time_for_service = -1
                 num_likely_missed_deadline += 1
@@ -1441,17 +1465,18 @@ def a_RL(parameters):
                 terminated = False
 
             if ((num_likely_missed_deadline + num_likely_MEET_deadline) >= len(Service.all())):
-                print(f"action taken:{num_likely_missed_deadline + num_likely_MEET_deadline}")
-                print(f"len(Service.all()):{len(Service.all())}")
+            # if (t > 500):
+            #     print(f"action taken:{num_likely_missed_deadline + num_likely_MEET_deadline}")
+            #     print(f"len(Service.all()):{len(Service.all())}")
                 truncated = True
             else:
                 truncated = False
 
             if terminated or truncated:
                 done = True
-                print(f"terminated:{terminated}")
-                print(f"truncated:{truncated}")
-                print(f"done:{done}")
+                # print(f"terminated:{terminated}")
+                # print(f"truncated:{truncated}")
+                # print(f"done:{done}")
                 # total_allocations_records.append(num_likely_MEET_deadline)
                 total_allocations_records.append((len(User.all()) - len(user_miss_deadline)))
                 ### Measuring memory & power usages of normal-RL
@@ -1498,6 +1523,12 @@ def a_RL(parameters):
                 episodes_user_miss_deadline.append(
                     (((len(User.all()) - len(user_miss_deadline)) / len(User.all())) * 100))
 
+                print(f"hi_from_edf:{hi_from_edf}")
+                print(f"hi_from_dl_decision:{hi_from_dl_decision}")
+                hi_from_dl_decision = 0
+                hi_from_edf = 0
+                hi_from_dl_decision = 0
+
                 print(
                     f"Episode {len(episode_allocated_service)} with duration: {episode_durations[-1]}, and total rewards: {total_rewards}")
                 file.write(
@@ -1509,6 +1540,7 @@ def a_RL(parameters):
                 print(f"Users who miss deadline due to service failure: {user_miss_deadline}")
                 file.write(f"Users who miss deadline due to service failure: {user_miss_deadline}\n")
 
+                # user based hit-ratio
                 print(
                     f"Hit-ratio: {round((((len(User.all()) - len(user_miss_deadline)) / len(User.all())) * 100), 2)}%.")
                 if(round((((len(User.all()) - len(user_miss_deadline)) / len(User.all())) * 100), 2) > 95):
@@ -1517,6 +1549,12 @@ def a_RL(parameters):
                     #     print(f"{key}: {value}")
                 file.write(
                     f"Hit-ratio: {round((((len(User.all()) - len(user_miss_deadline)) / len(User.all())) * 100), 2)}%.\n")
+
+                # ## task based hit-ratio
+                # print(
+                #     f"Hit-ratio: {round((((len(Service.all()) - num_likely_missed_deadline) / len(Service.all())) * 100), 2)}%.")
+                # file.write(
+                #     f"Hit-ratio: {round((((len(User.all()) - len(user_miss_deadline)) / len(User.all())) * 100), 2)}%.\n")
 
                 print(f'number of state:{num_states}')
                 num_states = 0
