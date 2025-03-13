@@ -1588,8 +1588,8 @@ def a_RL(parameters):
             average_value_for_allocation.append(avg_hit_ratio)
             # print(f"total_allocations_records:{total_allocations_records}")
             print(f"avg_hit_ratio:{avg_hit_ratio}")
-            if (len(total_allocations_records)>=20):
-                print(f"avg_HR_{20}:{sum(total_allocations_records[-20:]) / 20}")
+            # if (len(total_allocations_records)>=20):
+            #     print(f"avg_HR_{20}:{sum(total_allocations_records[-20:]) / 20}")
             print(f"objective_value_threshold:{objective_value_threshold}\n")
             # Ensures the agent's performance exceeds the threshold, varying by less than 0.02% of the optimal value.
             if (avg_hit_ratio >= objective_value_threshold) and len(average_value_for_allocation) > 1:
