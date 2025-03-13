@@ -868,7 +868,8 @@ def a_RL(parameters):
     """
     # sliding_window = 100  # Number of consecutive episodes checking the objective's threshold  ## was
     sliding_window = 10 ## is due to checking the wireless_delay_fluctuation
-    objective_value_threshold = (0.98 * len(User.all()))  ## Determining a threshold for the 'hit-ratio' objective
+    # objective_value_threshold = 0.98  ## Determining a threshold for the 'hit-ratio' objective  ## was
+    objective_value_threshold = 0.95  ## Determining a threshold for the 'hit-ratio' objective
     average_value_for_allocation, total_allocations_records = [], []
     num_completely_scheduled = 0
     steps_done = 0
@@ -1178,8 +1179,8 @@ def a_RL(parameters):
         ## Positive Rewards ##
         ######################
 
-        # if (num_crtc_alloc_services == len(Service.all())):
-        #     # reward += len(Service.all()) * 10
+        if (num_crtc_alloc_services == len(Service.all())):
+            reward += len(Service.all()) * 10
         #     reward += 1
 
         if (not_redundant == 1):
@@ -1199,7 +1200,7 @@ def a_RL(parameters):
         # Reward for meeting service deadlines
         if (service_deadline_met == 1):
             # reward += (num_crtc_alloc_services * 3)
-            reward += 100
+            reward += (((num_crtc_alloc_services)/(len(Service.all())))*100)
             # print(f"service_deadline_met:{service_deadline_met}, reward:{reward}")
 
         ######################
@@ -1214,17 +1215,17 @@ def a_RL(parameters):
         if (not_redundant == -1):
             # Reward for selecting the service with the earliest deadline
             # reward -= len(Service.all())
-            reward = reward - 3
+            reward = reward - 1
             # print(f"not_redundant:{not_redundant}, reward:{reward}")
 
         if (response_time_factor == -1) or (service_deadline_met == -1):
-            reward = reward - (50*(missed_tasks)+100)
+            reward = reward - (((missed_tasks*60)/(len(Service.all())))*100)
             # print("penalty response_time_factor")
 
         # Penalty for exceeding server capacity
         if (enough_capacity == -1):
             # reward -= (missed_tasks*2)
-            reward = reward - 5
+            reward = reward - 0.5
             # print("penalty enough_capacity")
 
         # # Severe penalty for missing deadlines
@@ -1237,7 +1238,8 @@ def a_RL(parameters):
         #     print()
         # reward += penalty
         # print(f"action reward:{reward}")
-        return reward
+        rounded_reward = round(reward, 1)
+        return rounded_reward
 
     def plot_durations(show_result=False):
         plt.figure(1)  # Work on figure #1
@@ -1457,15 +1459,15 @@ def a_RL(parameters):
             reward = torch.tensor([reward], device=device)
 
             if num_likely_MEET_deadline == len(Service.all()):
-                print(f"num_likely_MEET_deadline:{num_likely_MEET_deadline}")
-                print(f"len(Service.all()):{len(Service.all())}")
+                print(f"num_likely_MEET_deadline:{num_likely_MEET_deadline}, action taken:{t}")
+                # print(f"len(Service.all()):{len(Service.all())}")
                 terminated = True
                 num_completely_scheduled += 1
             else:
                 terminated = False
 
-            if ((num_likely_missed_deadline + num_likely_MEET_deadline) >= len(Service.all())):
-            # if (t > 500):
+            # if ((num_likely_missed_deadline + num_likely_MEET_deadline) >= len(Service.all())):
+            if (t > 280):
             #     print(f"action taken:{num_likely_missed_deadline + num_likely_MEET_deadline}")
             #     print(f"len(Service.all()):{len(Service.all())}")
                 truncated = True
@@ -1478,7 +1480,13 @@ def a_RL(parameters):
                 # print(f"truncated:{truncated}")
                 # print(f"done:{done}")
                 # total_allocations_records.append(num_likely_MEET_deadline)
-                total_allocations_records.append((len(User.all()) - len(user_miss_deadline)))
+                # total_allocations_records.append((len(User.all()) - len(user_miss_deadline))) ## was
+                if (num_likely_MEET_deadline == len(Service.all())):
+                    num_likely_missed_deadline = 0
+                    user_miss_deadline = []
+                    total_allocations_records.append((len(User.all()) - len(user_miss_deadline))/len(User.all()))
+                else:
+                    total_allocations_records.append((len(User.all()) - len(user_miss_deadline))/len(User.all()))
                 ### Measuring memory & power usages of normal-RL
                 resource_tracker.update(process.memory_info().rss)
             else:
@@ -1574,19 +1582,30 @@ def a_RL(parameters):
 
         # Check for convergence by users
         if len(total_allocations_records) >= sliding_window:
+            print(f"len(total_allocations_records):{len(total_allocations_records)}, sliding_window:{sliding_window}")
             avg_hit_ratio = sum(
                 total_allocations_records[-sliding_window:]) / sliding_window  # Compute average reward
             average_value_for_allocation.append(avg_hit_ratio)
-
+            # print(f"total_allocations_records:{total_allocations_records}")
+            print(f"avg_hit_ratio:{avg_hit_ratio}")
+            if (len(total_allocations_records)>=20):
+                print(f"avg_HR_{20}:{sum(total_allocations_records[-20:]) / 20}")
+            print(f"objective_value_threshold:{objective_value_threshold}\n")
             # Ensures the agent's performance exceeds the threshold, varying by less than 0.02% of the optimal value.
             if (avg_hit_ratio >= objective_value_threshold) and len(average_value_for_allocation) > 1:
                 # Checks that the agent's performance is stable and not fluctuating around the threshold.
-                if abs(average_value_for_allocation[-1] - average_value_for_allocation[-2]) < 1e-3:
-                    print(f"Policy converged after {i_episode} episodes.")
-                    file.write(f"Policy converged after {i_episode} episodes.\n")
-                    print(f"=========================")
-                    file.write(f"=========================\n")
-                    break
+                # print(f"average_value_for_allocation[-1]:{average_value_for_allocation[-1]}, average_value_for_allocation[-2]:{average_value_for_allocation[-2]}")
+                # if abs(average_value_for_allocation[-1] - average_value_for_allocation[-2]) < 1e-3:
+                #     print(f"Policy converged after {i_episode} episodes.")
+                #     file.write(f"Policy converged after {i_episode} episodes.\n")
+                #     print(f"=========================")
+                #     file.write(f"=========================\n")
+                #     break
+                print(f"Policy converged after {i_episode} episodes.")
+                file.write(f"Policy converged after {i_episode} episodes.\n")
+                print(f"=========================")
+                file.write(f"=========================\n")
+                break
 
     print('Complete')
     file.write(f"Complete\n")

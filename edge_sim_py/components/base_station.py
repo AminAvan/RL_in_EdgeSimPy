@@ -116,9 +116,9 @@ class BaseStation(ComponentManager, Agent):
                 new_delay = old_delay + fluct_factor
                 station.wireless_delay = new_delay
 
-        print("default wireless_delay: 2")
-        for station in BaseStation._instances:
-            print(f"station.id: {station.id}, station.wireless_delay: {station.wireless_delay}")
+        # print("default wireless_delay: 2")
+        # for station in BaseStation._instances:
+        #     print(f"station.id: {station.id}, station.wireless_delay: {station.wireless_delay}")
 
 
 
