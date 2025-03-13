@@ -868,8 +868,7 @@ def a_RL(parameters):
     """
     # sliding_window = 100  # Number of consecutive episodes checking the objective's threshold  ## was
     sliding_window = 10 ## is due to checking the wireless_delay_fluctuation
-    # objective_value_threshold = 0.98  ## Determining a threshold for the 'hit-ratio' objective  ## was
-    objective_value_threshold = 0.95  ## Determining a threshold for the 'hit-ratio' objective
+    objective_value_threshold = 0.98  ## Determining a threshold for the 'hit-ratio' objective  ## was
     average_value_for_allocation, total_allocations_records = [], []
     num_completely_scheduled = 0
     steps_done = 0
@@ -952,9 +951,6 @@ def a_RL(parameters):
                     #     f"ELSE_select_action: {int(map_action_to_task_server(policy_net(state).max(1).indices.view(1, 1).item())[0][0])}")
                     # print(f"else{selected_task_log_dict}")
                     return map_action_to_task_server(policy_net(state).max(1).indices.view(1, 1).item())
-
-
-
 
         else:
             hi_from_edf += 1
@@ -1531,8 +1527,8 @@ def a_RL(parameters):
                 episodes_user_miss_deadline.append(
                     (((len(User.all()) - len(user_miss_deadline)) / len(User.all())) * 100))
 
-                print(f"hi_from_edf:{hi_from_edf}")
-                print(f"hi_from_dl_decision:{hi_from_dl_decision}")
+                # print(f"hi_from_edf:{hi_from_edf}")
+                # print(f"hi_from_dl_decision:{hi_from_dl_decision}")
                 hi_from_dl_decision = 0
                 hi_from_edf = 0
                 hi_from_dl_decision = 0
@@ -1551,8 +1547,8 @@ def a_RL(parameters):
                 # user based hit-ratio
                 print(
                     f"Hit-ratio: {round((((len(User.all()) - len(user_miss_deadline)) / len(User.all())) * 100), 2)}%.")
-                if(round((((len(User.all()) - len(user_miss_deadline)) / len(User.all())) * 100), 2) > 95):
-                    print(f"len dict: {len(response_time_deadline_log_dict)}")
+                # if(round((((len(User.all()) - len(user_miss_deadline)) / len(User.all())) * 100), 2) > 95):
+                #     print(f"len dict: {len(response_time_deadline_log_dict)}")
                     # for key, value in response_time_deadline_log_dict.items():
                     #     print(f"{key}: {value}")
                 file.write(
