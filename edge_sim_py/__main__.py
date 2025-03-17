@@ -984,7 +984,7 @@ def a_RL(parameters):
     )
 
     Transition = namedtuple('Transition',
-                            ('state', 'action', 'next_state', 'reward'))
+                            ('state', 'action', 'next_state', 'reward', 'done'))
 
     class ReplayMemory(object):
 
@@ -1495,7 +1495,7 @@ def a_RL(parameters):
                 next_state = torch.tensor(observation, dtype=torch.float32, device=device).unsqueeze(0)
 
             # Store the transition in rl_memory
-            rl_memory.push(state, action, next_state, reward)
+            rl_memory.push(state, action, next_state, reward, done)
 
             # Move to the next state
             state = next_state
@@ -1578,15 +1578,15 @@ def a_RL(parameters):
 
         # Check for convergence by users
         if len(total_allocations_records) >= sliding_window:
-            print(f"len(total_allocations_records):{len(total_allocations_records)}, sliding_window:{sliding_window}")
+            # print(f"len(total_allocations_records):{len(total_allocations_records)}, sliding_window:{sliding_window}")
             avg_hit_ratio = sum(
                 total_allocations_records[-sliding_window:]) / sliding_window  # Compute average reward
             average_value_for_allocation.append(avg_hit_ratio)
             # print(f"total_allocations_records:{total_allocations_records}")
-            print(f"avg_hit_ratio:{avg_hit_ratio}")
+            # print(f"avg_hit_ratio:{avg_hit_ratio}")
             # if (len(total_allocations_records)>=20):
             #     print(f"avg_HR_{20}:{sum(total_allocations_records[-20:]) / 20}")
-            print(f"objective_value_threshold:{objective_value_threshold}\n")
+            # print(f"objective_value_threshold:{objective_value_threshold}\n")
             # Ensures the agent's performance exceeds the threshold, varying by less than 0.02% of the optimal value.
             if (avg_hit_ratio >= objective_value_threshold) and len(average_value_for_allocation) > 1:
                 # Checks that the agent's performance is stable and not fluctuating around the threshold.
