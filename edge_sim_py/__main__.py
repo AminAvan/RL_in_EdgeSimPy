@@ -869,7 +869,7 @@ def a_RL(parameters):
     [2]: Yu, Ming, et al. "Convergent policy optimization for safe reinforcement learning." Advances in Neural Information Processing Systems 32 (2019).
     """
     # sliding_window = 100  # Number of consecutive episodes checking the objective's threshold  ## was
-    sliding_window = 10 ## is due to checking the wireless_delay_fluctuation
+    sliding_window = 20 ## is due to checking the wireless_delay_fluctuation
     objective_value_threshold = 0.98  ## Determining a threshold for the 'hit-ratio' objective  ## was
     average_value_for_allocation, total_allocations_records = [], []
     num_completely_scheduled = 0
