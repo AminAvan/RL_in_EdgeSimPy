@@ -39,6 +39,8 @@ import nvidia_smi
 # from pynvml import nvmlInit, nvmlDeviceGetHandleByIndex, nvmlDeviceGetUtilizationRates, nvmlShutdown
 ## for server which poses GPU]
 
+from typing import List, Tuple, Any
+
 ####################################################
 # Generate the filename with the current date and time
 current_time = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")  # Format: YYYY-MM-DD_HH-MM-SS
@@ -986,20 +988,126 @@ def a_RL(parameters):
     Transition = namedtuple('Transition',
                             ('state', 'action', 'next_state', 'reward', 'done'))
 
+    # class ReplayMemory(object):
+    #
+    #     def __init__(self, capacity):
+    #         self.rl_memory = deque([], maxlen=capacity)
+    #
+    #     def push(self, *args):
+    #         """Save a transition"""
+    #         self.rl_memory.append(Transition(*args))
+    #
+    #     def sample(self, batch_size):
+    #         return random.sample(self.rl_memory, batch_size)
+    #
+    #     def __len__(self):
+    #         return len(self.rl_memory)
+
+
+
     class ReplayMemory(object):
+        """A prioritized experience replay buffer for reinforcement learning."""
 
-        def __init__(self, capacity):
-            self.rl_memory = deque([], maxlen=capacity)
+        def __init__(self, capacity: int, alpha: float = 0.6, epsilon: float = 1e-5):
+            """
+            Initialize the replay memory with specified parameters.
 
-        def push(self, *args):
-            """Save a transition"""
-            self.rl_memory.append(Transition(*args))
+            Args:
+                capacity: Maximum number of transitions to store
+                alpha: Prioritization factor (0 = uniform, 1 = full prioritization)
+                epsilon: Small constant to avoid zero priority
+            """
+            if not isinstance(capacity, int) or capacity <= 0:
+                raise ValueError("Capacity must be a positive integer")
+            if not 0 <= alpha <= 1:
+                raise ValueError("Alpha must be between 0 and 1")
+            if epsilon <= 0:
+                raise ValueError("Epsilon must be positive")
 
-        def sample(self, batch_size):
-            return random.sample(self.rl_memory, batch_size)
+            self.capacity = capacity
+            self.alpha = alpha
+            self.epsilon = epsilon
 
-        def __len__(self):
-            return len(self.rl_memory)
+            # Initialize storage
+            self.memory = deque(maxlen=capacity)
+            self.priorities = deque(maxlen=capacity)
+            self.position = 0
+
+        def push(self, *args) -> None:
+            """
+            Add a transition to memory with maximum priority.
+
+            Args:
+                *args: Transition components (state, action, reward, next_state, done)
+            """
+            transition = Transition(*args)
+
+            # Get maximum priority (default to 1.0 if empty)
+            max_priority = max(self.priorities) if self.priorities else 1.0
+
+            if len(self.memory) < self.capacity:
+                self.memory.append(transition)
+                self.priorities.append(max_priority)
+            else:
+                self.memory[self.position] = transition
+                self.priorities[self.position] = max_priority
+
+            self.position = (self.position + 1) % self.capacity
+
+        def sample(self, batch_size: int) -> Tuple[List[Any], List[int], np.ndarray]:
+            """
+            Sample a batch of transitions based on priorities.
+
+            Args:
+                batch_size: Number of transitions to sample
+
+            Returns:
+                Tuple of (transitions, indices, sampling_probabilities)
+            """
+            if not isinstance(batch_size, int) or batch_size <= 0:
+                raise ValueError("Batch size must be a positive integer")
+            if batch_size > len(self.memory):
+                raise ValueError("Batch size cannot exceed current memory size")
+            if not self.memory:
+                return [], [], np.array([])
+
+            # Calculate sampling probabilities
+            priorities = np.array(self.priorities, dtype=np.float32)
+            scaled_priorities = priorities ** self.alpha
+            sampling_probs = scaled_priorities / scaled_priorities.sum()
+
+            # Sample indices
+            indices = np.random.choice(len(self.memory), batch_size, p=sampling_probs)
+            transitions = [self.memory[idx] for idx in indices]
+
+            return transitions, indices.tolist(), sampling_probs[indices]
+
+        def update_priority(self, indices: List[int], errors: List[float]) -> None:
+            """
+            Update priorities for specified transitions.
+
+            Args:
+                indices: List of transition indices to update
+                errors: List of corresponding error values
+            """
+            if len(indices) != len(errors):
+                raise ValueError("Number of indices must match number of errors")
+            if not all(0 <= idx < len(self.memory) for idx in indices):
+                raise ValueError("Invalid index provided")
+
+            for idx, error in zip(indices, errors):
+                priority = abs(error) + self.epsilon
+                self.priorities[idx] = priority
+
+        def __len__(self) -> int:
+            """Return current size of memory."""
+            return len(self.memory)
+
+        def clear(self) -> None:
+            """Clear all transitions and priorities from memory."""
+            self.memory.clear()
+            self.priorities.clear()
+            self.position = 0
 
     class DQN(nn.Module):  ## was
 
@@ -1256,48 +1364,100 @@ def a_RL(parameters):
         plt.legend()
         plt.pause(0.001)  # Update the figure
 
+    # def optimize_model():
+    #     if len(rl_memory) < BATCH_SIZE:
+    #         return
+    #     transitions = rl_memory.sample(BATCH_SIZE)
+    #     # Transpose the batch (see https://stackoverflow.com/a/19343/3343043 for
+    #     # detailed explanation). This converts batch-array of Transitions
+    #     # to Transition of batch-arrays.
+    #     batch = Transition(*zip(*transitions))
+    #
+    #     # Compute a mask of non-final states and concatenate the batch elements
+    #     # (a final state would've been the one after which simulation ended)
+    #     non_final_mask = torch.tensor(tuple(map(lambda s: s is not None, batch.next_state)), device=device,
+    #                                   dtype=torch.bool)
+    #     non_final_next_states = torch.cat([s for s in batch.next_state if s is not None])
+    #     state_batch = torch.cat(batch.state)
+    #     action_batch = torch.cat(batch.action)
+    #     reward_batch = torch.cat(batch.reward)
+    #
+    #     # Compute Q(s_t, a) - the model computes Q(s_t), then we select the
+    #     # columns of actions taken. These are the actions which would've been taken
+    #     # for each batch state according to policy_net
+    #     state_action_values = policy_net(state_batch).gather(1, action_batch)
+    #
+    #     # Compute V(s_{t+1}) for all next states.
+    #     # Expected values of actions for non_final_next_states are computed based
+    #     # on the "older" target_net; selecting their best reward with max(1).values
+    #     # This is merged based on the mask, such that we'll have either the expected
+    #     # state value or 0 in case the state was final.
+    #     next_state_values = torch.zeros(BATCH_SIZE, device=device)
+    #     with torch.no_grad():
+    #         next_state_values[non_final_mask] = target_net(non_final_next_states).max(1).values
+    #     # Compute the expected Q values
+    #     expected_state_action_values = (next_state_values * GAMMA) + reward_batch
+    #
+    #     # Compute Huber loss
+    #     criterion = nn.SmoothL1Loss()
+    #     loss = criterion(state_action_values, expected_state_action_values.unsqueeze(1))
+    #
+    #     # Optimize the model
+    #     optimizer.zero_grad()
+    #     loss.backward()
+    #     # In-place gradient clipping
+    #     torch.nn.utils.clip_grad_value_(policy_net.parameters(), 100)
+    #     optimizer.step()
+
     def optimize_model():
         if len(rl_memory) < BATCH_SIZE:
             return
-        transitions = rl_memory.sample(BATCH_SIZE)
-        # Transpose the batch (see https://stackoverflow.com/a/19343/3343043 for
-        # detailed explanation). This converts batch-array of Transitions
-        # to Transition of batch-arrays.
+
+        transitions, indices, sampling_probabilities = rl_memory.sample(BATCH_SIZE)
+
         batch = Transition(*zip(*transitions))
 
-        # Compute a mask of non-final states and concatenate the batch elements
-        # (a final state would've been the one after which simulation ended)
-        non_final_mask = torch.tensor(tuple(map(lambda s: s is not None, batch.next_state)), device=device,
-                                      dtype=torch.bool)
+        non_final_mask = torch.tensor(tuple(map(lambda s: s is not None, batch.next_state)),
+                                      device=device, dtype=torch.bool)
         non_final_next_states = torch.cat([s for s in batch.next_state if s is not None])
         state_batch = torch.cat(batch.state)
-        action_batch = torch.cat(batch.action)
+        action_batch = torch.cat(batch.action)  # [1024, 2]
         reward_batch = torch.cat(batch.reward)
 
-        # Compute Q(s_t, a) - the model computes Q(s_t), then we select the
-        # columns of actions taken. These are the actions which would've been taken
-        # for each batch state according to policy_net
-        state_action_values = policy_net(state_batch).gather(1, action_batch)
+        # Compute Q(s_t, a)
+        q_values = policy_net(state_batch)  # [1024, num_actions]
+        state_action_values = q_values.gather(1, action_batch)  # [1024, 2]
 
-        # Compute V(s_{t+1}) for all next states.
-        # Expected values of actions for non_final_next_states are computed based
-        # on the "older" target_net; selecting their best reward with max(1).values
-        # This is merged based on the mask, such that we'll have either the expected
-        # state value or 0 in case the state was final.
+        # Compute V(s_{t+1})
         next_state_values = torch.zeros(BATCH_SIZE, device=device)
         with torch.no_grad():
             next_state_values[non_final_mask] = target_net(non_final_next_states).max(1).values
-        # Compute the expected Q values
-        expected_state_action_values = (next_state_values * GAMMA) + reward_batch
 
-        # Compute Huber loss
-        criterion = nn.SmoothL1Loss()
-        loss = criterion(state_action_values, expected_state_action_values.unsqueeze(1))
+        # Compute expected Q values
+        expected_state_action_values = (next_state_values * GAMMA) + reward_batch  # [1024]
+
+        # Reduce state_action_values to match expected values
+        state_action_values_mean = state_action_values.mean(dim=1)  # [1024], average over action dims
+
+        # Compute TD errors for priority updates
+        with torch.no_grad():
+            td_errors = torch.abs(state_action_values_mean - expected_state_action_values).cpu().numpy()
+        rl_memory.update_priority(indices, td_errors)
+
+        # Compute importance sampling weights
+        beta = 0.4
+        is_weights = (1.0 / (len(rl_memory) * sampling_probabilities)) ** beta
+        is_weights = torch.tensor(is_weights, device=device, dtype=torch.float32)
+        is_weights /= is_weights.max()
+
+        # Compute weighted Huber loss
+        criterion = nn.SmoothL1Loss(reduction='none')
+        loss_per_sample = criterion(state_action_values_mean, expected_state_action_values)  # [1024]
+        weighted_loss = (loss_per_sample * is_weights).mean()
 
         # Optimize the model
         optimizer.zero_grad()
-        loss.backward()
-        # In-place gradient clipping
+        weighted_loss.backward()
         torch.nn.utils.clip_grad_value_(policy_net.parameters(), 100)
         optimizer.step()
 
