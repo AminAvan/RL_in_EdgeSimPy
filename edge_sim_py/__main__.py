@@ -1908,23 +1908,6 @@ def D_a_RL(parameters):
     Transition = namedtuple('Transition',
                             ('state', 'action', 'next_state', 'reward', 'done'))
 
-    # class ReplayMemory(object):
-    #
-    #     def __init__(self, capacity):
-    #         self.rl_memory = deque([], maxlen=capacity)
-    #
-    #     def push(self, *args):
-    #         """Save a transition"""
-    #         self.rl_memory.append(Transition(*args))
-    #
-    #     def sample(self, batch_size):
-    #         return random.sample(self.rl_memory, batch_size)
-    #
-    #     def __len__(self):
-    #         return len(self.rl_memory)
-
-
-
     class ReplayMemory(object):
         """A prioritized experience replay buffer for reinforcement learning."""
 
