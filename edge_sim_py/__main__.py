@@ -29,6 +29,9 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 import torch.nn.functional as F
+import torch.multiprocessing as mp
+from torch.distributions import Categorical
+
 import csv
 import sys
 from datetime import datetime
