@@ -1983,7 +1983,6 @@ def wrapped_Service_Provisioning(parameters, algorithm_name=scheduling_algorithm
     # result = algorithm_functions[algorithm_name](parameters)
     # process = psutil.Process(os.getpid())
     # resource_tracker.update(process.memory_info().rss)
-    multiprocessing.freeze_support()  # Only needed for frozen executables
     # for testing RL for 31 runs
     # Get the function based on the algorithm name
     for i in range(31):
