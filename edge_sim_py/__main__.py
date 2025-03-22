@@ -45,6 +45,9 @@ import csv
 import sys
 from datetime import datetime
 
+import builtins
+sys.modules['__builtin__'] = builtins
+
 ## [for server which poses GPU
 import GPUtil
 import nvidia_smi
@@ -1787,14 +1790,67 @@ def a_RL(parameters):
 ## Distributed Agile (DaRL) implementation ##
 #############################################
 def D_a_RL(parameters):
+    import dill
+    import multiprocessing.reduction as reduction
+    dill.settings['recurse'] = True
+    reduction.ForkingPickler = dill.Pickler
     EdgeServer.has_capacity_to_host = has_capacity_to_host_proposed
-    # Instantiate your resource tracker (ensure ResourceTracker is defined or imported)
     resource_tracker = ResourceTracker()
 
+    # Define hyperparameters early so nested functions can access them
+    BATCH_SIZE = 1024
+    GAMMA = 0.995
+    EPS_START = 1.0
+    EPS_END = 0.05
+    EPS_DECAY = 5000
+    TAU = 0.005
+    LR = 5e-4
+    NUM_PROCESSES = 4
+
+    sliding_window = 20  ## is due to checking the wireless_delay_fluctuation
+    objective_value_threshold = 0.98  ## Determining a threshold for the 'hit-ratio' objective  ## was
+    average_value_for_allocation, total_allocations_records = [], []
+    num_completely_scheduled = 0
+    steps_done = 0
+    num_states = 0
+    edf_service_history = []
+    Hist_is_service_allocated_before = []
+    response_time_deadline_log_dict = {}
+    selected_task_log_dict = {}
+
+    hi_from_edf = 0
+    hi_from_dl_decision = 0
+
+    def edf_idx(): # Check the earliest unassigned tasks until now! Returns:  index of the service
+        nonlocal edf_service_history
+        # Sort users by their minimum delay_sla in ascending order
+        sorted_users = sorted(User.all(), key=lambda user: min(user.delay_slas.values()))
+        selected_users_def_edf_idx = []
+        for user in sorted_users:
+            # Iterate through the user's services to check for unallocated services
+            for service_edf in user.applications[0].services:
+                if service_edf.server != servers and not service_edf.being_provisioned:
+                    # User has at least one unallocated service
+                    selected_users_def_edf_idx.append(user)
+                    break  # Move to the next user once an unallocated service is found
+
+            # Stop if the required number of users is reached
+            if len(selected_users_def_edf_idx) >= (len(User.all())):
+                break
+
+        for a in selected_users_def_edf_idx:
+            for service_edf in a.applications[0].services:
+                # if service_edf.id not in edf_service_history:
+                #     edf_service_history.append(service_edf.id)
+                #     return service_edf.id
+                return service_edf.id
+
     # Define your Transition namedtuple
+    from collections import namedtuple, deque
     Transition = namedtuple('Transition', ('state', 'action', 'next_state', 'reward', 'done'))
 
     # Define ReplayMemory locally
+    import numpy as np
     class ReplayMemory:
         def __init__(self, capacity: int, alpha: float = 0.6, epsilon: float = 1e-5):
             self.capacity = capacity
@@ -1834,6 +1890,9 @@ def D_a_RL(parameters):
             return len(self.memory)
 
     # Define DQN locally
+    import torch
+    import torch.nn as nn
+    import torch.nn.functional as F
     class DQN(nn.Module):
         def __init__(self, n_observations, n_actions):
             super(DQN, self).__init__()
@@ -1847,6 +1906,8 @@ def D_a_RL(parameters):
             return self.layer3(x)
 
     # Define WorkerLogic locally
+    import random, math
+    from itertools import count
     class WorkerLogic:
         @staticmethod
         def run(worker_id, global_policy_net, global_target_net, global_optimizer,
@@ -1856,47 +1917,91 @@ def D_a_RL(parameters):
             local_memory = ReplayMemory(500000)
             steps_done = 0
 
-            # Define local helper functions as nested functions
+            # Nested helper function to select an action using epsilon-greedy policy
             def select_action(state):
-                nonlocal steps_done
+                nonlocal steps_done, num_states, hi_from_edf, hi_from_dl_decision
                 sample = random.random()
-                eps_threshold = EPS_END + (EPS_START - EPS_END) * math.exp(-1. * steps_done / EPS_DECAY)
+                eps_threshold = EPS_END + (EPS_START - EPS_END) * \
+                                math.exp(-1. * steps_done / EPS_DECAY)
                 steps_done += 1
-                with torch.no_grad():
-                    output = local_policy_net(state)
-                # For simplicity, choose the max action; you can add your logic here
-                return output.max(1).indices.view(1, 1)
+                num_states += 1
+
+                unassigned_services_indices = [
+                    1 if service.server == server or service.being_provisioned else 0
+                    for service in Service.all()
+                ]
+
+                servers_range_indices = list(range(1, len(EdgeServer.all()) + 1))
+
+                output = policy_net(state)
+
+                if not unassigned_services_indices:
+                    raise ValueError("No unassigned tasks available for selection.")
+
+                if sample > eps_threshold:
+                    with (torch.no_grad()):
+                        hi_from_dl_decision += 1
+                        # Exploitation: Choose the best action based on policy_net
+                        # Restricting to unassigned tasks is not necessary for exploitation
+                        # print(selected_task_log_dict)
+
+                        if f"{int(map_action_to_task_server(policy_net(state).max(1).indices.view(1, 1).item())[0][0])}-{int(map_action_to_task_server(policy_net(state).max(1).indices.view(1, 1).item())[0][1])}" in selected_task_log_dict:
+
+                            red_act = 2
+                            while (
+                                    f"{int(map_action_to_task_server(policy_net(state).topk(red_act, dim=1).indices[0, (red_act - 1)].item())[0][0])}-{int(map_action_to_task_server(policy_net(state).topk(red_act, dim=1).indices[0, (red_act - 1)].item())[0][1])}" in selected_task_log_dict):
+                                red_act += 1
+                            # print(f"select_action: {int(map_action_to_task_server(policy_net(state).topk(red_act, dim=1).indices[0, (red_act-1)].item())[0][0])}")
+                            # print(selected_task_log_dict)
+                            return map_action_to_task_server(
+                                policy_net(state).topk(red_act, dim=1).indices[0, (red_act - 1)].item())
+                        else:
+                            # print(
+                            #     f"ELSE_select_action: {int(map_action_to_task_server(policy_net(state).max(1).indices.view(1, 1).item())[0][0])}")
+                            # print(f"else{selected_task_log_dict}")
+                            return map_action_to_task_server(policy_net(state).max(1).indices.view(1, 1).item())
+
+                else:
+                    hi_from_edf += 1
+                    # Exploration: Randomly select from unassigned tasks
+                    edf_service_idx = edf_idx()
+                    # while (edf_service_idx in selected_task_log_dict):
+                    #     edf_service_idx += 1
+                    # if (edf_service_idx > 262):
+                    #     edf_service_idx = 262
+                    # if (edf_service_idx in selected_task_log_dict):
+                    #     print(f"redundant_edf_service_idx: {edf_service_idx}")
+                    # else:
+                    #     print(f"edf_service_idx: {edf_service_idx}")
+                    edf_server_idx = random.randint(1, len(servers_range_indices))
+
+                    while (f"{edf_service_idx}-{edf_server_idx}" in selected_task_log_dict):
+                        seed_edf_service_idx = [x for x in range(1, 262) if x != int(edf_service_idx)]
+                        seed_edf_server_idx = [x for x in range(1, 4) if x != int(edf_server_idx)]
+
+                        edf_service_idx = random.choice(seed_edf_service_idx)
+                        edf_server_idx = random.choice(seed_edf_server_idx)
+
+                    return torch.tensor([[edf_service_idx, edf_server_idx]], device=device, dtype=torch.long)
 
             def optimize_model():
-                # Your model optimization code here
+                # Placeholder: implement your optimization steps here.
                 pass
 
-            # Dummy loop for episodes (replace with your actual logic)
             num_episodes = 500  # or 2500 depending on device availability
             for i_episode in range(num_episodes):
                 local_policy_net.load_state_dict(global_policy_net.state_dict())
                 state = torch.tensor([0, 0], dtype=torch.float32, device=device).unsqueeze(0)
                 for t in count():
                     action = select_action(state)
-                    # Insert your logic: action execution, reward calculation, etc.
+                    # Insert your logic for action execution, reward calculation, etc.
                     optimize_model()
-                    # For demonstration, break out of the loop after one iteration
+                    # For demonstration, break out of the inner loop after one iteration.
                     break
-                print(f"Worker {worker_id} | Episode {i_episode} complete.")
-            print(f"Worker {worker_id} finished execution.")
-
-    # Hyperparameters (local definitions)
-    BATCH_SIZE = 1024
-    GAMMA = 0.995
-    EPS_START = 1.0
-    EPS_END = 0.05
-    EPS_DECAY = 5000
-    TAU = 0.005
-    LR = 5e-4
-    NUM_PROCESSES = 4
+                # print(f"Worker {worker_id} | Episode {i_episode} complete.")
+            # print(f"Worker {worker_id} finished execution.")
 
     # Create global shared models using your local DQN
-    # (Assuming Service.all() and EdgeServer.all() are available in your environment)
     n_actions = len(Service.all()) * len(EdgeServer.all())
     n_observations = 2  # [task, server]
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -1905,9 +2010,11 @@ def D_a_RL(parameters):
     global_policy_net.share_memory()
     global_target_net.share_memory()
     global_target_net.load_state_dict(global_policy_net.state_dict())
+    import torch.optim as optim
     global_optimizer = optim.AdamW(global_policy_net.parameters(), lr=LR, amsgrad=True)
 
     # Set multiprocessing start method and spawn processes
+    import torch.multiprocessing as mp
     mp.set_start_method('spawn', force=True)
     processes = []
     for i in range(NUM_PROCESSES):
@@ -1978,6 +2085,7 @@ scheduling_algorithm = "D_a_RL"
 
 # @measure_memory
 def wrapped_Service_Provisioning(parameters, algorithm_name=scheduling_algorithm):
+    # multiprocessing.freeze_support()  # Useful for frozen executables
     # # for normal running
     # # Get the function based on the algorithm name
     # result = algorithm_functions[algorithm_name](parameters)
@@ -1993,40 +2101,44 @@ def wrapped_Service_Provisioning(parameters, algorithm_name=scheduling_algorithm
     resource_tracker.update(process.memory_info().rss)
     return result
 
+### following should be in main file ? ###
+# Ensure that all process-spawning code is under this guard:
+if __name__ == '__main__':
+    # multiprocessing.freeze_support()  # Recommended to be here as well
 
-logs_directory = f"logs/algorithm={scheduling_algorithm};dataset=dataset1;"  ## dataset
+    logs_directory = f"logs/algorithm={scheduling_algorithm};dataset=dataset1;"  ## dataset
 
-# Creating a Simulator object
-simulator = Simulator(
-    dump_interval=5,
-    tick_duration=1,
-    tick_unit="seconds",
-    stopping_criterion=stopping_criterion,
-    resource_management_algorithm=wrapped_Service_Provisioning,
-    logs_directory=logs_directory,
-)
+    # Creating a Simulator object
+    simulator = Simulator(
+        dump_interval=5,
+        tick_duration=1,
+        tick_unit="seconds",
+        stopping_criterion=stopping_criterion,
+        resource_management_algorithm=wrapped_Service_Provisioning,
+        logs_directory=logs_directory,
+    )
 
-#########################
-## Loading the dataset ##
-#########################
-# Get the directory of the current script
-current_dir = os.path.dirname(__file__)
-# Define the relative path to the dataset, using the script's directory as the base
-dataset_path = os.path.join(current_dir, "dataset_generator", "datasets", "dataset1.json")
-# Initialize the simulator with the absolute path
-simulator.initialize(input_file=dataset_path)
+    #########################
+    ## Loading the dataset ##
+    #########################
+    # Get the directory of the current script
+    current_dir = os.path.dirname(__file__)
+    # Define the relative path to the dataset, using the script's directory as the base
+    dataset_path = os.path.join(current_dir, "dataset_generator", "datasets", "dataset1.json")
+    # Initialize the simulator with the absolute path
+    simulator.initialize(input_file=dataset_path)
 
 
-# Start the timer
-start_time_edgesimpy = time.time()
+    # Start the timer
+    start_time_edgesimpy = time.time()
 
-# Executing the simulation
-simulator.run_model()
+    # Executing the simulation
+    simulator.run_model()
 
-# End the timer and calculate the duration
-end_time_edgesimpy = time.time()
-duration_edgesimpy = end_time_edgesimpy - start_time_edgesimpy
-print(f"Total runtime: {duration_edgesimpy:.2f} seconds")
+    # End the timer and calculate the duration
+    end_time_edgesimpy = time.time()
+    duration_edgesimpy = end_time_edgesimpy - start_time_edgesimpy
+    print(f"Total runtime: {duration_edgesimpy:.2f} seconds")
 
-resource_tracker.final_report()
-file.close()
+    resource_tracker.final_report()
+    file.close()
