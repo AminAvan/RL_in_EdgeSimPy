@@ -1797,6 +1797,9 @@ def D_a_RL(parameters):
     EdgeServer.has_capacity_to_host = has_capacity_to_host_proposed
     resource_tracker = ResourceTracker()
 
+    # for service in Service.all():
+    #     print(f"service is {service}") ## accessible in here
+
     # Define hyperparameters early so nested functions can access them
     BATCH_SIZE = 1024
     GAMMA = 0.995
@@ -1905,17 +1908,33 @@ def D_a_RL(parameters):
             x = F.relu(self.layer2(x))
             return self.layer3(x)
 
+    # for service in Service.all():
+    #     print(f"service is {service}") ### si fine here
+
     # Define WorkerLogic locally
     import random, math
     from itertools import count
+
     class WorkerLogic:
         @staticmethod
-        def run(worker_id, global_policy_net, global_target_net, global_optimizer,
+        def run(worker_id, parameters, global_policy_net, global_target_net, global_optimizer,
                 device, n_observations, n_actions, resource_tracker):
             local_policy_net = DQN(n_observations, n_actions).to(device)
             local_policy_net.train()
             local_memory = ReplayMemory(500000)
             steps_done = 0
+
+            print("Inside WorkerLogic.run()")
+            try:
+                services = Service.all()
+                print(f"Service.all() returned: {services}")
+                for service in services:
+                    print(f"Inside class: service is {service}")
+            except Exception as e:
+                print(f"Error accessing Service.all(): {e}")
+
+            for service in services:
+                print(f"Worker {worker_id}: service is {service}")
 
             # Nested helper function to select an action using epsilon-greedy policy
             def select_action(state):
@@ -1926,16 +1945,33 @@ def D_a_RL(parameters):
                 steps_done += 1
                 num_states += 1
 
-                unassigned_services_indices = [
-                    1 if service.server == server or service.being_provisioned else 0
-                    for service in Service.all()
-                ]
+                # unassigned_services_indices = [
+                #     1 if service.server == server or service.being_provisioned else 0
+                #     for service in Service.all()
+                # ]
+                print("hi before loooop")
+                for service in Service.all():
+                    print(service)
+                    print("hi in loooop")
+
+                print(f"len(User.all()):{len(User.all())}")
+
+                print("hi 1938 loooop")
+                for service in Service.all():
+                    print("hi")
+                    condition = (service.server == server or service.being_provisioned)
+                    print(
+                        f"Service: {service}, service.server: {service.server}, server: {server}, being_provisioned: {service.being_provisioned}, condition: {condition}")
+                    unassigned_services_indices.append(1 if condition else 0)
+
+
 
                 servers_range_indices = list(range(1, len(EdgeServer.all()) + 1))
 
-                output = policy_net(state)
+                output = local_policy_net(state)
 
                 if not unassigned_services_indices:
+                    print(f"unassigned_services_indices:{unassigned_services_indices}")
                     raise ValueError("No unassigned tasks available for selection.")
 
                 if sample > eps_threshold:
@@ -2019,7 +2055,7 @@ def D_a_RL(parameters):
     processes = []
     for i in range(NUM_PROCESSES):
         p = mp.Process(target=WorkerLogic.run, args=(
-            i, global_policy_net, global_target_net, global_optimizer,
+            i, parameters, global_policy_net, global_target_net, global_optimizer,
             device, n_observations, n_actions, resource_tracker))
         p.start()
         processes.append(p)
@@ -2094,7 +2130,6 @@ def wrapped_Service_Provisioning(parameters, algorithm_name=scheduling_algorithm
     # for testing RL for 31 runs
     # Get the function based on the algorithm name
     for i in range(31):
-
         result = algorithm_functions[algorithm_name](parameters)
         BaseStation.fluctuate_wireless_delay(BaseStation)
     process = psutil.Process(os.getpid())
