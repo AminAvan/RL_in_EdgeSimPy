@@ -20,6 +20,7 @@ The original repository of EdgeSimPy can be found [here](https://github.com/Edge
 | TensorFlow | 33×10⁶ | 1,024 | 1,857.6 |
 
 > \* Required processor cycles for 1 MB of the service's workload per second.
+
 > \† P. S. Souza, T. Ferreto, and R. N. Calheiros, “Edgesimpy: Python- based modeling and simulation of edge computing resource management policies,” Future Generation Computer Systems, vol. 148, pp. 446–459, 2023.
 
 
