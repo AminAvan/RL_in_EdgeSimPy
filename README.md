@@ -3,6 +3,25 @@
 # Overview
 The original repository of EdgeSimPy can be found [here](https://github.com/EdgeSimPy/EdgeSimPy). We have added features to the original source code, developing it into a framework for testing and experimenting with scheduling algorithms for real-time applications in edge computing.
 
+## Characterization of Edge-users' Offloaded Tasks
+| **Service** | **Processor*** | **RAM (MB)** | **Storage (MB)** |
+|---|---|---|---|
+| Nginx | 3,500 | 60 | 187.8 |
+| Alpine Linux | 5,500 | 60 | 7.8 |
+| Redis | 15×10³ | 60 | 116.92 |
+| Aerospike | 20×10³ | 250 | 210.9 |
+| Ubuntu | 25×10³ | 350 | 78.1 |
+| Envoy | 25×10³ | 150 | 205 |
+| Apache Kafka | 25×10³ | 350 | 650 |
+| Python | 30×10³ | 60 | 1,020.1 |
+| MobileNetSSD | 90×10³ | 450 | 1,473.5 |
+| YOLOv8 | 25×10⁴ | 800 | 14,171.45 |
+| PyTorch | 3×10⁶ | 1,024 | 7,603.9 |
+| TensorFlow | 33×10⁶ | 1,024 | 1,857.6 |
+
+> \* Required processor cycles for 1 MB of the service's workload per second.
+
+
 
 ## Required Packages
 All packages required by EdgeSimPy are listed in the [pyproject.toml](pyproject.toml) file, which should be installed using [Poetry](https://python-poetry.org/) in Python.
