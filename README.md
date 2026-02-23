@@ -6,7 +6,7 @@ The original repository of EdgeSimPy can be found [here](https://github.com/Edge
 ## Network Topology
 <figure align="center">
   <img src="topozone.png" alt="Network Topology" width="600"/>
-  <figcaption><b>Figure 1. Network topology of the Edge Computing (EC) environment.</b> The EC infrastructure comprises 22 BSs, each covering a distinct area and equipped with a network switch for wired connectivity. Red circles represent BSs hosting edge-servers.</figcaption>
+  <figcaption><b>Fig: Network topology of the Edge Computing (EC) environment.</b> The EC infrastructure comprises 22 BSs, each covering a distinct area and equipped with a network switch for wired connectivity. Red circles represent BSs hosting edge-servers.</figcaption>
 </figure>
 
 ## Characterization of Edge-users' Offloaded Tasks<sup>†</sup>
