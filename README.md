@@ -23,7 +23,15 @@ The original repository of EdgeSimPy can be found [here](https://github.com/Edge
 
 > <sup>†</sup> P. S. Souza, T. Ferreto, and R. N. Calheiros, “Edgesimpy: Python- based modeling and simulation of edge computing resource management policies,” Future Generation Computer Systems, vol. 148, pp. 446–459, 2023.
 
+## Characterization of Edge-servers <sup>†</sup>
 
+| **Name** | **Clock Frequency (GHz)** | **Number of Cores** | **RAM (GB)** | **Storage (GB)** |
+|---|---|---|---|---|
+| NVIDIA Jetson TX2 | 1.479 | 4 | 8 | 32 |
+| Intel E5430 | 2.66 | 8 | 16 | 131 |
+| Intel E5645 | 2.4 | 12 | 16 | 131 |
+
+> <sup>†</sup> P. S. Souza, T. Ferreto, and R. N. Calheiros, "Edgesimpy: Python-based modeling and simulation of edge computing resource management policies," *Future Generation Computer Systems*, vol. 148, pp. 446–459, 2023.
 
 ## Required Packages
 All packages required by EdgeSimPy are listed in the [pyproject.toml](pyproject.toml) file, which should be installed using [Poetry](https://python-poetry.org/) in Python.
