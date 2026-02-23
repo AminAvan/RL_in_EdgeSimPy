@@ -3,8 +3,7 @@
 # Overview
 The original repository of EdgeSimPy can be found [here](https://github.com/EdgeSimPy/EdgeSimPy). We have added features to the original source code, developing it into a framework for testing and experimenting with scheduling algorithms for real-time applications in edge computing.
 
-## **MDP size with and without pruning.** Graph size is defined as |V|+|E|. Size reduction is calculated by comparing the conventional and pruned MDPs.
-
+## MDP size with and without pruning <sup>‡</sup>
 | **Edge Computing** | | **Conventional MDP Graph** | | **Pruned MDP Graph** | | **Graph Size** |
 |---|---|---|---|---|---|---|
 | **Tasks** | **Servers** | **Vertices** | **Edges** | **Vertices** | **Edges** | **Reduction** |
@@ -18,6 +17,8 @@ The original repository of EdgeSimPy can be found [here](https://github.com/Edge
 | 256 | 2 | 2<sup>512</sup> | ≈2<sup>1023</sup> | ≈2<sup>257</sup> | ≈2<sup>257</sup> | ≈99% |
 | 512 | 2 | 2<sup>1024</sup> | ≈2<sup>2047</sup> | ≈2<sup>513</sup> | ≈2<sup>513</sup> | ≈99% |
 | 1024 | 2 | 2<sup>2048</sup> | ≈2<sup>4095</sup> | ≈2<sup>1025</sup> | ≈2<sup>1025</sup> | ≈99% |
+
+> <sup>‡</sup> Graph size is defined as |V|+|E|. Size reduction is calculated by comparing the conventional and pruned MDPs.
 
 ## Network Topology
 <figure align="center">
