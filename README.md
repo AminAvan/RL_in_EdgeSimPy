@@ -4,9 +4,10 @@
 The original repository of EdgeSimPy can be found [here](https://github.com/EdgeSimPy/EdgeSimPy). We have added features to the original source code, developing it into a framework for testing and experimenting with scheduling algorithms for real-time applications in edge computing.
 
 ## Network Topology
-![Network Topology](topozone.png)
-
-*Network topology of the Edge Computing (EC) environment.*
+<figure align="center">
+  <img src="topozone.png" alt="Network Topology" width="600"/>
+  <figcaption><b>Figure 1. Network topology of the Edge Computing (EC) environment.</b> The EC infrastructure comprises 22 BSs, each covering a distinct area and equipped with a network switch for wired connectivity. Red circles represent BSs hosting edge-servers.</figcaption>
+</figure>
 
 ## Characterization of Edge-users' Offloaded Tasks<sup>†</sup>
 | **Service** | **Processor*** | **RAM (MB)** | **Storage (MB)** |
