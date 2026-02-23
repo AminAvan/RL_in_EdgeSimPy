@@ -5,6 +5,7 @@ The original repository of EdgeSimPy can be found [here](https://github.com/Edge
 
 ## Network Topology
 ![Network Topology](topozone.png)
+
 *Network topology of the Edge Computing (EC) environment.*
 
 ## Characterization of Edge-users' Offloaded Tasks<sup>†</sup>
