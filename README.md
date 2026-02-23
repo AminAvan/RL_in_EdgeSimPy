@@ -4,8 +4,6 @@
 The original repository of EdgeSimPy can be found [here](https://github.com/EdgeSimPy/EdgeSimPy). We have added features to the original source code, developing it into a framework for testing and experimenting with scheduling algorithms for real-time applications in edge computing.
 
 ## MDP size with and without pruning <sup>‡</sup>
-markdown**MDP size with and without pruning.** Graph size is defined as |V|+|E|. Size reduction is calculated by comparing the conventional and pruned MDPs.
-
 <table align="center">
   <thead>
     <tr>
